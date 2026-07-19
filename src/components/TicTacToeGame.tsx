@@ -236,7 +236,7 @@ export default function TicTacToeGame({
       >
         <div className="flex items-center justify-center gap-4">
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-lime-500/50" />
-          <h1 className="text-5xl font-black tracking-tighter text-white italic">
+          <h1 className="text-5xl font-black tracking-tighter text-foreground italic">
             ARENA<span className="text-lime-500">.</span>
           </h1>
           <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-emerald-500/50" />
@@ -254,9 +254,9 @@ export default function TicTacToeGame({
           highlight={currentPlayer === "X"}
         />
         <div className="flex flex-col items-center gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
-          <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-          <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+          <div className="w-1.5 h-1.5 rounded-full bg-muted" />
+          <div className="w-1.5 h-1.5 rounded-full bg-muted" />
+          <div className="w-1.5 h-1.5 rounded-full bg-muted" />
         </div>
         <ScoreCard
           label={t.scoreO}
@@ -276,12 +276,12 @@ export default function TicTacToeGame({
               exit={{ opacity: 0, y: -10 }}
               className="flex flex-col items-center gap-3"
             >
-              <div className="px-8 py-3 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-2xl flex items-center gap-4">
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">
+              <div className="px-8 py-3 rounded-2xl bg-muted/30 border border-border backdrop-blur-xl shadow-2xl flex items-center gap-4">
+                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                   {t.turn}
                 </span>
                 <span
-                  className={`inline-flex items-center justify-center w-10 h-10 rounded-xl font-black text-xl shadow-inner ${currentPlayer === "X" ? "bg-lime-500 text-black shadow-lime-500/20" : "bg-emerald-500 text-white shadow-emerald-500/20"}`}
+                  className={`inline-flex items-center justify-center w-10 h-10 rounded-xl font-black text-xl shadow-inner ${currentPlayer === "X" ? "bg-lime-500 text-black shadow-lime-500/20" : "bg-emerald-500 text-foreground shadow-emerald-500/20"}`}
                 >
                   {currentPlayer}
                 </span>
@@ -290,7 +290,7 @@ export default function TicTacToeGame({
                 <motion.span
                   animate={{ opacity: [0.4, 1, 0.4] }}
                   transition={{ duration: 2, repeat: Infinity }}
-                  className={`text-[9px] font-black uppercase tracking-[0.3em] ${currentPlayer === mySymbol ? "text-lime-400" : "text-white/20"}`}
+                  className={`text-[9px] font-black uppercase tracking-[0.3em] ${currentPlayer === mySymbol ? "text-lime-400" : "text-muted-foreground"}`}
                 >
                   {currentPlayer === mySymbol ? t.yourTurn : t.waiting}
                 </motion.span>
@@ -307,7 +307,7 @@ export default function TicTacToeGame({
               className="text-center"
             >
               <div
-                className={`inline-block px-12 py-4 rounded-2xl font-black text-xl border-2 backdrop-blur-3xl shadow-2xl ${winner === "draw" ? "bg-white/5 text-white/60 border-white/10" : winner === "X" ? "bg-lime-500/10 text-lime-400 border-lime-500/30 shadow-lime-500/10" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-emerald-500/10"}`}
+                className={`inline-block px-12 py-4 rounded-2xl font-black text-xl border-2 backdrop-blur-3xl shadow-2xl ${winner === "draw" ? "bg-muted/50 text-muted-foreground border-border" : winner === "X" ? "bg-lime-500/10 text-lime-400 border-lime-500/30 shadow-lime-500/10" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-emerald-500/10"}`}
               >
                 {winner === "draw"
                   ? t.drawResult
@@ -326,7 +326,7 @@ export default function TicTacToeGame({
         {/* Board Shadow Glow */}
         <div className="absolute inset-0 bg-lime-500/5 blur-[100px] rounded-full opacity-0 group-hover/board:opacity-100 transition-opacity duration-1000" />
 
-        <div className="grid grid-cols-3 gap-5 p-6 rounded-[56px] border border-white/10 bg-white/[0.02] backdrop-blur-3xl relative">
+        <div className="grid grid-cols-3 gap-5 p-6 rounded-[56px] border border-border bg-muted/30 backdrop-blur-3xl relative">
           {board.map((cell, index) => (
             <Cell
               key={index}
@@ -349,7 +349,7 @@ export default function TicTacToeGame({
           <HeroButton
             onClick={onQuit}
             variant="outline"
-            className="flex-1 py-5 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white"
+            className="flex-1 py-5 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-foreground"
           >
             <LogOut className="w-4 h-4" />
             {t.quit}
@@ -393,10 +393,10 @@ function ScoreCard({
       ? "text-lime-400"
       : color === "o"
         ? "text-emerald-400"
-        : "text-white/40";
+        : "text-muted-foreground";
   return (
     <div
-      className={`flex-1 flex flex-col items-center gap-2 py-6 rounded-[32px] bg-white/[0.02] border transition-all duration-700 backdrop-blur-2xl ${highlight ? "border-white/20 bg-white/5 scale-105 shadow-2xl" : "border-white/5 opacity-30"}`}
+      className={`flex-1 flex flex-col items-center gap-2 py-6 rounded-[32px] bg-muted/30 border transition-all duration-700 backdrop-blur-2xl ${highlight ? "border-border bg-muted/50 scale-105 shadow-2xl" : "border-border opacity-30"}`}
     >
       <span
         className={`text-[9px] font-black uppercase tracking-[0.3em] ${colorClass}`}
@@ -407,7 +407,7 @@ function ScoreCard({
         key={score}
         initial={{ scale: 1.5, filter: "blur(10px)" }}
         animate={{ scale: 1, filter: "blur(0px)" }}
-        className="text-4xl font-black text-white tracking-tighter italic"
+        className="text-4xl font-black text-foreground tracking-tighter italic"
       >
         {score}
       </motion.span>
@@ -437,7 +437,7 @@ function Cell({
       }
       whileTap={isClickable ? { scale: 0.94 } : {}}
       onClick={onClick}
-      className={`relative w-24 h-24 sm:w-32 sm:h-32 rounded-[32px] flex items-center justify-center text-6xl font-black transition-all border-2 ${isClickable ? "cursor-pointer bg-white/[0.03] border-white/5 hover:border-white/20" : "cursor-default bg-black/20 border-white/[0.02]"} ${isWinning ? "bg-white/10 border-white shadow-[0_0_50px_rgba(255,255,255,0.1)] z-10 scale-105" : ""}`}
+      className={`relative w-24 h-24 sm:w-32 sm:h-32 rounded-[32px] flex items-center justify-center text-6xl font-black transition-all border-2 ${isClickable ? "cursor-pointer bg-muted/30 border-border hover:border-border" : "cursor-default bg-foreground/10 border-border"} ${isWinning ? "bg-muted border-white shadow-[0_0_50px_rgba(255,255,255,0.1)] z-10 scale-105" : ""}`}
     >
       <AnimatePresence mode="wait">
         {value && (
@@ -459,7 +459,7 @@ function Cell({
       </AnimatePresence>
       {/* Corner Accents */}
       {!value && isClickable && (
-        <div className="absolute inset-2 border border-white/[0.02] rounded-[24px] opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-2 border border-border rounded-[24px] opacity-0 group-hover:opacity-100 transition-opacity" />
       )}
     </motion.button>
   );

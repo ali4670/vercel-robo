@@ -72,7 +72,7 @@ export const Hero: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${isAr ? "justify-end" : "justify-start"}`}
             >
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-muted/50 border border-border backdrop-blur-md">
                 <Zap className="w-3 h-3 text-lime-400 fill-lime-400" />
                 <span className="text-[10px] font-black text-white/80 uppercase tracking-widest">
                   {t.badge}
@@ -97,7 +97,7 @@ export const Hero: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="space-y-4"
             >
-              <p className="max-w-lg text-lg text-white/60 leading-relaxed font-light">
+              <p className="max-w-lg text-lg text-muted-foreground leading-relaxed font-light">
                 {t.description}
               </p>
               <div
@@ -158,7 +158,7 @@ export const Hero: React.FC = () => {
             transition={{ delay: 0.4 }}
             className="relative group hidden lg:block"
           >
-            <div className="relative p-12 rounded-[64px] bg-white/[0.02] border border-white/10 backdrop-blur-3xl shadow-2xl">
+            <div className="relative p-12 rounded-[64px] bg-muted/30 border border-border backdrop-blur-3xl shadow-2xl">
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-lime-500/20 rounded-full blur-[120px] pointer-events-none" />
               <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-500/20 rounded-full blur-[120px] pointer-events-none" />
 
@@ -177,7 +177,7 @@ export const Hero: React.FC = () => {
                     <p className="text-yellow-400 text-[10px] font-black uppercase tracking-widest">
                       Employee of the Month
                     </p>
-                    <p className="text-white/60 text-[8px] font-bold uppercase tracking-widest">
+                    <p className="text-muted-foreground text-[8px] font-bold uppercase tracking-widest">
                       WORLD CHAMPION
                     </p>
                   </div>
@@ -190,10 +190,10 @@ export const Hero: React.FC = () => {
                     <Target className="w-10 h-10 text-lime-400" />
                   </div>
                   <div>
-                    <h3 className="text-4xl font-black text-white italic tracking-tighter uppercase">
+                    <h3 className="text-4xl font-black text-foreground italic tracking-tighter uppercase">
                       2.4M+
                     </h3>
-                    <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em]">
+                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em]">
                       {t.statsTitle}
                     </p>
                   </div>
@@ -203,10 +203,10 @@ export const Hero: React.FC = () => {
                   <div
                     className={`flex justify-between text-[10px] font-black uppercase tracking-widest ${isAr ? "flex-row-reverse" : ""}`}
                   >
-                    <span className="text-white/40">{t.clientSat}</span>
+                    <span className="text-muted-foreground">{t.clientSat}</span>
                     <span className="text-lime-500">99.9%</span>
                   </div>
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                  <div className="h-2 w-full bg-muted/50 rounded-full overflow-hidden border border-border">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: "99.9%" }}
@@ -226,12 +226,12 @@ export const Hero: React.FC = () => {
                   ].map((stat, i) => (
                     <div
                       key={i}
-                      className="flex flex-col items-center p-4 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md"
+                      className="flex flex-col items-center p-4 rounded-3xl bg-muted/50 border border-border backdrop-blur-md"
                     >
-                      <span className="text-lg font-black text-white italic">
+                      <span className="text-lg font-black text-foreground italic">
                         {stat.v}
                       </span>
-                      <span className="text-[8px] uppercase tracking-widest text-white/30 font-black">
+                      <span className="text-[8px] uppercase tracking-widest text-muted-foreground font-black">
                         {stat.l}
                       </span>
                     </div>
@@ -259,7 +259,7 @@ export const Hero: React.FC = () => {
             transition={{ delay: 0.4 }}
             className="relative group lg:hidden mt-8"
           >
-            <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/10 backdrop-blur-3xl">
+            <div className="p-6 rounded-3xl bg-muted/30 border border-border backdrop-blur-3xl">
               {/* Employee of the Month Card (Simplified) */}
               <div
                 className={`p-4 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 flex items-center gap-3 ${isAr ? "flex-row-reverse text-right" : ""}`}
@@ -285,7 +285,7 @@ export const Hero: React.FC = () => {
       <motion.div
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-12 flex flex-col items-center gap-2 text-white/20 z-20"
+        className="absolute bottom-12 flex flex-col items-center gap-2 text-muted-foreground z-20"
       >
         <span className="text-[10px] font-black uppercase tracking-widest">
           {t.scroll}

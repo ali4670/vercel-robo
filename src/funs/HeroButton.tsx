@@ -24,8 +24,8 @@ export const HeroButton: React.FC<HeroButtonProps> = ({
     secondary:
       "bg-lime-500 text-black hover:bg-lime-400 shadow-xl shadow-lime-500/20",
     outline:
-      "bg-white/5 border border-white/10 text-white hover:bg-white/10 backdrop-blur-md",
-    ghost: "bg-transparent text-white/40 hover:text-white hover:bg-white/5",
+      "bg-muted/50 border border-border text-foreground hover:bg-muted backdrop-blur-md",
+    ghost: "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50",
   };
 
   const sizes = {

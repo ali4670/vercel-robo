@@ -453,6 +453,23 @@ CREATE POLICY "Manage profiles" ON profiles FOR UPDATE USING (auth.uid() = id OR
 DROP POLICY IF EXISTS "Admins full access" ON profiles;
 CREATE POLICY "Admins full access" ON profiles FOR ALL USING (is_admin());
 
+-- Prevent moderators from promoting users to admin via trigger
+CREATE OR REPLACE FUNCTION prevent_moderator_admin_promotion()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NOT is_admin() AND NEW.role = 'admin' THEN
+    RAISE EXCEPTION 'Moderators cannot promote users to admin';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS trg_prevent_admin_promotion ON profiles;
+CREATE TRIGGER trg_prevent_admin_promotion
+  BEFORE UPDATE OF role ON profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION prevent_moderator_admin_promotion();
+
 -- Levels
 DROP POLICY IF EXISTS "View levels" ON levels;
 CREATE POLICY "View levels" ON levels FOR SELECT USING (is_moderator() OR (is_published = true AND has_level_access(id)));
@@ -593,3 +610,11 @@ CREATE INDEX IF NOT EXISTS idx_exam_responses_attempt_id ON exam_responses(attem
 CREATE INDEX IF NOT EXISTS idx_level_access_user_id ON level_access(user_id);
 CREATE INDEX IF NOT EXISTS idx_level_chats_level_id ON level_chats(level_id);
 CREATE INDEX IF NOT EXISTS idx_internal_tasks_assigned_to ON internal_tasks(assigned_to_id);
+
+-- 8. PER-LECTURE CHAT ROOMS
+-- Adds lecture_id to level_chats so each lecture can have its own chat thread.
+-- Existing messages (lecture_id = NULL) remain as level-wide classroom chat.
+----------------------------------------------------------------
+ALTER TABLE level_chats ADD COLUMN IF NOT EXISTS lecture_id UUID REFERENCES lectures(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_level_chats_lecture_id ON level_chats(lecture_id);
+

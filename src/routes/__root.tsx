@@ -3,7 +3,6 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
-  useRouter,
 } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -11,39 +10,49 @@ import {
   User as UserIcon,
   LogOut,
   Shield,
-  MessageSquare,
+  Moon,
+  Sun,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { LanguageProvider, useLanguage } from "../lib/LanguageContext";
+import { ThemeProvider, useTheme } from "../lib/ThemeContext";
 import { AuthProvider, useAuth } from "../hooks/use-auth";
 import { AuthModal } from "../components/AuthModal";
 import { ProfileEdit } from "../components/ProfileEdit";
 import { HeroButton } from "../funs/HeroButton";
 import { Component as Footer } from "../components/ui/footer-taped-design";
 
-function Header() {
+function InnerLayout() {
   const { language, setLanguage, isAr } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const { user, profile, signOut, isAdmin, isModerator } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl bg-black/40 border-b border-white/5">
+      <header className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-4 md:px-6 py-3 md:py-4 backdrop-blur-xl bg-background/80 border-b border-border transition-colors duration-300">
         <Link
           to="/"
-          className="text-xl md:text-2xl font-black text-white tracking-tighter italic"
+          className="flex items-center gap-2"
         >
-          ROBOTICS-CLUB<span className="text-[#CCFF00]">.</span>
+          <img
+            src="/logo-2026, 12_38_18 PM.png"
+            alt="ROBOTICS-CLUB"
+            className="h-9 w-9 md:h-10 md:w-10 rounded-full object-cover ring-2 ring-primary/30"
+          />
+          <span className="text-xl md:text-2xl font-black text-foreground tracking-tighter italic">
+            ROBOTICS-CLUB<span className="text-primary">.</span>
+          </span>
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Link to="/levels">
             <HeroButton
               size="sm"
               variant="outline"
-              className="px-4 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/10"
+              className="px-4 border-border text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-200"
             >
               <Globe className="w-3.5 h-3.5 mr-2" />
               <span className="text-[10px] font-black uppercase tracking-widest">
@@ -51,85 +60,117 @@ function Header() {
               </span>
             </HeroButton>
           </Link>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="relative flex items-center justify-center w-9 h-9 rounded-full border border-border bg-muted hover:bg-accent/10 transition-all duration-200 group"
+            aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {theme === "light" ? (
+                <motion.span
+                  key="moon"
+                  initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center justify-center"
+                >
+                  <Moon className="w-4 h-4 text-foreground" />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="sun"
+                  initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center justify-center"
+                >
+                  <Sun className="w-4 h-4 text-primary" />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+
+          {/* Language Toggle */}
           <button
             onClick={() => setLanguage(language === "en" ? "ar" : "en")}
-            className="flex items-center gap-2 px-3 h-9 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-all group"
+            className="flex items-center gap-2 px-3 h-9 rounded-full border border-border bg-muted hover:bg-accent/10 transition-all duration-200 group"
           >
             <span
-              className={`text-[9px] font-black transition-colors ${language === "en" ? "text-[#CCFF00]" : "text-white/20"}`}
+              className={`text-[9px] font-black transition-colors ${language === "en" && !isAr ? "text-primary" : "text-muted-foreground"}`}
             >
               EN
             </span>
-            <div className="w-7 h-3.5 rounded-full bg-black/40 border border-white/10 relative">
+            <div className="w-7 h-3.5 rounded-full bg-background border border-border relative overflow-hidden">
               <motion.div
-                animate={{ x: language === "ar" ? (isAr ? -14 : 14) : 0 }}
-                className="absolute top-0.5 left-0.5 w-2 h-2 rounded-full bg-[#CCFF00] shadow-[0_0_8px_rgba(204,255,0,0.5)]"
+                animate={{ x: language === "ar" ? 14 : 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                className="absolute top-0.5 left-0.5 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(112,224,0,0.5)]"
               />
             </div>
             <span
-              className={`text-[9px] font-black transition-colors ${language === "ar" ? "text-[#CCFF00]" : "text-white/20"}`}
+              className={`text-[9px] font-black transition-colors ${language === "ar" ? "text-primary" : "text-muted-foreground"}`}
             >
               AR
             </span>
           </button>
+
           {user ? (
             <div
-              className={`flex items-center gap-4 ${isAr ? "flex-row-reverse" : ""}`}
+              className={`flex items-center gap-3 ${isAr ? "flex-row-reverse" : ""}`}
             >
-              <div className="flex items-center gap-2">
-                {profile?.role === "parent" && (
-                  <Link to="/parent-dashboard">
-                    <HeroButton
-                      size="sm"
-                      variant="outline"
-                      className="px-4 border-purple-500/20 text-purple-400 hover:bg-purple-500/20"
-                    >
-                      <UserIcon className="w-4 h-4 mr-2" />
-                      {isAr ? "لوحة أولياء الأمور" : "Parent Dashboard"}
-                    </HeroButton>
-                  </Link>
+              {profile?.role === "parent" && (
+                <Link to="/parent-dashboard">
+                  <HeroButton
+                    size="sm"
+                    variant="outline"
+                    className="px-4 border-border text-foreground hover:bg-muted transition-all duration-200"
+                  >
+                    <UserIcon className="w-4 h-4 mr-2" />
+                    {isAr ? "لوحة أولياء الأمور" : "Parent"}
+                  </HeroButton>
+                </Link>
+              )}
+              {isModerator && (
+                <Link to="/moderator">
+                  <HeroButton
+                    size="sm"
+                    variant="outline"
+                    className="px-4 border-border text-foreground hover:bg-muted transition-all duration-200"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    {isAr ? "لوحة التحكم" : "Admin"}
+                  </HeroButton>
+                </Link>
+              )}
+              <button
+                onClick={() => setIsProfileEditOpen(true)}
+                className="w-9 h-9 rounded-full overflow-hidden border-2 border-border hover:border-primary transition-all duration-200"
+              >
+                {profile?.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-primary flex items-center justify-center text-primary-foreground font-black text-sm">
+                    {(profile?.username || user.email?.split("@")[0] || "?")
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
                 )}
-                {isModerator && (
-                  <Link to="/moderator">
-                    <HeroButton
-                      size="sm"
-                      variant="outline"
-                      className="px-4 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20"
-                    >
-                      <Shield className="w-4 h-4 mr-2" />
-                      {isAr ? "لوحة التحكم" : "Moderator Panel"}
-                    </HeroButton>
-                  </Link>
-                )}
-                <HeroButton
-                  onClick={() => setIsProfileEditOpen(true)}
-                  size="sm"
-                  variant="outline"
-                  className="w-11 h-11 p-0 rounded-full overflow-hidden border-2 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
-                >
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-black text-sm">
-                      {(profile?.username || user.email?.split("@")[0] || "?")
-                        .charAt(0)
-                        .toUpperCase()}
-                    </div>
-                  )}
-                </HeroButton>
-                <HeroButton
-                  onClick={() => signOut()}
-                  size="sm"
-                  variant="outline"
-                  className="w-10 h-10 p-0 rounded-xl border-red-500/20 text-red-500 hover:bg-red-500/20"
-                >
-                  <LogOut className="w-4 h-4" />
-                </HeroButton>
-              </div>
+              </button>
+              <button
+                onClick={() => signOut()}
+                className="w-9 h-9 rounded-full flex items-center justify-center border border-border text-muted-foreground hover:text-destructive hover:border-destructive/50 hover:bg-destructive/10 transition-all duration-200"
+                aria-label="Sign out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
           ) : (
             <HeroButton
@@ -159,19 +200,27 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <AuthProvider>
-          <div className="min-h-screen bg-background text-foreground">
-            <Header />
-            <main className="pt-20 md:pt-24 min-h-screen">
-              <Outlet />
-            </main>
-            <Footer />
-          </div>
-          <Toaster position="bottom-right" theme="dark" richColors />
-        </AuthProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <ThemeContent />
+      </ThemeProvider>
     </QueryClientProvider>
+  );
+}
+
+function ThemeContent() {
+  return (
+    <LanguageProvider>
+      <AuthProvider>
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+          <InnerLayout />
+          <main className="pt-20 md:pt-24 min-h-screen bg-background transition-colors duration-300">
+            <Outlet />
+          </main>
+          <Footer />
+        </div>
+        <Toaster position="bottom-right" theme="dark" richColors />
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

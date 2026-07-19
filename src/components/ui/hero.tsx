@@ -31,7 +31,7 @@ const SplineScene = lazy(() =>
 const ArrowGreenLeft = () => (
   <svg
     viewBox="0 0 100 100"
-    className="w-full h-full text-[#00a5cfff] stroke-current overflow-visible"
+    className="w-full h-full text-primary stroke-current overflow-visible"
     fill="none"
     strokeWidth="6"
     strokeLinecap="round"
@@ -45,7 +45,7 @@ const ArrowGreenLeft = () => (
 const ArrowGreenRight = () => (
   <svg
     viewBox="0 0 100 100"
-    className="w-full h-full text-[#00a5cfff] stroke-current overflow-visible"
+    className="w-full h-full text-primary stroke-current overflow-visible"
     fill="none"
     strokeWidth="6"
     strokeLinecap="round"
@@ -59,7 +59,7 @@ const ArrowGreenRight = () => (
 const ArrowBlack1 = () => (
   <svg
     viewBox="0 0 100 100"
-    className="w-full h-full text-black stroke-current overflow-visible"
+    className="w-full h-full text-foreground stroke-current overflow-visible"
     fill="none"
     strokeWidth="5"
     strokeLinecap="round"
@@ -73,7 +73,7 @@ const ArrowBlack1 = () => (
 const ArrowBlack2 = () => (
   <svg
     viewBox="0 0 100 100"
-    className="w-full h-full text-black stroke-current overflow-visible"
+    className="w-full h-full text-foreground stroke-current overflow-visible"
     fill="none"
     strokeWidth="5"
     strokeLinecap="round"
@@ -85,7 +85,7 @@ const ArrowBlack2 = () => (
 );
 
 const CircularBadge = () => (
-  <div className="relative w-28 h-28 md:w-36 md:h-36 bg-[#9fffcbff] rounded-full flex items-center justify-center shadow-xl rotate-12 hover:scale-105 transition-transform cursor-pointer border-[3px] border-[#004e64ff]/20">
+  <div className="relative w-28 h-28 md:w-36 md:h-36 bg-primary rounded-full flex items-center justify-center shadow-xl rotate-12 hover:scale-105 transition-transform cursor-pointer border-[3px] border-primary/20">
     <div className="absolute inset-1 animate-[spin_10s_linear_infinite]">
       <svg viewBox="0 0 100 100" className="w-full h-full">
         <path
@@ -95,7 +95,7 @@ const CircularBadge = () => (
         />
         <text
           className="text-[11px] font-black tracking-[0.18em] uppercase"
-          fill="#004e64ff"
+          fill="currentColor"
         >
           <textPath href="#circlePath" startOffset="0%">
             INNOVATING THE FUTURE • ROBOTICS •
@@ -103,10 +103,10 @@ const CircularBadge = () => (
         </text>
       </svg>
     </div>
-    <div className="absolute inset-0 flex items-center justify-center">
+    <div className="absolute inset-0 flex items-center justify-center text-primary-foreground">
       <svg
         viewBox="0 0 100 100"
-        className="w-10 h-10 text-[#004e64ff] stroke-current overflow-visible"
+        className="w-10 h-10 stroke-current overflow-visible"
         fill="none"
         strokeWidth="8"
         strokeLinecap="round"
@@ -164,24 +164,17 @@ export const Component = () => {
       <nav className="relative z-20 flex items-center justify-between px-6 py-6 md:px-10 md:py-8 max-w-[1440px] mx-auto w-full">
         {/* Mobile Toggle */}
         <div className="md:hidden">
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white">
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-foreground">
             {isMobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
 
         {/* Brand & Menu Items */}
         <div className="hidden md:flex items-center gap-8">
-          <div className="flex items-center gap-3">
-            <img 
-              src="/LOGO-ST.jpeg" 
-              alt="ST Logo" 
-              className="w-24 h-16 rounded-xl object-cover border-2 border-[#00a5cf] shadow-lg shadow-[#00a5cf]/30 p-0.5 bg-[#004e64]"
-            />
-            <span className="text-white font-black uppercase tracking-widest text-lg">ROBOTICS<span className="text-[#9fffcb]">-</span>CLUB<span className="text-[#00a5cf]">.</span></span>
-          </div>
+          <span className="text-foreground font-black uppercase tracking-widest text-lg">ROBOTICS<span className="text-primary">-</span>CLUB<span className="text-primary">.</span></span>
           <button
             onClick={() => document.getElementById("arena-section")?.scrollIntoView({ behavior: "smooth" })}
-            className="text-white/70 hover:text-white font-bold uppercase tracking-widest text-xs transition-colors"
+            className="text-muted-foreground hover:text-foreground font-bold uppercase tracking-widest text-xs transition-colors"
           >
             {isAr ? "الدورات" : "COURSES"}
           </button>
@@ -189,24 +182,24 @@ export const Component = () => {
 
         {/* Language & Auth */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5">
-            <span className={cn("text-[9px] font-black", !isAr ? "text-white" : "text-white/40")}>EN</span>
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-muted">
+            <span className={cn("text-[9px] font-black", !isAr ? "text-foreground" : "text-muted-foreground")}>EN</span>
             <LeverSwitch checked={isAr} onChange={() => setLanguage(language === "en" ? "ar" : "en")} />
-            <span className={cn("text-[9px] font-black", isAr ? "text-white" : "text-white/40")}>AR</span>
+            <span className={cn("text-[9px] font-black", isAr ? "text-foreground" : "text-muted-foreground")}>AR</span>
           </div>
 
           <div className="hidden md:block">
             {user ? (
                 <button
                 onClick={() => signOut()}
-                className="p-2 rounded-full border border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/50 transition-colors"
+                className="p-2 rounded-full border border-border text-foreground hover:bg-destructive/20 hover:border-destructive/50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             ) : (
                 <button
                 onClick={() => setIsAuthModalOpen(true)}
-                className="px-5 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md text-white text-xs font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300"
+                className="px-5 py-2 rounded-full border border-border bg-muted backdrop-blur-md text-foreground text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                 >
                 {isAr ? "دخول النظام" : "Initialize"}
                 </button>
@@ -216,28 +209,21 @@ export const Component = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="absolute top-20 left-0 w-full bg-[#004e64]/95 p-6 flex flex-col items-center gap-4 md:hidden border-b border-[#00a5cf]/10 z-50">
-          <div className="flex items-center gap-3 mb-4">
-            <img 
-              src="/LOGO-ST.jpeg" 
-              alt="ST Logo" 
-              className="w-14 h-10 rounded-xl object-cover border border-[#00a5cf] shadow-lg p-0.5 bg-[#004e64]"
-            />
-            <span className="text-white font-black uppercase tracking-widest text-sm">ROBOTICS<span className="text-[#9fffcb]">-</span>CLUB</span>
-          </div>
+          <div className="absolute top-20 left-0 w-full bg-background/95 p-6 flex flex-col items-center gap-4 md:hidden border-b border-border z-50 backdrop-blur-xl">
+            <span className="text-foreground font-black uppercase tracking-widest text-sm">ROBOTICS<span className="text-primary">-</span>CLUB</span>
             <button
               onClick={() => {
                 document.getElementById("arena-section")?.scrollIntoView({ behavior: "smooth" });
                 setIsMobileMenuOpen(false);
               }}
-              className="text-white text-sm font-semibold uppercase tracking-widest"
+              className="text-foreground text-sm font-semibold uppercase tracking-widest"
             >
               {isAr ? "الدورات" : "COURSES"}
             </button>
-            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-[#00a5cf]/10 bg-[#00a5cf]/5">
-              <span className={cn("text-[10px] font-bold", !isAr ? "text-white" : "text-white/40")}>EN</span>
+            <div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-border bg-muted">
+              <span className={cn("text-[10px] font-bold", !isAr ? "text-foreground" : "text-muted-foreground")}>EN</span>
               <LeverSwitch checked={isAr} onChange={() => setLanguage(language === "en" ? "ar" : "en")} />
-              <span className={cn("text-[10px] font-bold", isAr ? "text-white" : "text-white/40")}>AR</span>
+              <span className={cn("text-[10px] font-bold", isAr ? "text-foreground" : "text-muted-foreground")}>AR</span>
             </div>
           </div>
         )}
@@ -252,11 +238,11 @@ export const Component = () => {
             {/* #LEARN */}
             <div className="w-full flex justify-start pl-[10%] md:pl-[25%] relative z-30">
               <h1
-                className="text-[clamp(4.5rem,12vw,160px)] font-black leading-[0.85] tracking-tighter text-[#CCFF00] m-0 p-0 uppercase"
+                className="text-[clamp(4.5rem,12vw,160px)] font-black leading-[0.85] tracking-tighter text-primary m-0 p-0 uppercase"
                 style={{
                   fontFamily: '"Arial Black", Impact, sans-serif',
                   textShadow:
-                    "1px 1px 0 #001A99, 2px 2px 0 #001A99, 3px 3px 0 #001A99, 4px 4px 0 #001A99, 5px 5px 0 #001A99, 6px 6px 0 #001A99, 7px 7px 0 #001A99, 8px 8px 0 #001A99, 9px 9px 0 #001A99, 10px 10px 0 #001A99, 11px 11px 0 #001A99, 12px 12px 0 #001A99, 13px 13px 0 #001A99, 14px 14px 0 #001A99",
+                    "1px 1px 0 rgba(0,0,0,0.15), 2px 2px 0 rgba(0,0,0,0.15), 3px 3px 0 rgba(0,0,0,0.15), 4px 4px 0 rgba(0,0,0,0.15), 5px 5px 0 rgba(0,0,0,0.15), 6px 6px 0 rgba(0,0,0,0.15), 7px 7px 0 rgba(0,0,0,0.15), 8px 8px 0 rgba(0,0,0,0.15), 9px 9px 0 rgba(0,0,0,0.15), 10px 10px 0 rgba(0,0,0,0.15), 11px 11px 0 rgba(0,0,0,0.15), 12px 12px 0 rgba(0,0,0,0.15), 13px 13px 0 rgba(0,0,0,0.15), 14px 14px 0 rgba(0,0,0,0.15)",
                 }}
               >
                 {isAr ? "#تعلم" : "#LEARN"}
@@ -266,11 +252,11 @@ export const Component = () => {
             {/* ROBOTICS */}
             <div className="w-full flex justify-center relative z-20">
               <h1
-                className="text-[clamp(5rem,15vw,220px)] font-black leading-[0.85] tracking-tighter text-white m-0 p-0 uppercase"
+                className="text-[clamp(5rem,15vw,220px)] font-black leading-[0.85] tracking-tighter text-foreground m-0 p-0 uppercase"
                 style={{
                   fontFamily: '"Arial Black", Impact, sans-serif',
                   textShadow:
-                    "1px 1px 0 #001A99, 2px 2px 0 #001A99, 3px 3px 0 #001A99, 4px 4px 0 #001A99, 5px 5px 0 #001A99, 6px 6px 0 #001A99, 7px 7px 0 #001A99, 8px 8px 0 #001A99, 9px 9px 0 #001A99, 10px 10px 0 #001A99, 11px 11px 0 #001A99, 12px 12px 0 #001A99, 13px 13px 0 #001A99, 14px 14px 0 #001A99",
+                    "1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.1), 3px 3px 0 rgba(0,0,0,0.1), 4px 4px 0 rgba(0,0,0,0.1), 5px 5px 0 rgba(0,0,0,0.1), 6px 6px 0 rgba(0,0,0,0.1), 7px 7px 0 rgba(0,0,0,0.1), 8px 8px 0 rgba(0,0,0,0.1), 9px 9px 0 rgba(0,0,0,0.1), 10px 10px 0 rgba(0,0,0,0.1), 11px 11px 0 rgba(0,0,0,0.1), 12px 12px 0 rgba(0,0,0,0.1), 13px 13px 0 rgba(0,0,0,0.1), 14px 14px 0 rgba(0,0,0,0.1)",
                 }}
               >
                 ROBOTICS
@@ -280,11 +266,11 @@ export const Component = () => {
             {/* CLUB */}
             <div className="w-full flex justify-start pl-[15%] md:pl-[30%] relative z-10">
               <h1
-                className="text-[clamp(4.5rem,12vw,160px)] font-black leading-[0.85] tracking-tighter text-white m-0 p-0 uppercase"
+                className="text-[clamp(4.5rem,12vw,160px)] font-black leading-[0.85] tracking-tighter text-foreground m-0 p-0 uppercase"
                 style={{
                   fontFamily: '"Arial Black", Impact, sans-serif',
                   textShadow:
-                    "1px 1px 0 #001A99, 2px 2px 0 #001A99, 3px 3px 0 #001A99, 4px 4px 0 #001A99, 5px 5px 0 #001A99, 6px 6px 0 #001A99, 7px 7px 0 #001A99, 8px 8px 0 #001A99, 9px 9px 0 #001A99, 10px 10px 0 #001A99, 11px 11px 0 #001A99, 12px 12px 0 #001A99, 13px 13px 0 #001A99, 14px 14px 0 #001A99",
+                    "1px 1px 0 rgba(0,0,0,0.1), 2px 2px 0 rgba(0,0,0,0.1), 3px 3px 0 rgba(0,0,0,0.1), 4px 4px 0 rgba(0,0,0,0.1), 5px 5px 0 rgba(0,0,0,0.1), 6px 6px 0 rgba(0,0,0,0.1), 7px 7px 0 rgba(0,0,0,0.1), 8px 8px 0 rgba(0,0,0,0.1), 9px 9px 0 rgba(0,0,0,0.1), 10px 10px 0 rgba(0,0,0,0.1), 11px 11px 0 rgba(0,0,0,0.1), 12px 12px 0 rgba(0,0,0,0.1), 13px 13px 0 rgba(0,0,0,0.1), 14px 14px 0 rgba(0,0,0,0.1)",
                 }}
               >
                 {isAr ? "نادي" : "CLUB"}
@@ -300,7 +286,7 @@ export const Component = () => {
                 <Suspense
                   fallback={
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className="w-12 h-12 border-4 border-[#CCFF00] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                   }
                 >
@@ -334,14 +320,14 @@ export const Component = () => {
       </main>
 
       {/* Bottom Features Section */}
-      <section className="bg-white text-black rounded-t-[2.5rem] md:rounded-t-[3.5rem] px-6 py-12 md:px-10 md:py-16 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.2)] mt-auto w-full">
+      <section className="bg-card text-card-foreground rounded-t-[2.5rem] md:rounded-t-[3.5rem] px-6 py-12 md:px-10 md:py-16 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.1)] mt-auto w-full border-t border-border">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {/* Card 1 */}
-          <div className="bg-[#F8F9FA] rounded-[2rem] p-8 flex flex-col items-center text-center relative h-64 border border-gray-100">
+          <div className="bg-muted rounded-[2rem] p-8 flex flex-col items-center text-center relative h-64 border border-border">
             <h3 className="text-xl md:text-2xl uppercase leading-tight mb-2 font-black">
               {isAr ? "دورات الروبوتات" : "ROBOTICS COURSES"}
             </h3>
-            <p className="text-[10px] md:text-xs text-black/60 font-bold mb-auto">
+            <p className="text-[10px] md:text-xs text-muted-foreground font-bold mb-auto">
               {isAr
                 ? "للمهندسين الصغار (أعمار 7-13)"
                 : "For Junior Engineers (Ages 7-13)"}
@@ -349,8 +335,8 @@ export const Component = () => {
 
             {/* Pill Graphic */}
             <div className="relative w-full flex justify-center mt-6">
-              <div className="flex items-center bg-[#0038FF] rounded-2xl p-2 pr-16 text-white shadow-lg relative z-10">
-                <div className="w-8 h-8 bg-[#D2B48C] rounded-full mr-3 border border-white/30 overflow-hidden flex-shrink-0">
+              <div className="flex items-center bg-primary rounded-2xl p-2 pr-16 text-primary-foreground shadow-lg relative z-10">
+                <div className="w-8 h-8 bg-muted rounded-full mr-3 border border-border overflow-hidden flex-shrink-0">
                   <img
                     src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200"
                     alt="Avatar"
@@ -361,12 +347,12 @@ export const Component = () => {
                   <p className="text-[10px] font-bold leading-none">
                     {isAr ? "سجل الآن" : "ENROLL NOW"}
                   </p>
-                  <p className="text-[8px] text-white/70 leading-none mt-1">
+                  <p className="text-[8px] text-primary-foreground/70 leading-none mt-1">
                     2026 Season
                   </p>
                 </div>
               </div>
-               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#9fffcbff] text-[#004e64ff] font-black text-[10px] px-3 py-2 rounded-xl z-20 shadow-md">
+               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground font-black text-[10px] px-3 py-2 rounded-xl z-20 shadow-md">
                  {isAr ? "خصم 20%" : "20% OFF"}
                </div>
             </div>
@@ -378,11 +364,11 @@ export const Component = () => {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-[#F8F9FA] rounded-[2rem] p-8 flex flex-col items-center text-center relative h-64 border border-gray-100">
+          <div className="bg-muted rounded-[2rem] p-8 flex flex-col items-center text-center relative h-64 border border-border">
             <h3 className="text-xl md:text-2xl uppercase leading-tight mb-2 font-black">
               {isAr ? "مسابقات عالمية" : "GLOBAL CHALLENGE"}
             </h3>
-            <p className="text-[10px] md:text-xs text-black/60 font-bold mb-auto">
+            <p className="text-[10px] md:text-xs text-muted-foreground font-bold mb-auto">
               {isAr
                 ? "نافس فرقاً من جميع أنحاء العالم"
                 : "Compete with teams worldwide"}
@@ -390,8 +376,8 @@ export const Component = () => {
 
             {/* Pill Graphic */}
             <div className="relative w-full flex justify-center mt-6">
-              <div className="flex items-center bg-[#0038FF] rounded-full p-1.5 text-white shadow-lg">
-                <div className="bg-white/20 text-white font-bold text-sm px-4 py-2 rounded-full mr-2">
+              <div className="flex items-center bg-primary rounded-full p-1.5 text-primary-foreground shadow-lg">
+                <div className="bg-primary-foreground/20 text-primary-foreground font-bold text-sm px-4 py-2 rounded-full mr-2">
                   50+
                 </div>
                 <div className="font-bold text-xs px-4 uppercase">
@@ -400,8 +386,8 @@ export const Component = () => {
               </div>
 
               {/* Small floating green pill */}
-              <div className="absolute -bottom-6 right-1/3 bg-[#CCFF00] rounded-full p-2.5 shadow-lg transform rotate-12 z-20">
-                <ArrowUpRight className="w-4 h-4 text-black" strokeWidth={3} />
+              <div className="absolute -bottom-6 right-1/3 bg-primary rounded-full p-2.5 shadow-lg transform rotate-12 z-20">
+                <ArrowUpRight className="w-4 h-4 text-primary-foreground" strokeWidth={3} />
               </div>
             </div>
 
@@ -412,18 +398,18 @@ export const Component = () => {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-[#F8F9FA] rounded-[2rem] p-8 flex flex-col items-center text-center relative h-64 border border-gray-100">
+          <div className="bg-muted rounded-[2rem] p-8 flex flex-col items-center text-center relative h-64 border border-border">
             <h3 className="text-xl md:text-2xl uppercase leading-tight mb-2 font-black">
               {isAr ? "يوم الصناعة الحر" : "FREE BUILD DAYS"}
             </h3>
-            <p className="text-[10px] md:text-xs text-black/60 font-bold mb-auto">
+            <p className="text-[10px] md:text-xs text-muted-foreground font-bold mb-auto">
               {isAr
                 ? "تعال واصنع روبوتك الخاص مجاناً"
                 : "Come and make your robot for free"}
             </p>
 
             {/* Pill Graphic */}
-            <div className="flex flex-col items-center bg-[#CCFF00] rounded-[2rem] px-6 py-4 text-black shadow-lg mt-6 relative w-full max-w-[200px]">
+            <div className="flex flex-col items-center bg-primary rounded-[2rem] px-6 py-4 text-primary-foreground shadow-lg mt-6 relative w-full max-w-[200px]">
               <p className="text-[9px] font-black uppercase tracking-wider mb-1">
                 {isAr ? "السبت القادم" : "NEXT SATURDAY"}
               </p>
@@ -432,7 +418,7 @@ export const Component = () => {
               </p>
 
               {/* Speech bubble tail */}
-              <div className="absolute -bottom-2 left-8 w-5 h-5 bg-[#CCFF00] transform rotate-45"></div>
+              <div className="absolute -bottom-2 left-8 w-5 h-5 bg-primary transform rotate-45"></div>
             </div>
           </div>
         </div>

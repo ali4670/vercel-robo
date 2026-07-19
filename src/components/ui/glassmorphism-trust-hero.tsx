@@ -27,9 +27,9 @@ const CLIENTS = [
 
 // --- SUB-COMPONENTS ---
 const StatItem = ({ value, label }: { value: string; label: string }) => (
-  <div className="flex flex-col items-center p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-    <span className="text-xl font-bold text-white">{value}</span>
-    <span className="text-[10px] uppercase tracking-wider text-white/50 font-medium">
+  <div className="flex flex-col items-center p-3 rounded-2xl bg-muted/50 border border-border backdrop-blur-md">
+    <span className="text-xl font-bold text-foreground">{value}</span>
+    <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
       {label}
     </span>
   </div>
@@ -125,12 +125,12 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
           >
             {/* Badge */}
             <div className={`flex ${isAr ? "justify-end" : "justify-start"}`}>
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-muted/50 border border-border backdrop-blur-md">
                 <div className="flex -space-x-1">
                   {[...Array(3)].map((_, i) => (
                     <div
                       key={i}
-                      className="w-4 h-4 rounded-full bg-white/10 border border-white/20 flex items-center justify-center"
+                      className="w-4 h-4 rounded-full bg-muted border border-border flex items-center justify-center"
                     >
                       <Star className="w-2 h-2 text-yellow-500 fill-yellow-500" />
                     </div>
@@ -143,7 +143,7 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
             </div>
 
             {/* Heading */}
-            <h1 className="text-5xl md:text-7xl font-bold text-white leading-[1.1] tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-[1.1] tracking-tight">
               {t.headingLine1} <br />
               <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-lime-400 bg-clip-text text-transparent">
                 {t.headingLine2}
@@ -154,7 +154,7 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
 
             {/* Description & Scrambled Text */}
             <div className="space-y-4">
-              <p className="max-w-lg text-lg text-white/60 leading-relaxed font-light">
+              <p className="max-w-lg text-lg text-muted-foreground leading-relaxed font-light">
                 {t.description}
               </p>
               <div
@@ -178,8 +178,8 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
                 />
               </button>
 
-              <button className="flex items-center gap-2 px-8 py-4 bg-white/5 text-white font-semibold rounded-full border border-white/10 backdrop-blur-md transition-colors hover:bg-white/10">
-                <div className="w-6 h-6 flex items-center justify-center rounded-full bg-white/10">
+              <button className="flex items-center gap-2 px-8 py-4 bg-muted/50 text-foreground font-semibold rounded-full border border-border backdrop-blur-md transition-colors hover:bg-muted">
+                <div className="w-6 h-6 flex items-center justify-center rounded-full bg-muted">
                   <Play
                     className={`w-2.5 h-2.5 fill-white ml-0.5 ${isAr ? "rotate-180" : ""}`}
                   />
@@ -192,7 +192,7 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
           {/* --- RIGHT COLUMN --- */}
           <div className="relative group animate-fade-in delay-300">
             {/* Stats Card */}
-            <div className="relative p-8 md:p-12 rounded-[40px] bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl">
+            <div className="relative p-8 md:p-12 rounded-[40px] bg-muted/50 border border-border backdrop-blur-2xl shadow-2xl">
               {/* Card Glow Effect */}
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/20 rounded-full blur-[120px] pointer-events-none" />
               <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-green-500/20 rounded-full blur-[120px] pointer-events-none" />
@@ -205,10 +205,10 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
                     <Target className="w-8 h-8 text-emerald-400" />
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold text-white tracking-tight">
+                    <h3 className="text-3xl font-bold text-foreground tracking-tight">
                       150+
                     </h3>
-                    <p className="text-sm text-white/40 font-medium uppercase tracking-wider">
+                    <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
                       {t.statsTitle}
                     </p>
                   </div>
@@ -219,10 +219,10 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
                   <div
                     className={`flex justify-between text-sm ${isAr ? "flex-row-reverse" : ""}`}
                   >
-                    <span className="text-white/60">{t.clientSat}</span>
+                    <span className="text-muted-foreground">{t.clientSat}</span>
                     <span className="text-white font-bold">98%</span>
                   </div>
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                  <div className="h-2 w-full bg-muted/50 rounded-full overflow-hidden border border-border">
                     <div className="h-full w-[98%] bg-gradient-to-r from-emerald-500 to-lime-500 rounded-full" />
                   </div>
                 </div>
@@ -251,8 +251,8 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
             </div>
 
             {/* Marquee Card */}
-            <div className="mt-8 overflow-hidden rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md py-6">
-              <p className="text-center text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-4">
+            <div className="mt-8 overflow-hidden rounded-3xl bg-muted/50 border border-border backdrop-blur-md py-6">
+              <p className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">
                 {t.trustedBy}
               </p>
               <div className="relative flex overflow-hidden">
@@ -262,8 +262,8 @@ export default function HeroSection({ isAr = false }: { isAr?: boolean }) {
                       key={i}
                       className="flex items-center gap-3 group/brand cursor-default"
                     >
-                      <client.icon className="w-6 h-6 text-white/40 group-hover/brand:text-white transition-colors" />
-                      <span className="text-lg font-bold text-white/20 group-hover/brand:text-white/60 transition-colors uppercase tracking-tight">
+                      <client.icon className="w-6 h-6 text-muted-foreground group-hover/brand:text-white transition-colors" />
+                      <span className="text-lg font-bold text-muted-foreground group-hover/brand:text-muted-foreground transition-colors uppercase tracking-tight">
                         {client.name}
                       </span>
                     </div>

@@ -79,9 +79,9 @@ function StudentMessagingPage() {
   };
 
   return (
-    <div className="h-screen bg-[#030303] text-white flex flex-col font-sans selection:bg-[#CCFF00]/30">
+    <div className="h-screen bg-[#030303] text-foreground flex flex-col font-sans selection:bg-primary/30">
       {/* Sleek Compact Header */}
-      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-[#0A0A0A] border-b border-white/5">
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-[#0A0A0A] border-b border-border">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-lime-500/10 border border-lime-500/20 flex items-center justify-center">
             <span className="font-black text-lime-400 text-[10px] italic">
@@ -106,7 +106,7 @@ function StudentMessagingPage() {
         ref={chatContainerRef}
       >
         {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-white/10 gap-2">
+          <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 gap-2">
             <Send className="w-10 h-10 opacity-20" />
             <p className="font-bold text-[10px] tracking-widest uppercase">
               {isAr ? "لا توجد رسائل بعد" : "Awaiting Transmission"}
@@ -123,7 +123,7 @@ function StudentMessagingPage() {
                 className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"} mb-2`}
               >
                 {!isMe && (
-                  <div className="w-8 h-8 rounded-full bg-white/5 overflow-hidden flex-shrink-0 border border-white/5">
+                  <div className="w-8 h-8 rounded-full bg-muted/50 overflow-hidden flex-shrink-0 border border-border">
                     {sender?.avatar_url ? (
                       <img
                         src={sender.avatar_url}
@@ -138,11 +138,11 @@ function StudentMessagingPage() {
                 )}
 
                 <div
-                  className={`max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? "bg-[#CCFF00] text-black rounded-tr-none" : "bg-white/5 text-white rounded-tl-none border border-white/5"}`}
+                  className={`max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? "bg-primary text-black rounded-tr-none" : "bg-muted/50 text-foreground rounded-tl-none border border-border"}`}
                 >
                   <p className="font-medium leading-relaxed">{m.content}</p>
                   <p
-                    className={`text-[8px] mt-1 font-black uppercase tracking-widest opacity-40 ${isMe ? "text-black" : "text-white"}`}
+                    className={`text-[8px] mt-1 font-black uppercase tracking-widest opacity-40 ${isMe ? "text-black" : "text-foreground"}`}
                   >
                     {new Date(m.created_at).toLocaleTimeString([], {
                       hour: "2-digit",
@@ -157,10 +157,10 @@ function StudentMessagingPage() {
       </div>
 
       {/* Compact Input Area */}
-      <div className="p-3 bg-[#0A0A0A] border-t border-white/5">
+      <div className="p-3 bg-[#0A0A0A] border-t border-border">
         <div className="relative flex items-center gap-2">
           <input
-            className="flex-1 bg-[#111] p-3 rounded-xl outline-none border border-white/5 focus:border-[#CCFF00]/50 transition-all font-bold text-xs placeholder:text-white/20"
+            className="flex-1 bg-[#111] p-3 rounded-xl outline-none border border-border focus:border-primary/50 transition-all font-bold text-xs placeholder:text-muted-foreground"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
@@ -168,7 +168,7 @@ function StudentMessagingPage() {
           />
           <button
             onClick={sendMessage}
-            className="p-3 bg-[#CCFF00] text-black rounded-xl hover:scale-105 transition-all font-black uppercase tracking-widest text-[10px]"
+            className="p-3 bg-primary text-black rounded-xl hover:scale-105 transition-all font-black uppercase tracking-widest text-[10px]"
           >
             <Send className="w-3 h-3" />
           </button>

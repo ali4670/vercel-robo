@@ -167,10 +167,10 @@ function LevelsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-white p-6 pb-20 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-background text-foreground p-6 pb-20 relative overflow-hidden font-sans">
       <div className="fixed inset-0 bg-background z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/10 blur-[120px] rounded-full animate-pulse"></div>
-        <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-white/5 blur-[100px] rounded-full"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-muted blur-[120px] rounded-full animate-pulse"></div>
+        <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-muted/50 blur-[100px] rounded-full"></div>
       </div>
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-10 opacity-20"></div>
 
@@ -183,12 +183,12 @@ function LevelsPage() {
           >
             {isAr ? "مسار المهمات" : "MISSION TRACK"}
           </motion.h1>
-          <div className="flex items-center justify-center gap-6 text-white/40">
-            <div className="h-[1px] w-20 bg-white/20" />
+          <div className="flex items-center justify-center gap-6 text-muted-foreground">
+            <div className="h-[1px] w-20 bg-muted" />
             <p className="font-black uppercase tracking-[0.5em] text-[10px] italic">
               {isAr ? "النظام جاهز للتشغيل" : "SYSTEM OPERATIONAL"}
             </p>
-            <div className="h-[1px] w-20 bg-white/20" />
+            <div className="h-[1px] w-20 bg-muted" />
           </div>
         </header>
 
@@ -214,20 +214,20 @@ function LevelsPage() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className={`relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-[3rem] p-8 md:p-12 overflow-hidden shadow-2xl transition-all duration-500`}
+                  className={`relative bg-muted backdrop-blur-xl border border-border rounded-[3rem] p-8 md:p-12 overflow-hidden shadow-2xl transition-all duration-500`}
                 >
                   <>
                     <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                       <div className="flex items-end gap-6">
-                        <div className="text-8xl font-black italic text-white/5 leading-none select-none">
+                        <div className="text-8xl font-black italic text-muted-foreground/20 leading-none select-none">
                           {String(level.level_order).padStart(2, "0")}
                         </div>
                         <div className="mb-2 text-left">
-                          <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tight text-white">
+                          <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tight text-foreground">
                             {level.title}
                           </h2>
                           <div className="flex items-center gap-4 mt-2">
-                            <span className="text-white/60 text-[10px] font-black uppercase tracking-[0.2em]">
+                            <span className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">
                               {levelLectures.length} {isAr ? "وحدة مفعلة" : "LIVE UNITS"}
                             </span>
                           </div>
@@ -236,15 +236,15 @@ function LevelsPage() {
 
                       <div className="w-full md:w-64">
                         <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
-                          <span className="text-white/40">Progress</span>
-                          <span className="text-white">
+                          <span className="text-muted-foreground">Progress</span>
+                          <span className="text-foreground">
                             {Math.round(
                               (completedCount / (levelLectures.length || 1)) * 100,
                             )}
                             %
                           </span>
                         </div>
-                        <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{
@@ -275,20 +275,20 @@ function LevelsPage() {
                               <div
                                 className={`h-full p-8 rounded-3xl border transition-all duration-300 ${
                                   !isUnlocked
-                                    ? "bg-black/20 border-white/5"
+                                    ? "bg-foreground/10 border-border"
                                     : isCompleted
-                                      ? "bg-white/20 border-white/40"
-                                      : "bg-white/5 border-white/10 hover:border-white/30"
+                                      ? "bg-muted border-border"
+                                      : "bg-muted/50 border-border hover:border-border"
                                 }`}
                               >
                                 <div className="flex justify-between items-start mb-6">
                                   <div
                                     className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-colors ${
                                       !isUnlocked
-                                        ? "bg-white/5 text-white/10 border-white/5"
+                                        ? "bg-muted/50 text-muted-foreground/30 border-border"
                                         : isCompleted
                                           ? "bg-white text-emerald-600 border-white"
-                                          : "bg-white/5 border-white/10 text-white/20"
+                                          : "bg-muted/50 border-border text-muted-foreground"
                                     }`}
                                   >
                                     {!isUnlocked ? (
@@ -300,7 +300,7 @@ function LevelsPage() {
                                     )}
                                   </div>
                                   <span
-                                    className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? "text-white" : "text-white/40"}`}
+                                    className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? "text-foreground" : "text-muted-foreground"}`}
                                   >
                                     {!isUnlocked
                                       ? unlockDate?.toLocaleDateString()
@@ -314,12 +314,12 @@ function LevelsPage() {
                                 <h3 className="font-black text-sm uppercase tracking-wider mb-2 text-left flex items-center gap-2">
                                   {lecture.title}
                                   {!isUnlocked && (
-                                    <span className="text-[8px] px-2 py-0.5 rounded-full bg-white/10 text-white/40">
+                                    <span className="text-[8px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                                       LOCKED
                                     </span>
                                   )}
                                   {lecture.is_live === false && (isAdmin || isModerator) && (
-                                    <span className="bg-red-500 text-white text-[8px] px-2 py-0.5 rounded-full">
+                                    <span className="bg-red-500 text-foreground text-[8px] px-2 py-0.5 rounded-full">
                                       OFFLINE
                                     </span>
                                   )}
@@ -328,6 +328,19 @@ function LevelsPage() {
                                   <div className="mt-4 flex items-center gap-2 text-[10px] font-black text-emerald-400">
                                     <GraduationCap className="w-3 h-3" />
                                     {isAr ? "اختبار شامل" : "BIG EXAM"}
+                                  </div>
+                                )}
+                                {isUnlocked && (
+                                  <div className="mt-4 flex justify-end">
+                                    <Link
+                                      to={`/lecture/${lecture.id}`}
+                                      search={{ tab: "chat" }}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="p-2 rounded-xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all"
+                                      title={isAr ? "محادثة الدرس" : "Lecture Chat"}
+                                    >
+                                      <MessageSquare className="w-4 h-4" />
+                                    </Link>
                                   </div>
                                 )}
                               </div>
@@ -349,7 +362,7 @@ function LevelsPage() {
                         </Link>
                         {hasExam && (
                           <Link to={`/exam/${level.id}`} className={`flex-1`}>
-                            <HeroButton className="w-full bg-white/20 border-white/30 text-white h-14 rounded-2xl uppercase font-black tracking-widest italic flex items-center justify-center gap-3">
+                            <HeroButton className="w-full bg-muted border-border text-foreground h-14 rounded-2xl uppercase font-black tracking-widest italic flex items-center justify-center gap-3">
                               <GraduationCap className="w-5 h-5" />
                               {isAr ? "بدء الاختبار" : "INITIATE EXAM"}
                             </HeroButton>

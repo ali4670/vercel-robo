@@ -56,15 +56,15 @@ export const AcademicReviewer = ({
   };
 
   return (
-    <div className="p-1 rounded-[2.5rem] bg-white/10 border border-white/20 group overflow-hidden">
-      <div className="bg-white/5 border border-white/10 rounded-[calc(2.5rem-0.25rem)] p-8 md:p-10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+    <div className="p-1 rounded-[2.5rem] bg-muted border border-border group overflow-hidden">
+      <div className="bg-muted/50 border border-border rounded-[calc(2.5rem-0.25rem)] p-8 md:p-10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6">
           <div>
             <div className="flex items-center gap-3 mb-3">
               <span className="px-2.5 py-1 bg-primary/10 border border-primary/20 text-primary text-[9px] font-black uppercase tracking-[0.3em] rounded-full">
                 Cognitive Suite
               </span>
-              <div className="h-px w-6 bg-white/10"></div>
+              <div className="h-px w-6 bg-muted"></div>
             </div>
             <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none">
               {isAr ? "المراجع الأكاديمي" : "Academic Context Reviewer"}
@@ -73,7 +73,7 @@ export const AcademicReviewer = ({
           <HeroButton
             onClick={generateReview}
             disabled={loading || !!review}
-            className="w-full md:w-auto flex items-center gap-3 px-8 h-14 bg-white/5 border border-white/10 text-white rounded-[1.25rem] font-black uppercase tracking-widest italic hover:bg-primary hover:text-black hover:scale-105 transition-all disabled:opacity-50"
+            className="w-full md:w-auto flex items-center gap-3 px-8 h-14 bg-muted/50 border border-border text-foreground rounded-[1.25rem] font-black uppercase tracking-widest italic hover:bg-primary hover:text-black hover:scale-105 transition-all disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -95,7 +95,7 @@ export const AcademicReviewer = ({
             <section className="space-y-4">
               <div className="flex items-center gap-3">
                 <BookOpen className="w-4 h-4 text-primary" />
-                <h3 className="font-black uppercase tracking-[0.2em] text-[10px] text-white/40">
+                <h3 className="font-black uppercase tracking-[0.2em] text-[10px] text-muted-foreground">
                   {isAr ? "الملخص التنفيذي" : "EXECUTIVE SUMMARY"}
                 </h3>
               </div>
@@ -107,7 +107,7 @@ export const AcademicReviewer = ({
             <section className="space-y-6">
               <div className="flex items-center gap-3">
                 <Zap className="w-4 h-4 text-primary" />
-                <h3 className="font-black uppercase tracking-[0.2em] text-[10px] text-white/40">
+                <h3 className="font-black uppercase tracking-[0.2em] text-[10px] text-muted-foreground">
                   {isAr ? "هيكلية المعلومات" : "CORE INFORMATION HIERARCHY"}
                 </h3>
               </div>
@@ -115,17 +115,17 @@ export const AcademicReviewer = ({
                 {review.blueprint.map((c: any, i: number) => (
                   <div
                     key={i}
-                    className="p-0.5 rounded-[2rem] bg-white/10 border border-white/20 group/card"
+                    className="p-0.5 rounded-[2rem] bg-muted border border-border group/card"
                   >
-                    <div className="bg-white/5 p-6 rounded-[calc(2rem-0.125rem)] h-full border border-white/10 transition-colors group-hover/card:border-white/30">
+                    <div className="bg-muted/50 p-6 rounded-[calc(2rem-0.125rem)] h-full border border-border transition-colors group-hover/card:border-border">
                       <p className="font-black uppercase tracking-widest text-primary text-xs mb-3">
                         {c.name}
                       </p>
                       <p className="text-xs text-foreground/60 leading-relaxed mb-4">
                         {c.definition}
                       </p>
-                      <div className="pt-3 border-t border-white/10">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1.5">
+                      <div className="pt-3 border-t border-border">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1.5">
                           Pitfall:
                         </p>
                         <p className="text-[9px] font-bold text-red-400/60">

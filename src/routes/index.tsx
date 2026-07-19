@@ -308,25 +308,25 @@ function Index() {
       {/* Services Section */}
       <section
         id="missions-section"
-        className="py-40 px-6 bg-[#004e64] relative overflow-hidden"
+        className="py-40 px-6 bg-muted/50 relative overflow-hidden border-y border-border"
       >
         <div className="container mx-auto max-w-7xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 items-start">
             <div className="lg:col-span-5">
-              <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-white/10 border border-white/20 rounded-full mb-8">
-                <span className="text-white text-[10px] font-black uppercase tracking-[0.3em]">
+              <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full mb-8">
+                <span className="text-primary text-[10px] font-black uppercase tracking-[0.3em]">
                   {isAr ? "مجالات الخبرة" : "EXPERT DOMAINS"}
                 </span>
               </div>
-              <h2 className="text-6xl md:text-8xl font-black italic tracking-[calc(-0.05em)] mb-8 uppercase leading-[0.85] text-white">
+              <h2 className="text-6xl md:text-8xl font-black italic tracking-[calc(-0.05em)] mb-8 uppercase leading-[0.85] text-foreground">
                 {isAr ? "الخدمات الجوهرية" : "CORE SERVICES"}
               </h2>
-              <p className="text-white/40 font-bold uppercase tracking-[0.4em] text-[10px] mb-12">
+              <p className="text-muted-foreground font-bold uppercase tracking-[0.4em] text-[10px] mb-12">
                 {isAr
                   ? "تطوير الكفاءات التقنية المتقدمة"
                   : "ADVANCING TECHNICAL COMPETENCY AT SCALE"}
               </p>
-              <div className="h-1 w-20 bg-white/20 rounded-full"></div>
+              <div className="h-1 w-20 bg-primary/30 rounded-full"></div>
             </div>
 
             <div className="lg:col-span-7 space-y-4">
@@ -358,29 +358,29 @@ function Index() {
               ].map((s, i) => (
                 <div
                   key={i}
-                  className="p-1 rounded-[2.5rem] bg-[#25a18e]/20 border border-[#00a5cf]/30 hover:border-[#7ae582]/60 transition-all duration-700 group"
+                  className="p-1 rounded-[2.5rem] bg-primary/5 border border-border hover:border-primary/40 transition-all duration-700 group"
                 >
-                  <div className="bg-[#004e64]/40 backdrop-blur-3xl p-8 md:p-10 rounded-[calc(2.5rem-0.25rem)] flex flex-col md:flex-row items-center justify-between gap-8">
+                  <div className="bg-card/60 backdrop-blur-3xl p-8 md:p-10 rounded-[calc(2.5rem-0.25rem)] flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="flex items-center gap-8 text-center md:text-left flex-col md:flex-row">
-                      <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-500 shadow-2xl">
+                      <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-2xl">
                         {s.icon}
                       </div>
                       <div>
                         <div className="flex items-center gap-3 mb-2 justify-center md:justify-start">
-                          <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">
+                          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                             {s.tag}
                           </span>
-                          <div className="h-px w-6 bg-white/10"></div>
+                          <div className="h-px w-6 bg-border"></div>
                         </div>
-                        <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter text-white uppercase leading-none">
+                        <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter text-foreground uppercase leading-none">
                           {s.t}
                         </h3>
-                        <p className="text-white/50 font-medium mt-3 text-sm md:text-base">
+                        <p className="text-muted-foreground font-medium mt-3 text-sm md:text-base">
                           {s.d}
                         </p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-primary transition-all duration-500 shrink-0">
+                    <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shrink-0">
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
@@ -416,13 +416,13 @@ function Index() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <img 
-                  src="/LOGO-ST.jpeg" 
+                  src="/logo-2026, 12_38_18 PM.png" 
                   alt="ST-Company Logo" 
-                  className="w-28 h-20 rounded-xl object-cover border-2 border-[#00a5cf] shadow-lg shadow-[#00a5cf]/30 p-0.5 bg-[#004e64]"
+                  className="w-28 h-20 rounded-full object-cover border-2 border-border shadow-lg p-0.5 bg-card"
                 />
                 <div>
                   <h3 className="text-2xl font-black italic tracking-tighter text-foreground">
-                    ST<span className="text-[#00a5cf]">-</span>COMPANY<span className="text-[#9fffcb]">.</span>
+                    ST<span className="text-primary">-</span>COMPANY<span className="text-primary">.</span>
                   </h3>
                 </div>
               </div>

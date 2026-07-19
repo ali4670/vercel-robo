@@ -211,31 +211,31 @@ export const AdvancedTodo: React.FC = () => {
   };
 
   return (
-    <div className="min-h-fit w-full max-w-6xl mx-auto bg-black/40 border border-white/10 rounded-[2rem] lg:rounded-[48px] overflow-hidden shadow-2xl backdrop-blur-3xl flex flex-col lg:flex-row relative group/os">
+    <div className="min-h-fit w-full max-w-6xl mx-auto bg-foreground/20 border border-border rounded-[2rem] lg:rounded-[48px] overflow-hidden shadow-2xl backdrop-blur-3xl flex flex-col lg:flex-row relative group/os">
       {/* Sidebar Navigation */}
-      <div className="w-full lg:w-80 bg-white/[0.02] border-r border-white/5 p-8 flex flex-col gap-8">
+      <div className="w-full lg:w-80 bg-muted/30 border-r border-border p-8 flex flex-col gap-8">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-[#CCFF00] flex items-center justify-center shadow-[0_0_20px_rgba(204,255,0,0.2)]">
+          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(204,255,0,0.2)]">
             <Zap className="w-6 h-6 text-black fill-current" />
           </div>
           <div>
-            <h2 className="text-xl font-black text-white tracking-tighter uppercase italic leading-none">
+            <h2 className="text-xl font-black text-foreground tracking-tighter uppercase italic leading-none">
               ST-OS
             </h2>
-            <p className="text-[7px] text-[#CCFF00]/40 font-bold uppercase tracking-[0.4em] mt-1">
+            <p className="text-[7px] text-primary/40 font-bold uppercase tracking-[0.4em] mt-1">
               Control Unit
             </p>
           </div>
         </div>
 
         {/* Timer UI */}
-        <div className="p-6 rounded-[32px] bg-white/[0.03] border border-white/5 flex flex-col items-center gap-6">
-          <div className="flex gap-2 p-1 bg-black/40 rounded-full border border-white/5 w-full">
+        <div className="p-6 rounded-[32px] bg-muted/30 border border-border flex flex-col items-center gap-6">
+          <div className="flex gap-2 p-1 bg-foreground/20 rounded-full border border-border w-full">
             {(["work", "shortBreak"] as TimerMode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => switchMode(m)}
-                className={`flex-1 py-2 text-[8px] font-black uppercase tracking-widest rounded-full transition-all ${mode === m ? "bg-[#CCFF00] text-black shadow-lg shadow-[#CCFF00]/20" : "text-white/40 hover:text-white"}`}
+                className={`flex-1 py-2 text-[8px] font-black uppercase tracking-widest rounded-full transition-all ${mode === m ? "bg-primary text-black shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {m === "work"
                   ? isAr
@@ -257,7 +257,7 @@ export const AdvancedTodo: React.FC = () => {
                 stroke="currentColor"
                 strokeWidth="2"
                 fill="transparent"
-                className="text-white/5"
+                className="text-muted-foreground"
               />
               <motion.circle
                 cx="80"
@@ -272,14 +272,14 @@ export const AdvancedTodo: React.FC = () => {
                   strokeDashoffset:
                     440 - (440 * (timeLeft || 0)) / (timerSettings[mode] || 1),
                 }}
-                className="text-[#CCFF00]"
+                className="text-primary"
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-black text-white tabular-nums tracking-tighter">
+              <span className="text-3xl font-black text-foreground tabular-nums tracking-tighter">
                 {formatTime(timeLeft)}
               </span>
-              <span className="text-[8px] font-black text-[#CCFF00] uppercase tracking-[0.2em]">
+              <span className="text-[8px] font-black text-primary uppercase tracking-[0.2em]">
                 {isActive
                   ? isAr
                     ? "قيد العمل"
@@ -295,7 +295,7 @@ export const AdvancedTodo: React.FC = () => {
             <HeroButton
               onClick={toggleTimer}
               variant="primary"
-              className="flex-1 rounded-2xl h-12 p-0 bg-[#CCFF00] text-black"
+              className="flex-1 rounded-2xl h-12 p-0 bg-primary text-black"
             >
               {isActive ? (
                 <Pause className="w-5 h-5" />
@@ -306,7 +306,7 @@ export const AdvancedTodo: React.FC = () => {
             <HeroButton
               onClick={resetTimer}
               variant="outline"
-              className="w-12 h-12 p-0 rounded-2xl border-white/10"
+              className="w-12 h-12 p-0 rounded-2xl border-border"
             >
               <RotateCcw className="w-5 h-5" />
             </HeroButton>
@@ -324,7 +324,7 @@ export const AdvancedTodo: React.FC = () => {
           ].map((item, i) => (
             <button
               key={i}
-              className={`flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${item.active ? "bg-white/[0.05] text-white border border-white/10 shadow-xl" : "text-white/30 hover:text-white hover:bg-white/5"}`}
+              className={`flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${item.active ? "bg-muted/50 text-foreground border border-border shadow-xl" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
             >
               <item.icon className="w-4 h-4" />
               {item.label}
@@ -335,13 +335,13 @@ export const AdvancedTodo: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-grow p-8 lg:p-12 flex flex-col gap-8">
-        <div className="flex justify-between items-end border-b border-white/5 pb-8">
+        <div className="flex justify-between items-end border-b border-border pb-8">
           <div>
-            <h1 className="text-5xl font-black text-white italic tracking-tighter uppercase leading-none">
+            <h1 className="text-5xl font-black text-foreground italic tracking-tighter uppercase leading-none">
               {isAr ? "المهام البرمجية" : "System Missions"}
             </h1>
-            <p className="text-[#CCFF00]/40 text-[10px] font-bold uppercase tracking-[0.4em] mt-4 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#CCFF00] animate-pulse" />
+            <p className="text-primary/40 text-[10px] font-bold uppercase tracking-[0.4em] mt-4 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               {todos.filter((t) => !t.is_completed).length} Priority Modules
               Online
             </p>
@@ -349,7 +349,7 @@ export const AdvancedTodo: React.FC = () => {
           <HeroButton
             onClick={() => setShowAdd(!showAdd)}
             variant="primary"
-            className="w-14 h-14 p-0 rounded-2xl bg-[#CCFF00] text-black shadow-[0_0_30px_rgba(204,255,0,0.2)]"
+            className="w-14 h-14 p-0 rounded-2xl bg-primary text-black shadow-[0_0_30px_rgba(204,255,0,0.2)]"
           >
             <Plus
               className={`w-8 h-8 transition-transform duration-500 ${showAdd ? "rotate-45" : ""}`}
@@ -364,10 +364,10 @@ export const AdvancedTodo: React.FC = () => {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               onSubmit={addTodo}
-              className="bg-white/[0.03] border border-white/10 rounded-[32px] p-8 space-y-6 overflow-hidden backdrop-blur-xl shadow-2xl"
+              className="bg-muted/30 border border-border rounded-[32px] p-8 space-y-6 overflow-hidden backdrop-blur-xl shadow-2xl"
             >
               <div className="space-y-2">
-                <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] ml-1 text-left block">
+                <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1 text-left block">
                   Primary Objective
                 </label>
                 <input
@@ -376,30 +376,30 @@ export const AdvancedTodo: React.FC = () => {
                   placeholder={
                     isAr ? "أدخل المهمة..." : "Define Mission Parameters..."
                   }
-                  className={`w-full bg-black/60 border border-white/5 rounded-2xl px-6 py-5 text-white font-bold placeholder:text-white/10 focus:outline-none focus:border-[#CCFF00]/50 transition-all ${isAr ? "text-right" : "text-left"}`}
+                  className={`w-full bg-card/80 border border-border rounded-2xl px-6 py-5 text-foreground font-bold placeholder:text-white/10 focus:outline-none focus:border-primary/50 transition-all ${isAr ? "text-right" : "text-left"}`}
                   required
                 />
               </div>
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 space-y-2">
-                  <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] ml-1 text-left block">
+                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1 text-left block">
                     Duration (Min)
                   </label>
                   <input
                     type="number"
                     value={taskDuration}
                     onChange={(e) => setTaskDuration(Number(e.target.value))}
-                    className={`w-full bg-black/60 border border-white/5 rounded-2xl px-6 py-4 text-white font-bold focus:outline-none focus:border-[#CCFF00]/50 transition-all ${isAr ? "text-right" : "text-left"}`}
+                    className={`w-full bg-card/80 border border-border rounded-2xl px-6 py-4 text-foreground font-bold focus:outline-none focus:border-primary/50 transition-all ${isAr ? "text-right" : "text-left"}`}
                   />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <label className="text-[9px] font-black text-white/30 uppercase tracking-[0.3em] ml-1 text-left block">
+                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] ml-1 text-left block">
                     Priority Level
                   </label>
                   <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value as Priority)}
-                    className={`w-full bg-black/60 border border-white/5 rounded-2xl px-6 py-[18px] text-[10px] font-black uppercase tracking-widest text-white outline-none focus:border-[#CCFF00]/30 appearance-none ${isAr ? "text-right" : "text-left"}`}
+                    className={`w-full bg-card/80 border border-border rounded-2xl px-6 py-[18px] text-[10px] font-black uppercase tracking-widest text-foreground outline-none focus:border-primary/30 appearance-none ${isAr ? "text-right" : "text-left"}`}
                   >
                     <option value="low">Standard</option>
                     <option value="medium">Enhanced</option>
@@ -410,7 +410,7 @@ export const AdvancedTodo: React.FC = () => {
               </div>
               <HeroButton
                 type="submit"
-                className="w-full rounded-2xl bg-[#CCFF00] text-black font-black uppercase text-[10px] tracking-widest py-5 shadow-[0_0_20px_rgba(204,255,0,0.1)]"
+                className="w-full rounded-2xl bg-primary text-black font-black uppercase text-[10px] tracking-widest py-5 shadow-[0_0_20px_rgba(204,255,0,0.1)]"
               >
                 Deploy Mission
               </HeroButton>
@@ -421,7 +421,7 @@ export const AdvancedTodo: React.FC = () => {
         <div className="flex-grow space-y-4 overflow-y-auto pr-2 custom-scrollbar max-h-[450px]">
           {loading ? (
             <div className="flex items-center justify-center h-full opacity-20">
-              <Zap className="w-12 h-12 animate-pulse text-[#CCFF00]" />
+              <Zap className="w-12 h-12 animate-pulse text-primary" />
             </div>
           ) : todos.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-60 opacity-10">
@@ -439,11 +439,11 @@ export const AdvancedTodo: React.FC = () => {
                 key={todo.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`group flex items-center gap-6 p-6 rounded-[32px] border transition-all duration-500 ${todo.is_completed ? "bg-black/20 border-white/5 opacity-30" : "bg-white/[0.02] border-white/5 hover:border-[#CCFF00]/30 shadow-xl"}`}
+                className={`group flex items-center gap-6 p-6 rounded-[32px] border transition-all duration-500 ${todo.is_completed ? "bg-foreground/10 border-border opacity-30" : "bg-muted/30 border-border hover:border-primary/30 shadow-xl"}`}
               >
                 <button
                   onClick={() => toggleTodo(todo.id, todo.is_completed)}
-                  className={`w-12 h-12 flex items-center justify-center rounded-2xl border-2 transition-all duration-500 ${todo.is_completed ? "bg-[#CCFF00] border-[#CCFF00] text-black" : "border-white/10 text-transparent hover:border-[#CCFF00]"}`}
+                  className={`w-12 h-12 flex items-center justify-center rounded-2xl border-2 transition-all duration-500 ${todo.is_completed ? "bg-primary border-primary text-black" : "border-border text-transparent hover:border-primary"}`}
                 >
                   <CheckCircle2 className="w-6 h-6" />
                 </button>
@@ -452,18 +452,18 @@ export const AdvancedTodo: React.FC = () => {
                   onClick={() => !todo.is_completed && startTask(todo)}
                 >
                   <h3
-                    className={`font-black text-sm uppercase tracking-widest transition-all duration-500 ${todo.is_completed ? "line-through text-white/20" : "text-white"}`}
+                    className={`font-black text-sm uppercase tracking-widest transition-all duration-500 ${todo.is_completed ? "line-through text-muted-foreground" : "text-foreground"}`}
                   >
                     {todo.task}
                   </h3>
                   <div className="flex items-center gap-3 mt-2">
                     <span
-                      className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-lg border ${todo.priority === "urgent" ? "text-red-500 border-red-500/20 bg-red-500/5" : "text-[#CCFF00]/50 border-white/5"}`}
+                      className={`text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-lg border ${todo.priority === "urgent" ? "text-red-500 border-red-500/20 bg-red-500/5" : "text-primary/50 border-border"}`}
                     >
                       {todo.priority}
                     </span>
                     {todo.time_limit && (
-                      <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em] flex items-center gap-1">
+                      <span className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" />
                         {todo.time_limit} MIN
                       </span>
@@ -472,7 +472,7 @@ export const AdvancedTodo: React.FC = () => {
                 </div>
                 <button
                   onClick={() => deleteTodo(todo.id)}
-                  className="w-12 h-12 flex items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
+                  className="w-12 h-12 flex items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-foreground"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>

@@ -14,6 +14,7 @@ import {
 import { AcademicReviewer } from "../../../components/AcademicReviewer";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { validateFile, sanitizeFilename, safeStoragePath } from "../../../lib/upload-security";
 
 export const Route = createFileRoute("/levels/classroom/$levelId")({
   component: LevelClassroomPage,
@@ -30,6 +31,8 @@ function LevelClassroomPage() {
   const [levelTitle, setLevelTitle] = useState("");
   const [levelContent, setLevelContent] = useState("");
   const [activeTab, setActiveTab] = useState<"chat" | "review">("chat");
+  const [selectedChatTab, setSelectedChatTab] = useState<string>("general");
+  const [lectures, setLectures] = useState<{ id: string; title: string; slot_number: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasAccessToLevel, setHasAccessToLevel] = useState(false);
 
@@ -49,13 +52,15 @@ function LevelClassroomPage() {
         supabase.from("levels").select("title").eq("id", levelId).single(),
         supabase
           .from("lectures")
-          .select("title, description")
-          .eq("level_id", levelId),
+          .select("id, title, description, slot_number")
+          .eq("level_id", levelId)
+          .order("slot_number", { ascending: true }),
       ]);
 
       if (levelRes.error) throw levelRes.error;
 
       setLevelTitle(levelRes.data?.title || "Unknown Level");
+      setLectures(lecturesRes.data || []);
 
       const aggregatedContent =
         lecturesRes.data
@@ -127,9 +132,41 @@ function LevelClassroomPage() {
           </button>
         </div>
 
+        {activeTab === "chat" && lectures.length > 0 && (
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 custom-scrollbar">
+            <button
+              onClick={() => setSelectedChatTab("general")}
+              className={`flex-shrink-0 px-5 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all ${
+                selectedChatTab === "general"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card text-muted-foreground hover:bg-muted"
+              }`}
+            >
+              {isAr ? "عام" : "GENERAL"}
+            </button>
+            {lectures.map((lec) => (
+              <button
+                key={lec.id}
+                onClick={() => setSelectedChatTab(lec.id)}
+                className={`flex-shrink-0 px-5 py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all ${
+                  selectedChatTab === lec.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {isAr ? `الدرس ${lec.slot_number}` : `UNIT ${lec.slot_number}`}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex-1">
           {activeTab === "chat" ? (
-            <LevelChat levelId={levelId} isAr={isAr} />
+            <LevelChat
+              levelId={levelId}
+              lectureId={selectedChatTab !== "general" ? selectedChatTab : undefined}
+              isAr={isAr}
+            />
           ) : (
             <div className="h-full overflow-y-auto custom-scrollbar">
               <AcademicReviewer
@@ -145,45 +182,70 @@ function LevelClassroomPage() {
   );
 }
 
-function LevelChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
+function LevelChat({ levelId, lectureId, isAr }: { levelId: string; lectureId?: string; isAr: boolean }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const { profile, isAdmin } = useAuth();
+  const { profile, isAdmin, isModerator } = useAuth();
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+  const lastSentAtRef = useRef<number>(0);
+  const COOLDOWN_MS = 10 * 60 * 1000;
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - lastSentAtRef.current;
+      const remaining = Math.max(0, Math.ceil((COOLDOWN_MS - elapsed) / 1000));
+      setCooldownRemaining(remaining);
+      if (remaining <= 0) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
+
+  const canSend = isAdmin || isModerator || cooldownRemaining <= 0;
 
   const fetchMessages = useCallback(async () => {
-    const { data } = await supabase
+    let query = supabase
       .from("level_chats")
       .select("*, profiles(username, avatar_url, role)")
       .eq("level_id", levelId)
       .order("created_at", { ascending: true });
+
+    if (lectureId) {
+      query = query.eq("lecture_id", lectureId);
+    } else {
+      query = query.is("lecture_id", null);
+    }
+
+    const { data } = await query;
     if (data) setMessages(data);
-  }, [levelId]);
+  }, [levelId, lectureId]);
 
   useEffect(() => {
     fetchMessages();
+    const channelName = lectureId ? `lecture_chat:${lectureId}` : `level:${levelId}`;
+    const filter = lectureId
+      ? `lecture_id=eq.${lectureId}`
+      : `level_id=eq.${levelId}`;
     const subscription = supabase
-      .channel(`level:${levelId}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "level_chats",
-          filter: `level_id=eq.${levelId}`,
+          filter,
         },
-        () => {
-          fetchMessages();
-        },
+        () => fetchMessages(),
       )
       .subscribe();
-
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, [levelId, fetchMessages]);
+  }, [levelId, lectureId, fetchMessages]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -194,18 +256,28 @@ function LevelChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !profile) return;
-    const { error } = await supabase.from("level_chats").insert([
-      {
-        level_id: levelId,
-        sender_id: profile.id,
-        content: newMessage,
-      },
-    ]);
+    if (!canSend) {
+      const mins = Math.ceil(cooldownRemaining / 60);
+      const secs = cooldownRemaining % 60;
+      toast.error(isAr ? `انتظر ${mins}د ${secs}ث` : `Wait ${mins}m ${secs}s`);
+      return;
+    }
+    const insertData: any = {
+      level_id: levelId,
+      sender_id: profile.id,
+      content: newMessage,
+    };
+    if (lectureId) insertData.lecture_id = lectureId;
+    const { error } = await supabase.from("level_chats").insert([insertData]);
 
     if (error) {
       toast.error(isAr ? "فشل إرسال الرسالة" : "Failed to send message");
     } else {
       setNewMessage("");
+      if (!isAdmin && !isModerator) {
+        lastSentAtRef.current = Date.now();
+        setCooldownRemaining(Math.ceil(COOLDOWN_MS / 1000));
+      }
     }
   };
 
@@ -214,27 +286,29 @@ function LevelChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
   ) => {
     const file = event.target.files?.[0];
     if (!file || !profile || !isAdmin) return;
+    const v = validateFile(file, "chatFile", true);
+    if (!v.valid) { toast.error(v.error); return; }
 
     setIsUploading(true);
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `classroom/${Date.now()}.${fileExt}`;
+      const filePath = safeStoragePath("classroom", file.name, profile.id);
       const { error } = await supabase.storage
         .from("course_files")
-        .upload(fileName, file);
+        .upload(filePath, file);
       if (error) throw error;
 
       const {
         data: { publicUrl },
-      } = supabase.storage.from("course_files").getPublicUrl(fileName);
+      } = supabase.storage.from("course_files").getPublicUrl(filePath);
 
-      const { error: insertError } = await supabase.from("level_chats").insert([
-        {
-          level_id: levelId,
-          sender_id: profile.id,
-          content: `📎 ${isAr ? "ملف" : "FILE"}: ${file.name}\n${publicUrl}`,
-        },
-      ]);
+      const safeName = sanitizeFilename(file.name);
+      const insertData: any = {
+        level_id: levelId,
+        sender_id: profile.id,
+        content: `📎 ${isAr ? "ملف" : "FILE"}: ${safeName}\n${publicUrl}`,
+      };
+      if (lectureId) insertData.lecture_id = lectureId;
+      const { error: insertError } = await supabase.from("level_chats").insert([insertData]);
       if (insertError) throw insertError;
       toast.success(isAr ? "تم رفع الملف" : "File uploaded to comm-link");
     } catch (err: any) {
@@ -250,7 +324,9 @@ function LevelChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
         <div className="flex items-center gap-4">
           <MessageSquare className="w-5 h-5 text-primary" />
           <h3 className="font-black italic uppercase tracking-widest text-sm">
-            {isAr ? "غرفة محادثة المستوى" : "LEVEL COMM-LINK"}
+            {lectureId
+              ? (isAr ? "محادثة الدرس" : "LECTURE COMM-LINK")
+              : (isAr ? "غرفة محادثة المستوى" : "LEVEL COMM-LINK")}
           </h3>
         </div>
       </header>
@@ -322,6 +398,11 @@ function LevelChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
         )}
       </div>
       <div className="p-8 bg-card border-t border-border">
+        {!canSend && cooldownRemaining > 0 && (
+          <div className="text-center text-xs text-muted-foreground mb-2 font-mono">
+            {isAr ? `انتظر ${Math.ceil(cooldownRemaining / 60)}:${String(cooldownRemaining % 60).padStart(2, "0")}` : `Cooldown ${Math.ceil(cooldownRemaining / 60)}:${String(cooldownRemaining % 60).padStart(2, "0")}`}
+          </div>
+        )}
         <div className="relative max-w-4xl mx-auto group">
           <input
             type="text"
@@ -329,13 +410,15 @@ function LevelChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder={
-              isAr ? "أرسل تحديثات المهمة..." : "Transmit mission updates..."
+              !canSend
+                ? (isAr ? "في الانتظار..." : "On cooldown...")
+                : (isAr ? "أرسل تحديثات المهمة..." : "Transmit mission updates...")
             }
             className="w-full bg-muted border border-border rounded-3xl py-6 pl-8 pr-20 font-bold focus:outline-none focus:border-primary focus:bg-muted/50 transition-all"
           />
           <button
             onClick={sendMessage}
-            disabled={isUploading}
+            disabled={isUploading || !canSend}
             className={`absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 p-4 bg-primary text-primary-foreground rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 disabled:opacity-50`}
           >
             <Send className={`w-5 h-5 ${isAr ? "rotate-180" : ""}`} />

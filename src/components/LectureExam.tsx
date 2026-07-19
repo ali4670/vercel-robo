@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { validateFile, safeStoragePath } from "../lib/upload-security";
 import {
   X,
   Check,
@@ -65,11 +66,12 @@ export function LectureExam({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const v = validateFile(file, "examFile", false);
+    if (!v.valid) { toast.error(v.error); return; }
+
     setSubmitting(true);
     try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
-        const filePath = `submissions/${fileName}`;
+        const filePath = safeStoragePath("submissions", file.name);
 
         const { error: uploadError } = await supabase.storage.from("submissions").upload(filePath, file);
         if (uploadError) throw uploadError;
@@ -153,14 +155,14 @@ export function LectureExam({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+        className="absolute inset-0 bg-card/90 backdrop-blur-xl"
         onClick={onClose}
       />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-2xl bg-white/10 border border-white/20 rounded-[40px] overflow-hidden shadow-2xl backdrop-blur-3xl"
+        className="relative w-full max-w-2xl bg-muted border border-border rounded-[40px] overflow-hidden shadow-2xl backdrop-blur-3xl"
       >
         <div className="p-8 md:p-12">
           {!result ? (
@@ -174,14 +176,14 @@ export function LectureExam({
                     <h2 className="text-xl font-black uppercase italic tracking-tight">
                       {isBigExam ? "Big Exam Unit" : "Module Certification"}
                     </h2>
-                    <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">
+                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
                       Question {currentIdx + 1} of {questions.length}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                  className="p-3 rounded-xl bg-muted/50 border border-border hover:bg-muted transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -203,12 +205,12 @@ export function LectureExam({
                         className={`p-6 rounded-2xl border transition-all text-left font-bold ${
                           answers[currentQuestion.id] === idx
                             ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                            : "bg-white/5 border-white/10 hover:border-white/20"
+                            : "bg-muted/50 border-border hover:border-border"
                         }`}
                       >
                         <div className="flex items-center gap-4">
                           <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-[10px] ${
-                            answers[currentQuestion.id] === idx ? "bg-emerald-500 border-emerald-500 text-black" : "border-white/20 text-white/40"
+                            answers[currentQuestion.id] === idx ? "bg-emerald-500 border-emerald-500 text-black" : "border-border text-muted-foreground"
                           }`}>
                             {String.fromCharCode(65 + idx)}
                           </div>
@@ -221,14 +223,14 @@ export function LectureExam({
                   <div className="space-y-4">
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-full h-48 border-2 border-dashed border-white/20 rounded-3xl flex flex-col items-center justify-center gap-4 hover:border-emerald-500/50 transition-colors"
+                        className="w-full h-48 border-2 border-dashed border-border rounded-3xl flex flex-col items-center justify-center gap-4 hover:border-emerald-500/50 transition-colors"
                     >
-                        <FileText className="w-10 h-10 text-white/20" />
-                        <span className="font-bold text-white/60">
+                        <FileText className="w-10 h-10 text-muted-foreground" />
+                        <span className="font-bold text-muted-foreground">
                             {answers[currentQuestion.id] ? "File Selected" : "Click to Upload File"}
                         </span>
                     </button>
-                    <input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, currentQuestion.id)} className="hidden" />
+                    <input type="file" ref={fileInputRef} onChange={(e) => handleFileUpload(e, currentQuestion.id)} className="hidden" accept="image/jpeg,image/png,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
                   </div>
                 ) : (
                   <textarea
@@ -237,7 +239,7 @@ export function LectureExam({
                       setAnswers((prev) => ({ ...prev, [currentQuestion.id]: e.target.value }))
                     }
                     placeholder="Provide your detailed response..."
-                    className="w-full h-48 p-6 bg-black/40 border border-white/10 rounded-3xl outline-none focus:border-emerald-500/50 transition-all text-white font-medium resize-none"
+                    className="w-full h-48 p-6 bg-foreground/20 border border-border rounded-3xl outline-none focus:border-emerald-500/50 transition-all text-foreground font-medium resize-none"
                   />
                 )}
               </div>
@@ -274,7 +276,7 @@ export function LectureExam({
               <h2 className="text-4xl font-black italic tracking-tighter uppercase">
                 {result.needsGrading ? "Submission Pending" : result.passed ? "Certification Approved" : "Sync Failed"}
               </h2>
-              <p className="text-white/40 font-bold uppercase tracking-widest text-sm max-w-sm mx-auto">
+              <p className="text-muted-foreground font-bold uppercase tracking-widest text-sm max-w-sm mx-auto">
                 {result.needsGrading 
                   ? "Your written responses have been sent to the moderator for manual evaluation."
                   : result.passed 
@@ -285,7 +287,7 @@ export function LectureExam({
               <HeroButton
                 onClick={onClose}
                 variant="primary"
-                className="mt-8 bg-[#CCFF00] text-black"
+                className="mt-8 bg-primary text-black"
               >
                 {result.passed || result.needsGrading ? "Return to Interface" : "Retry Sync"}
               </HeroButton>

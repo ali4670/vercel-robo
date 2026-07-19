@@ -146,36 +146,36 @@ function ParentDashboard() {
     if (!error) setMessage("");
   };
 
-  if (loading) return <div className="p-10 text-white">Loading...</div>;
+  if (loading) return <div className="p-10 text-foreground">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-[#030303] text-white p-10 pt-24">
+    <div className="min-h-screen bg-[#030303] text-foreground p-10 pt-24">
       <h1 className="text-4xl font-black uppercase italic mb-8">
         {isAr ? "لوحة أولياء الأمور" : "Parent Dashboard"}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <aside className="md:col-span-1 space-y-4">
-          <h2 className="text-xs font-black text-white/40 uppercase tracking-widest mb-4">
+          <h2 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-4">
             {isAr ? "طلابك" : "Your Students"}
           </h2>
           {students.map((student) => (
             <button
               key={student.id}
               onClick={() => setSelectedStudent(student)}
-              className={`w-full p-4 rounded-2xl text-left ${selectedStudent?.id === student.id ? "bg-[#CCFF00] text-black" : "bg-white/5"}`}
+              className={`w-full p-4 rounded-2xl text-left ${selectedStudent?.id === student.id ? "bg-primary text-black" : "bg-muted/50"}`}
             >
               {student.username}
             </button>
           ))}
 
-          <div className="mt-8 pt-8 border-t border-white/10">
-            <h2 className="text-xs font-black text-white/40 uppercase tracking-widest mb-4">
+          <div className="mt-8 pt-8 border-t border-border">
+            <h2 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-4">
               {isAr ? "مركز الرسائل" : "Message Hub"}
             </h2>
             <Link
               to="/messages"
-              className="w-full bg-[#CCFF00] text-black font-black py-4 rounded-xl text-xs uppercase flex items-center justify-center gap-2"
+              className="w-full bg-primary text-black font-black py-4 rounded-xl text-xs uppercase flex items-center justify-center gap-2"
             >
               <MessageSquare className="w-4 h-4" />
               {isAr ? "الانتقال للرسائل" : "Go to Messages"}
@@ -186,19 +186,19 @@ function ParentDashboard() {
         <main className="md:col-span-3 space-y-8">
           {selectedStudent ? (
             <>
-              <div className="bg-white/5 p-8 rounded-3xl border border-white/10">
+              <div className="bg-muted/50 p-8 rounded-3xl border border-border">
                 <h2 className="text-2xl font-black mb-6">
                   {selectedStudent.username}'s Status
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/5 p-4 rounded-xl">
-                    <p className="text-white/40 text-[10px] uppercase font-bold">
+                  <div className="bg-muted/50 p-4 rounded-xl">
+                    <p className="text-muted-foreground text-[10px] uppercase font-bold">
                       XP
                     </p>
                     <p className="text-2xl font-black">{selectedStudent.xp}</p>
                   </div>
-                  <div className="bg-white/5 p-4 rounded-xl">
-                    <p className="text-white/40 text-[10px] uppercase font-bold">
+                  <div className="bg-muted/50 p-4 rounded-xl">
+                    <p className="text-muted-foreground text-[10px] uppercase font-bold">
                       Current Module
                     </p>
                     <p className="text-sm font-black">
@@ -225,15 +225,15 @@ function ParentDashboard() {
                 </div>
               </div>
 
-              <section className="bg-white/5 p-8 rounded-3xl border border-white/10">
+              <section className="bg-muted/50 p-8 rounded-3xl border border-border">
                 <h3 className="text-xl font-black mb-4">
                   {isAr ? "نتائج الاختبارات" : "Exam Results"}
                 </h3>
                 {examSubmissions.map((sub) => (
-                  <div key={sub.id} className="p-4 border-b border-white/10 flex justify-between items-center">
+                  <div key={sub.id} className="p-4 border-b border-border flex justify-between items-center">
                     <div>
                       <p className="font-bold">{sub.lectures?.title || "Exam"}</p>
-                      <p className="text-xs text-white/60">
+                      <p className="text-xs text-muted-foreground">
                         {new Date(sub.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -242,7 +242,7 @@ function ParentDashboard() {
                         {sub.total_grade !== null ? `${sub.total_grade}%` : "Pending"}
                       </p>
                       {sub.moderator_feedback && (
-                        <p className="text-[10px] text-white/40 italic">
+                        <p className="text-[10px] text-muted-foreground italic">
                           {sub.moderator_feedback}
                         </p>
                       )}
@@ -251,26 +251,26 @@ function ParentDashboard() {
                 ))}
               </section>
 
-              <section className="bg-white/5 p-8 rounded-3xl border border-white/10">
+              <section className="bg-muted/50 p-8 rounded-3xl border border-border">
                 <h3 className="text-xl font-black mb-4">
                   {isAr ? "الواجبات المنزلية" : "Homework"}
                 </h3>
                 {homework.map((hw) => (
-                  <div key={hw.id} className="p-4 border-b border-white/10">
+                  <div key={hw.id} className="p-4 border-b border-border">
                     <p className="font-bold">{hw.title}</p>
-                    <p className="text-xs text-white/60">{hw.description}</p>
+                    <p className="text-xs text-muted-foreground">{hw.description}</p>
                   </div>
                 ))}
               </section>
 
-              <section className="bg-white/5 p-8 rounded-3xl border border-white/10">
+              <section className="bg-muted/50 p-8 rounded-3xl border border-border">
                 <h3 className="text-xl font-black mb-4">
                   {isAr ? "ملاحظات المشرف" : "Moderator Notes"}
                 </h3>
                 {notes.map((note) => (
-                  <div key={note.id} className="p-4 border-b border-white/10">
+                  <div key={note.id} className="p-4 border-b border-border">
                     <p className="text-sm">{note.content}</p>
-                    <p className="text-[10px] text-white/40">
+                    <p className="text-[10px] text-muted-foreground">
                       {new Date(note.created_at).toLocaleDateString()}
                     </p>
                   </div>

@@ -52,6 +52,7 @@ import { HeroButton } from "../funs/HeroButton";
 import { supabase } from "../lib/supabase-code";
 import { toast } from "sonner";
 import { parseDocx, parseXlsx, ParsedLecture } from "../utils/file-parser";
+import { validateFile, sanitizeFilename, safeStoragePath, getExt } from "../lib/upload-security";
 
 export const Route = createFileRoute("/moderator")({
   component: ModeratorDashboard,
@@ -198,11 +199,11 @@ function ModeratorDashboard() {
 
   if (!isModerator) {
     return (
-      <div className="min-h-screen bg-[#0a2610] text-white flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
         <div className="text-center space-y-4">
           <Shield className="w-20 h-20 mx-auto text-red-500 opacity-50" />
           <h1 className="text-4xl font-black italic uppercase">Access Denied</h1>
-          <p className="text-white/40 font-bold uppercase tracking-widest text-xs">
+          <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">
             Security Clearance Level 4 Required
           </p>
         </div>
@@ -223,25 +224,25 @@ function ModeratorDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#004e64] text-white flex flex-col relative overflow-hidden font-sans selection:bg-[#9fffcb]/30">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden font-sans selection:bg-primary/30">
       {/* Cinematic Background */}
-      <div className="fixed inset-0 bg-[#004e64] z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#00a5cf]/20 blur-[120px] rounded-full animate-pulse"></div>
-          <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-[#25a18e]/10 blur-[100px] rounded-full"></div>
+      <div className="fixed inset-0 bg-background z-0">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full animate-pulse"></div>
+          <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-primary/10 blur-[100px] rounded-full"></div>
       </div>
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-10 opacity-20"></div>
 
       <div className="flex-1 flex flex-col md:flex-row relative z-20 pt-12 px-6 max-w-[1400px] mx-auto w-full gap-12">
         {/* Floating Glass Sidebar - Horizontal on Mobile */}
-        <aside className="w-full md:w-64 sticky top-12 h-fit space-y-1.5 p-1.5 bg-white/10 border border-white/20 backdrop-blur-3xl rounded-[2rem] shadow-2xl flex md:flex-col overflow-x-auto md:overflow-visible custom-scrollbar">
-          <div className="hidden md:block px-5 py-3 border-b border-white/10 mb-1">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/60">Moderator OS</p>
+        <aside className="w-full md:w-64 sticky top-12 h-fit space-y-1.5 p-1.5 bg-muted border border-border backdrop-blur-3xl rounded-[2rem] shadow-2xl flex md:flex-col overflow-x-auto md:overflow-visible custom-scrollbar">
+          <div className="hidden md:block px-5 py-3 border-b border-border mb-1">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">Moderator OS</p>
           </div>
           <button
             onClick={() => setActiveTab("levels")}
-            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "levels" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "levels" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
           >
-            <div className={`p-1.5 rounded-lg ${activeTab === "levels" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+            <div className={`p-1.5 rounded-lg ${activeTab === "levels" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                 <Layout className="w-3.5 h-3.5" />
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest">
@@ -251,9 +252,9 @@ function ModeratorDashboard() {
           
           <button
             onClick={() => setActiveTab("users")}
-            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "users" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "users" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
           >
-            <div className={`p-1.5 rounded-lg ${activeTab === "users" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+            <div className={`p-1.5 rounded-lg ${activeTab === "users" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                 <Users className="w-3.5 h-3.5" />
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest">
@@ -263,16 +264,16 @@ function ModeratorDashboard() {
 
           <button
             onClick={() => setActiveTab("messaging")}
-            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] relative whitespace-nowrap ${activeTab === "messaging" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] relative whitespace-nowrap ${activeTab === "messaging" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
           >
-            <div className={`p-1.5 rounded-lg ${activeTab === "messaging" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+            <div className={`p-1.5 rounded-lg ${activeTab === "messaging" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                 <MessageSquare className="w-3.5 h-3.5" />
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest">
               {isAr ? "الرسائل" : "MESSAGING"}
             </span>
             {totalUnreadMessages > 0 && (
-              <span className="absolute top-3 right-5 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full ring-2 ring-black/20">
+              <span className="absolute top-3 right-5 flex items-center justify-center w-4 h-4 bg-red-500 text-foreground text-[9px] font-bold rounded-full ring-2 ring-black/20">
                 {totalUnreadMessages}
               </span>
             )}
@@ -280,9 +281,9 @@ function ModeratorDashboard() {
 
           <button
             onClick={() => setActiveTab("analytics")}
-            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "analytics" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "analytics" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
           >
-            <div className={`p-1.5 rounded-lg ${activeTab === "analytics" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+            <div className={`p-1.5 rounded-lg ${activeTab === "analytics" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                 <Activity className="w-3.5 h-3.5" />
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest">
@@ -292,9 +293,9 @@ function ModeratorDashboard() {
           
           <button
             onClick={() => setActiveTab("tasks")}
-            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "tasks" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "tasks" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
           >
-            <div className={`p-1.5 rounded-lg ${activeTab === "tasks" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+            <div className={`p-1.5 rounded-lg ${activeTab === "tasks" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                 <ListOrdered className="w-3.5 h-3.5" />
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest">
@@ -304,9 +305,9 @@ function ModeratorDashboard() {
 
           <button
             onClick={() => setActiveTab("failed_exams")}
-            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "failed_exams" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "failed_exams" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
           >
-            <div className={`p-1.5 rounded-lg ${activeTab === "failed_exams" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+            <div className={`p-1.5 rounded-lg ${activeTab === "failed_exams" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                 <ShieldAlert className="w-3.5 h-3.5" />
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest">
@@ -316,9 +317,9 @@ function ModeratorDashboard() {
 
           <button
             onClick={() => setActiveTab("grading")}
-            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "grading" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "grading" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
           >
-            <div className={`p-1.5 rounded-lg ${activeTab === "grading" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+            <div className={`p-1.5 rounded-lg ${activeTab === "grading" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                 <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest">
@@ -330,9 +331,9 @@ function ModeratorDashboard() {
             <>
                 <button
                 onClick={() => setActiveTab("directory")}
-                className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "directory" ? "bg-[#CCFF00] text-black shadow-lg shadow-[#CCFF00]/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+                className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "directory" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
                 >
-                <div className={`p-1.5 rounded-lg ${activeTab === "directory" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+                <div className={`p-1.5 rounded-lg ${activeTab === "directory" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                     <FileDown className="w-3.5 h-3.5" />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-widest">
@@ -342,9 +343,9 @@ function ModeratorDashboard() {
 
                 <button
                 onClick={() => setActiveTab("spotlight")}
-                className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "spotlight" ? "bg-[#CCFF00] text-black shadow-lg shadow-[#CCFF00]/20 scale-[1.02]" : "hover:bg-white/5 text-white/40 hover:text-white"}`}
+                className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "spotlight" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
                 >
-                <div className={`p-1.5 rounded-lg ${activeTab === "spotlight" ? "bg-black/10" : "bg-white/5 group-hover:bg-white/10"}`}>
+                <div className={`p-1.5 rounded-lg ${activeTab === "spotlight" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
                     <Zap className="w-3.5 h-3.5" />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-widest">
@@ -362,7 +363,7 @@ function ModeratorDashboard() {
                   <span className="px-2.5 py-1 bg-primary/10 border border-primary/20 text-primary text-[9px] font-black uppercase tracking-[0.2em] rounded-full">
                       Section {activeTab.toUpperCase()}
                   </span>
-                  <div className="h-px w-10 bg-white/10"></div>
+                  <div className="h-px w-10 bg-muted"></div>
               </div>
               <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter mb-3 leading-none">
                 {activeTab === "levels"
@@ -377,7 +378,7 @@ function ModeratorDashboard() {
                     ? isAr ? "دليل المستخدمين" : "USER DIRECTORY"
                   : isAr ? "مركز الرسائل" : "MESSAGING HUB"}
               </h1>
-              <p className="text-white/30 font-bold uppercase tracking-[0.4em] text-[9px]">
+              <p className="text-muted-foreground font-bold uppercase tracking-[0.4em] text-[9px]">
                 {isAr ? "نظام إدارة المنهج المتطور" : "ADVANCED PEDAGOGICAL OPERATING SYSTEM"}
               </p>
             </div>
@@ -407,11 +408,11 @@ function ModeratorDashboard() {
                 {levels.map((level) => (
                   <div
                     key={level.id}
-                    className="p-1 rounded-[2rem] bg-white/10 border border-white/20 hover:border-white/40 transition-all group"
+                    className="p-1 rounded-[2rem] bg-muted border border-border hover:border-border transition-all group"
                   >
-                    <div className="bg-white/5 border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-[calc(2rem-0.25rem)] p-6 flex items-center justify-between">
+                    <div className="bg-muted/50 border border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-[calc(2rem-0.25rem)] p-6 flex items-center justify-between">
                       <div className="flex items-center gap-8">
-                        <div className="text-4xl font-black italic text-white/5 w-16 leading-none">
+                        <div className="text-4xl font-black italic text-muted-foreground w-16 leading-none">
                           {String(level.level_order).padStart(2, "0")}
                         </div>
                         <div>
@@ -420,12 +421,12 @@ function ModeratorDashboard() {
                           </h3>
                           <div className="flex items-center gap-4">
                             <span
-                              className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full border ${level.is_published ? "bg-green-500/10 border-green-500/20 text-green-500" : "bg-white/5 border-white/10 text-white/40"}`}
+                              className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full border ${level.is_published ? "bg-green-500/10 border-green-500/20 text-green-500" : "bg-muted/50 border-border text-muted-foreground"}`}
                             >
                               {level.is_published ? "LIVE STATUS" : "DRAFT ARCHIVE"}
                             </span>
-                            <div className="h-0.5 w-0.5 rounded-full bg-white/20"></div>
-                            <span className="text-[8px] font-black uppercase text-white/20 tracking-widest">ID: {level.id.slice(0, 8)}</span>
+                            <div className="h-0.5 w-0.5 rounded-full bg-muted"></div>
+                            <span className="text-[8px] font-black uppercase text-muted-foreground tracking-widest">ID: {level.id.slice(0, 8)}</span>
                           </div>
                         </div>
                       </div>
@@ -435,7 +436,7 @@ function ModeratorDashboard() {
                             setSelectedLevelId(level.id);
                             setIsEditing(true);
                           }}
-                          className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-primary hover:text-black transition-all duration-500 hover:scale-110"
+                          className="p-3 rounded-full bg-muted/50 border border-border hover:bg-primary hover:text-black transition-all duration-500 hover:scale-110"
                         >
                           <Settings className="w-4 h-4" />
                         </button>
@@ -450,7 +451,7 @@ function ModeratorDashboard() {
                                     fetchLevels();
                                 }
                               }}
-                              className="p-3 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all duration-500 hover:scale-110 text-red-500"
+                              className="p-3 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-foreground transition-all duration-500 hover:scale-110 text-red-500"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -505,47 +506,47 @@ function UserDirectory({ isAr }: { isAr: boolean }) {
 
   return (
     <div className="space-y-8">
-      <div className="bg-white/5 border border-white/10 rounded-[32px] p-8">
+      <div className="bg-muted/50 border border-border rounded-[32px] p-8">
         <div className="relative group mb-8">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#CCFF00] transition-colors" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
                 type="text"
                 placeholder={isAr ? "بحث بالاسم أو الهاتف..." : "Search by name or phone..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl py-5 pl-16 pr-6 font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-[#CCFF00]/50 transition-all"
+                className="w-full bg-foreground/20 border border-border rounded-2xl py-5 pl-16 pr-6 font-bold text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all"
             />
         </div>
 
-        <div className="overflow-hidden border border-white/5 rounded-2xl">
+        <div className="overflow-hidden border border-border rounded-2xl">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/5">
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white/40 border-b border-white/5">{isAr ? "المستخدم" : "USER"}</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white/40 border-b border-white/5">{isAr ? "الرتبة" : "ROLE"}</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white/40 border-b border-white/5">{isAr ? "رقم الهاتف" : "PHONE NUMBER"}</th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white/40 border-b border-white/5">{isAr ? "XP" : "EXPERIENCE"}</th>
+              <tr className="bg-muted/50">
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border">{isAr ? "المستخدم" : "USER"}</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border">{isAr ? "الرتبة" : "ROLE"}</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border">{isAr ? "رقم الهاتف" : "PHONE NUMBER"}</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border">{isAr ? "XP" : "EXPERIENCE"}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {filteredUsers.map((u) => (
-                <tr key={u.id} className="hover:bg-white/[0.02] transition-colors group">
+                <tr key={u.id} className="hover:bg-muted/30 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-white/5 overflow-hidden flex-shrink-0 border border-white/10">
+                      <div className="w-8 h-8 rounded-full bg-muted/50 overflow-hidden flex-shrink-0 border border-border">
                         {u.avatar_url ? <img src={u.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-3 h-3 m-auto opacity-20" />}
                       </div>
                       <span className="font-bold text-sm">{u.username}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded border ${u.role === 'admin' ? "bg-red-500/10 border-red-500/20 text-red-500" : u.role === 'moderator' ? "bg-primary/10 border-primary/20 text-primary" : "bg-white/5 border-white/10 text-white/40"}`}>
+                    <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded border ${u.role === 'admin' ? "bg-red-500/10 border-red-500/20 text-red-500" : u.role === 'moderator' ? "bg-primary/10 border-primary/20 text-primary" : "bg-muted/50 border-border text-muted-foreground"}`}>
                       {u.role}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs text-white/60">{u.phone_number || "---"}</span>
+                      <span className="font-mono text-xs text-muted-foreground">{u.phone_number || "---"}</span>
                       {u.phone_number && (
                         <button onClick={() => copyToClipboard(u.phone_number!)} className="opacity-0 group-hover:opacity-100 p-1 hover:text-primary transition-all">
                           <Download className="w-3 h-3 rotate-180" />
@@ -561,7 +562,7 @@ function UserDirectory({ isAr }: { isAr: boolean }) {
             </tbody>
           </table>
           {filteredUsers.length === 0 && (
-            <div className="p-20 text-center text-white/20 uppercase font-black text-[10px] tracking-widest">
+            <div className="p-20 text-center text-muted-foreground uppercase font-black text-[10px] tracking-widest">
               No matching records found in central database
             </div>
           )}
@@ -602,17 +603,17 @@ function FailedExams({ isAr }: { isAr: boolean }) {
         {failedAttempts.map((attempt) => (
           <div
             key={attempt.id}
-            className="bg-white/5 border border-white/10 p-6 rounded-2xl flex justify-between items-center"
+            className="bg-muted/50 border border-border p-6 rounded-2xl flex justify-between items-center"
           >
             <div>
               <p className="font-bold">{attempt.profiles?.username}</p>
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-muted-foreground">
                 {attempt.levels?.title} - Score: {attempt.score}%
               </p>
             </div>
             <button
               onClick={() => approveProgression(attempt.student_id, attempt.level_id)}
-              className="bg-[#CCFF00] text-black px-4 py-2 rounded-xl font-black text-xs uppercase"
+              className="bg-primary text-black px-4 py-2 rounded-xl font-black text-xs uppercase"
             >
               {isAr ? "تجاوز" : "Approve Progression"}
             </button>
@@ -779,13 +780,14 @@ function SpotlightManagement({ isAr }: { isAr: boolean }) {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    const v = validateFile(file, "avatar", true);
+    if (!v.valid) { toast.error(v.error); return; }
     setUploading(true);
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `spotlight/${Date.now()}.${fileExt}`;
-      const { error } = await supabase.storage.from("avatars").upload(fileName, file);
+      const filePath = safeStoragePath("spotlight", file.name);
+      const { error } = await supabase.storage.from("avatars").upload(filePath, file);
       if (error) throw error;
-      const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
+      const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
       setAvatarUrl(data.publicUrl);
       toast.success("Avatar uploaded");
     } catch (err: any) {
@@ -821,25 +823,25 @@ function SpotlightManagement({ isAr }: { isAr: boolean }) {
       <h2 className="text-3xl font-black italic uppercase tracking-tighter">
         {isAr ? "إدارة بطاقة التميز" : "HERO CARD CONTROL"}
       </h2>
-      <div className="bg-white/5 border border-white/10 p-10 rounded-[40px] space-y-8 shadow-2xl relative overflow-hidden">
+      <div className="bg-muted/50 border border-border p-10 rounded-[40px] space-y-8 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-5">
             <Zap className="w-32 h-32 text-primary" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
             <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em] px-2">{isAr ? "اختيار العميل المميز" : "SELECT ELITE AGENT"}</label>
+                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] px-2">{isAr ? "اختيار العميل المميز" : "SELECT ELITE AGENT"}</label>
                 <div className="flex flex-col gap-2">
                     <input 
                         value={searchTerm} 
                         onChange={(e) => setSearchTerm(e.target.value)} 
-                        className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50" 
+                        className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50" 
                         placeholder={isAr ? "ابحث بالاسم أو الهاتف..." : "Search by name or phone..."} 
                     />
                     <select 
                         value={selectedUserId} 
                         onChange={(e) => setSelectedUserId(e.target.value)} 
-                        className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50 text-white"
+                        className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50 text-foreground"
                     >
                         <option value="">{filteredUsers.length > 0 ? (isAr ? "اختر من القائمة" : "Select from list") : (isAr ? "لا يوجد نتائج" : "No agents found")}</option>
                         {filteredUsers.map(u => <option key={u.id} value={u.id} className="bg-neutral-900">{u.username} {u.phone_number ? `(${u.phone_number})` : ''}</option>)}
@@ -848,34 +850,34 @@ function SpotlightManagement({ isAr }: { isAr: boolean }) {
             </div>
 
             <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em] px-2">{isAr ? "المسمى الوظيفي / التكريم" : "MOTIVATIONAL TITLE"}</label>
+                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] px-2">{isAr ? "المسمى الوظيفي / التكريم" : "MOTIVATIONAL TITLE"}</label>
                 <input 
                     value={title} 
                     onChange={(e) => setTitle(e.target.value)} 
-                    className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50" 
+                    className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50" 
                     placeholder="e.g. Employee of the Month" 
                 />
                 
-                <label className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em] px-2 pt-4">{isAr ? "الإنجاز / اللقب" : "ELITE ACHIEVEMENT"}</label>
+                <label className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] px-2 pt-4">{isAr ? "الإنجاز / اللقب" : "ELITE ACHIEVEMENT"}</label>
                 <input 
                     value={description} 
                     onChange={(e) => setDescription(e.target.value)} 
-                    className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50" 
+                    className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50" 
                     placeholder="e.g. WORLD CHAMPION" 
                 />
             </div>
         </div>
         
         <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em] px-2">{isAr ? "صورة التميز (اختياري)" : "HERO OVERRIDE AVATAR (OPTIONAL)"}</label>
+            <label className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] px-2">{isAr ? "صورة التميز (اختياري)" : "HERO OVERRIDE AVATAR (OPTIONAL)"}</label>
             <div className="flex gap-4">
                 <input 
                     value={avatarUrl} 
                     onChange={(e) => setAvatarUrl(e.target.value)} 
-                    className="flex-1 bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50" 
+                    className="flex-1 bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-primary/50" 
                     placeholder="Custom Image URL" 
                 />
-                <HeroButton onClick={() => fileInputRef.current?.click()} variant="outline" className="h-14 px-8 border-white/10">
+                <HeroButton onClick={() => fileInputRef.current?.click()} variant="outline" className="h-14 px-8 border-border">
                     <FileUp className="w-4 h-4 mr-2" />
                     {isAr ? "رفع صورة" : "UPLOAD"}
                 </HeroButton>
@@ -892,8 +894,8 @@ function SpotlightManagement({ isAr }: { isAr: boolean }) {
         </HeroButton>
 
         {spotlight && (
-            <div className="pt-10 mt-10 border-t border-white/5">
-                <p className="text-[8px] font-black uppercase text-white/20 tracking-widest text-center mb-4">LIVE PREVIEW ON SYSTEM</p>
+            <div className="pt-10 mt-10 border-t border-border">
+                <p className="text-[8px] font-black uppercase text-muted-foreground tracking-widest text-center mb-4">LIVE PREVIEW ON SYSTEM</p>
                 <div className="flex items-center gap-6 justify-center grayscale opacity-40 scale-90">
                     <div className="w-16 h-16 rounded-full border-2 border-primary overflow-hidden">
                         <img src={avatarUrl || spotlight.profiles?.avatar_url} className="w-full h-full object-cover" />
@@ -901,7 +903,7 @@ function SpotlightManagement({ isAr }: { isAr: boolean }) {
                     <div className="text-left">
                         <p className="font-black italic text-xl leading-none">{spotlight.profiles?.username}</p>
                         <p className="text-[10px] font-black uppercase text-primary">{title}</p>
-                        <p className="text-[8px] font-black uppercase text-white/40">{description}</p>
+                        <p className="text-[8px] font-black uppercase text-muted-foreground">{description}</p>
                     </div>
                 </div>
             </div>
@@ -987,6 +989,14 @@ function UserManagement({ isAr }: { isAr: boolean }) {
   };
 
   const changeRole = async (userId: string, role: string) => {
+    if (!isAdmin && role === "admin") {
+      toast.error(isAr ? "لا يمكنك ترقية شخص إلى Admin" : "Cannot promote to Admin");
+      return;
+    }
+    if (userId === profile?.id) {
+      toast.error(isAr ? "لا يمكنك تغيير رتبتك" : "Cannot change your own role");
+      return;
+    }
     const { error } = await supabase.from("profiles").update({ role }).eq("id", userId);
     if (!error) {
       toast.success(isAr ? "تم تحديث الرتبة" : "Role updated");
@@ -1064,24 +1074,24 @@ function UserManagement({ isAr }: { isAr: boolean }) {
       <div className="flex flex-col gap-6">
         <div className="flex gap-4">
             <div className="relative group flex-1">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#CCFF00] transition-colors" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
                 type="text"
                 placeholder={isAr ? "البحث عن عميل (الاسم/الهاتف)..." : "Search for agent (Name/Phone)..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white/10 border border-white/20 rounded-2xl py-5 pl-16 pr-6 font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/50 transition-all"
+                className="w-full bg-muted border border-border rounded-2xl py-5 pl-16 pr-6 font-bold text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border0 transition-all"
             />
             </div>
         </div>
 
         {/* Tab-based Role Filter */}
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 w-fit">
+        <div className="flex bg-muted/50 p-1 rounded-2xl border border-border w-fit">
             {(["all", "student", "parent", "moderator", "admin"] as const).map((role) => (
                 <button
                     key={role}
                     onClick={() => setRoleFilter(role)}
-                    className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${roleFilter === role ? "bg-[#CCFF00] text-black shadow-lg" : "text-white/40 hover:text-white hover:bg-white/10"}`}
+                    className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${roleFilter === role ? "bg-primary text-black shadow-lg" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                 >
                     {role}
                 </button>
@@ -1091,33 +1101,33 @@ function UserManagement({ isAr }: { isAr: boolean }) {
 
       {/* Top 3 Leaderboard */}
       <section className="space-y-6">
-          <h2 className="text-2xl font-black italic uppercase tracking-tighter text-white/60">{isAr ? "أعلى 3 طلاب" : "TOP 3 AGENTS"}</h2>
+          <h2 className="text-2xl font-black italic uppercase tracking-tighter text-muted-foreground">{isAr ? "أعلى 3 طلاب" : "TOP 3 AGENTS"}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {top3.map((user, i) => (
                   <div key={user.id} className="relative p-0.5 rounded-[2.5rem] bg-gradient-to-br from-white/20 to-white/5 overflow-hidden">
-                      <div className="bg-white/10 backdrop-blur-3xl p-8 rounded-[calc(2.5rem-0.125rem)] text-center">
-                          <div className="absolute top-4 right-8 text-4xl font-black italic text-white/10">#{i + 1}</div>
-                          <div className="w-20 h-20 rounded-full bg-white/20 mx-auto mb-6 flex items-center justify-center border-2 border-white/30 overflow-hidden">
-                              {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-10 h-10 text-white/40" />}
+                      <div className="bg-muted backdrop-blur-3xl p-8 rounded-[calc(2.5rem-0.125rem)] text-center">
+                          <div className="absolute top-4 right-8 text-4xl font-black italic text-muted-foreground/30">#{i + 1}</div>
+                          <div className="w-20 h-20 rounded-full bg-muted mx-auto mb-6 flex items-center justify-center border-2 border-border overflow-hidden">
+                              {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-10 h-10 text-muted-foreground" />}
                           </div>
-                          <h3 className="text-xl font-black uppercase tracking-tight text-white mb-2">{user.username}</h3>
+                          <h3 className="text-xl font-black uppercase tracking-tight text-foreground mb-2">{user.username}</h3>
                           <div className="flex flex-col items-center gap-2">
-                              <span className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-black text-white">{user.xp} XP</span>
-                              <span className="text-[8px] font-black uppercase text-white/40">{user.role}</span>
+                              <span className="px-3 py-1 bg-muted rounded-full text-[10px] font-black text-foreground">{user.xp} XP</span>
+                              <span className="text-[8px] font-black uppercase text-muted-foreground">{user.role}</span>
                           </div>
 
                           <div className="mt-8 flex flex-col gap-2">
                               <div className="flex gap-2">
                                 <button
                                     onClick={() => toggleApproval(user.id, user.is_approved)}
-                                    className={`flex-1 h-10 rounded-xl text-[9px] font-black uppercase transition-all ${user.is_approved ? "bg-green-500 text-black" : "bg-white/10 text-white border border-white/10"}`}
+                                    className={`flex-1 h-10 rounded-xl text-[9px] font-black uppercase transition-all ${user.is_approved ? "bg-green-500 text-black" : "bg-muted text-foreground border border-border"}`}
                                 >
                                     {user.is_approved ? (isAr ? "معتمد" : "APPROVED") : (isAr ? "غير معتمد" : "PENDING")}
                                 </button>
                                 {isAdmin && (
                                     <button
                                         onClick={() => deleteUser(user.id)}
-                                        className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white transition-all flex items-center justify-center"
+                                        className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-foreground transition-all flex items-center justify-center"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
@@ -1128,19 +1138,20 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                 <select
                                     value={user.role}
                                     onChange={(e) => changeRole(user.id, e.target.value)}
-                                    className="flex-1 bg-black/40 border border-white/10 rounded-xl p-2 text-[10px] text-white"
+                                    disabled={user.id === profile?.id || (!isAdmin && user.role === 'admin')}
+                                    className="flex-1 bg-foreground/20 border border-border rounded-xl p-2 text-[10px] text-foreground disabled:opacity-50"
                                 >
                                     <option value="student">Student</option>
                                     <option value="parent">Parent</option>
                                     <option value="moderator">Moderator</option>
-                                    <option value="admin">Admin</option>
+                                    {isAdmin && <option value="admin">Admin</option>}
                                 </select>
                                 <button
                                     onClick={() => {
                                         setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
                                         if (selectedUserId !== user.id) fetchUserAccess(user.id);
                                     }}
-                                    className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white text-white hover:text-black transition-all flex items-center justify-center ${selectedUserId === user.id ? "bg-white text-black" : ""}`}
+                                    className={`w-10 h-10 rounded-xl bg-muted/50 border border-border hover:bg-muted text-foreground hover:text-foreground transition-all flex items-center justify-center ${selectedUserId === user.id ? "bg-primary text-primary-foreground" : ""}`}
                                 >
                                     <Lock className="w-4 h-4" />
                                 </button>
@@ -1151,7 +1162,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                     setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
                                     if (selectedUserId !== user.id) fetchUserAccess(user.id);
                                 }}
-                                className="w-full bg-white text-black h-12 rounded-2xl font-black text-[10px] uppercase tracking-widest mt-2"
+                                className="w-full bg-primary text-primary-foreground h-12 rounded-2xl font-black text-[10px] uppercase tracking-widest mt-2"
                               >
                                 {isAr ? "إدارة الصلاحيات" : "MANAGE ACCESS"}
                               </HeroButton>
@@ -1163,7 +1174,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden border-t border-white/5 mt-6 pt-6 text-left"
+                                className="overflow-hidden border-t border-border mt-6 pt-6 text-left"
                               >
                                 <div className="grid grid-cols-1 gap-3">
                                   <div className="flex gap-2 mb-2">
@@ -1181,7 +1192,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                         <button
                                           key={level.id}
                                           onClick={() => toggleLevelAccess(user.id, level.id, hasAccess)}
-                                          className={`p-2 rounded-xl border text-left transition-all group ${hasAccess ? "bg-lime-500/10 border-lime-500/50 text-lime-400 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : "bg-white/5 border-white/10 text-white/20 hover:border-white/20"}`}
+                                          className={`p-2 rounded-xl border text-left transition-all group ${hasAccess ? "bg-lime-500/10 border-lime-500/50 text-lime-400 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : "bg-muted/50 border-border text-muted-foreground hover:border-border"}`}
                                         >
                                           <div className="flex items-center justify-between mb-1">
                                             <span className="text-[8px] font-black uppercase tracking-tighter">
@@ -1212,7 +1223,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
 
       {/* Rest of Students */}
       <section className="space-y-6">
-          <h2 className="text-xl font-black italic uppercase tracking-tighter text-white/40">{isAr ? "بقية الطلاب" : "OPERATIVE ROSTER"}</h2>
+          <h2 className="text-xl font-black italic uppercase tracking-tighter text-muted-foreground">{isAr ? "بقية الطلاب" : "OPERATIVE ROSTER"}</h2>
           <div className="grid gap-3">
             {rest.map((user) => {
               const currentLinks = user.role === 'parent' 
@@ -1222,7 +1233,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
               return (
               <div
                 key={user.id}
-                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-5 flex flex-col gap-6 group hover:bg-white/10 transition-all"
+                className="bg-muted/50 backdrop-blur-xl border border-border rounded-3xl p-5 flex flex-col gap-6 group hover:bg-muted transition-all"
               >
                 {user.role === 'student' && (
                     <div className="px-2">
@@ -1230,11 +1241,11 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                             const link = parentStudentLinks.find(l => l.student_id === user.id);
                             const parent = users.find(u => u.id === link?.parent_id);
                             return parent ? (
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#CCFF00] mb-2">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">
                                     {isAr ? "ولي الأمر: " : "PARENT: "} {parent.username}
                                 </p>
                             ) : (
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-2">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">
                                     {isAr ? "لا يوجد ولي أمر مرتبط" : "NO PARENT LINKED"}
                                 </p>
                             );
@@ -1243,17 +1254,17 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                 )}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
-                        <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/10 overflow-hidden flex items-center justify-center">
-                            {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-5 h-5 text-white/20" />}
+                        <div className="w-12 h-12 rounded-2xl bg-muted border border-border overflow-hidden flex items-center justify-center">
+                            {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-5 h-5 text-muted-foreground" />}
                         </div>
                         <div>
-                            <h3 className="font-bold text-white">{user.username}</h3>
-                            <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">{user.xp} XP • {user.role}</p>
+                            <h3 className="font-bold text-foreground">{user.username}</h3>
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{user.xp} XP • {user.role}</p>
                             <div className="flex flex-wrap gap-1 mt-1">
                                 {currentLinks.map(link => {
                                     const linkedUser = users.find(u => u.id === (user.role === 'parent' ? link.student_id : link.parent_id));
                                     return linkedUser ? (
-                                        <div key={link.id} className="flex items-center gap-1 bg-white/10 rounded-full px-2 py-0.5 text-[7px] font-black text-white/60">
+                                        <div key={link.id} className="flex items-center gap-1 bg-muted rounded-full px-2 py-0.5 text-[7px] font-black text-muted-foreground">
                                             {linkedUser.username}
                                             <button onClick={() => unlinkStudentFromParent(user.role === 'parent' ? linkedUser.id : user.id, user.role === 'parent' ? user.id : linkedUser.id)}>
                                                 <X className="w-2 h-2 hover:text-red-500" />
@@ -1268,7 +1279,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                     <div className="flex items-center gap-2">
                         <button
                           onClick={() => toggleApproval(user.id, user.is_approved)}
-                          className={`px-4 h-10 rounded-xl text-[9px] font-black uppercase transition-all ${user.is_approved ? "bg-green-500 text-black" : "bg-white/10 text-white border border-white/10"}`}
+                          className={`px-4 h-10 rounded-xl text-[9px] font-black uppercase transition-all ${user.is_approved ? "bg-green-500 text-black" : "bg-muted text-foreground border border-border"}`}
                         >
                           {user.is_approved ? "APPROVED" : "PENDING"}
                         </button>
@@ -1277,7 +1288,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                 setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
                                 if (selectedUserId !== user.id) fetchUserAccess(user.id);
                             }}
-                            className={`p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white text-white hover:text-black transition-all ${selectedUserId === user.id ? "bg-white text-black" : ""}`}
+                            className={`p-3 rounded-2xl bg-muted/50 border border-border hover:bg-muted text-foreground hover:text-foreground transition-all ${selectedUserId === user.id ? "bg-primary text-primary-foreground" : ""}`}
                         >
                             <Lock className="w-4 h-4" />
                         </button>
@@ -1285,12 +1296,13 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                         <select
                             value={user.role}
                             onChange={(e) => changeRole(user.id, e.target.value)}
-                            className="bg-black/40 border border-white/10 rounded-xl p-2 text-[10px] text-white"
+                            disabled={user.id === profile?.id || (!isAdmin && user.role === 'admin')}
+                            className="bg-foreground/20 border border-border rounded-xl p-2 text-[10px] text-foreground disabled:opacity-50"
                         >
                             <option value="student">Student</option>
                             <option value="parent">Parent</option>
                             <option value="moderator">Moderator</option>
-                            <option value="admin">Admin</option>
+                            {isAdmin && <option value="admin">Admin</option>}
                         </select>
 
                         {user.role === 'student' && (
@@ -1299,7 +1311,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                     <input
                                         type="text"
                                         placeholder={isAr ? "ربط ولي أمر (اسم/هاتف)" : "Link Parent (Name/Phone)"}
-                                        className="bg-black/40 border border-white/10 rounded-xl p-1 text-[8px] text-white w-32"
+                                        className="bg-foreground/20 border border-border rounded-xl p-1 text-[8px] text-foreground w-32"
                                         onChange={(e) => {
                                             const val = e.target.value.toLowerCase();
                                             const parentSelect = e.target.nextSibling as HTMLSelectElement;
@@ -1311,7 +1323,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                         onKeyDown={(e) => e.stopPropagation()}
                                     />
                                     <select
-                                        className="bg-black/40 border border-white/10 rounded-xl p-1 text-[8px] text-white w-32"
+                                        className="bg-foreground/20 border border-border rounded-xl p-1 text-[8px] text-foreground w-32"
                                         onChange={(e) => {
                                             if (e.target.value) linkStudentToParent(user.id, e.target.value);
                                         }}
@@ -1326,7 +1338,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                 <div className="flex flex-col gap-1">
                                     <textarea
                                         placeholder={isAr ? "أضف ملاحظة لولي الأمر..." : "Add note for parent..."}
-                                        className="bg-black/40 border border-white/10 rounded-xl p-2 text-[8px] text-white w-full h-16"
+                                        className="bg-foreground/20 border border-border rounded-xl p-2 text-[8px] text-foreground w-full h-16"
                                         onBlur={(e) => {
                                             if(e.target.value) {
                                                 supabase.from("moderator_notes").insert({
@@ -1348,7 +1360,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                     <input
                                         type="text"
                                         placeholder={isAr ? "ربط طالب (اسم/هاتف)" : "Link Student (Name/Phone)"}
-                                        className="bg-black/40 border border-white/10 rounded-xl p-1 text-[8px] text-white w-32"
+                                        className="bg-foreground/20 border border-border rounded-xl p-1 text-[8px] text-foreground w-32"
                                         onChange={(e) => {
                                             const val = e.target.value.toLowerCase();
                                             const studentSelect = e.target.nextSibling as HTMLSelectElement;
@@ -1360,7 +1372,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                         onKeyDown={(e) => e.stopPropagation()}
                                     />
                                     <select
-                                        className="bg-black/40 border border-white/10 rounded-xl p-1 text-[8px] text-white w-32"
+                                        className="bg-foreground/20 border border-border rounded-xl p-1 text-[8px] text-foreground w-32"
                                         onChange={(e) => {
                                             if (e.target.value) linkStudentToParent(e.target.value, user.id);
                                         }}
@@ -1372,7 +1384,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                         ))}
                                     </select>
                                 </div>
-                                <div className="text-[8px] font-black text-white/40 uppercase tracking-tighter">
+                                <div className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter">
                                     {isAr ? "اربط الطلاب لرؤية بياناتهم" : "Link students to see info"}
                                 </div>
                             </div>
@@ -1381,7 +1393,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                         {isAdmin && (
                             <button
                                 onClick={() => deleteUser(user.id)}
-                                className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-white transition-all"
+                                className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-foreground transition-all"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>
@@ -1395,7 +1407,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden border-t border-white/5 pt-6"
+                      className="overflow-hidden border-t border-border pt-6"
                     >
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div className="col-span-2 md:col-span-4 flex gap-2 mb-2">
@@ -1412,7 +1424,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                             <button
                               key={level.id}
                               onClick={() => toggleLevelAccess(user.id, level.id, hasAccess)}
-                              className={`p-4 rounded-2xl border text-left transition-all group ${hasAccess ? "bg-lime-500/10 border-lime-500/50 text-lime-400 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : "bg-white/5 border-white/10 text-white/20 hover:border-white/20"}`}
+                              className={`p-4 rounded-2xl border text-left transition-all group ${hasAccess ? "bg-lime-500/10 border-lime-500/50 text-lime-400 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : "bg-muted/50 border-border text-muted-foreground hover:border-border"}`}
                             >
                               <div className="flex items-center justify-between mb-2">
                                 <span className="text-[10px] font-black uppercase tracking-tighter">
@@ -1451,6 +1463,9 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
   const [selectedChatType, setSelectedChatType] = useState<"dm" | "level" | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
+  const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null);
+  const [levelLectures, setLevelLectures] = useState<Record<string, { id: string; title: string; slot_number: number }[]>>({});
+  const [expandedLevels, setExpandedLevels] = useState<Set<string>>(new Set());
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const { profile: myProfile } = useAuth();
@@ -1483,18 +1498,24 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
     } else if (selectedChatType === "level" && selectedLevelId) {
       // Level Chat Subscription
       fetchMessages();
+      const channelName = selectedLectureId
+        ? `lecture_chat:${selectedLectureId}`
+        : `level_chat:${selectedLevelId}`;
+      const filter = selectedLectureId
+        ? `lecture_id=eq.${selectedLectureId}`
+        : `level_id=eq.${selectedLevelId}`;
       subscription = supabase
-        .channel(`level_chat:${selectedLevelId}`)
+        .channel(channelName)
         .on(
           "postgres_changes",
           {
             event: "INSERT",
             schema: "public",
             table: "level_chats",
-            filter: `level_id=eq.${selectedLevelId}`,
+            filter,
           },
-          (payload) => {
-            setMessages((prev) => [...prev, payload.new]);
+          () => {
+            fetchMessages();
           },
         )
         .subscribe();
@@ -1502,7 +1523,7 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
     return () => {
       if (subscription) supabase.removeChannel(subscription);
     };
-  }, [selectedChatType, selectedUserId, selectedLevelId, myProfile?.id]);
+  }, [selectedChatType, selectedUserId, selectedLevelId, selectedLectureId, myProfile?.id]);
 
   useEffect(() => {
     // Scroll to bottom on new message
@@ -1522,7 +1543,19 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
       .from("levels")
       .select("*")
       .order("level_order", { ascending: true });
-    if (levelsData) setLevels(levelsData);
+    if (levelsData) {
+      setLevels(levelsData);
+      const lecMap: Record<string, { id: string; title: string; slot_number: number }[]> = {};
+      for (const lv of levelsData) {
+        const { data: lecs } = await supabase
+          .from("lectures")
+          .select("id, title, slot_number")
+          .eq("level_id", lv.id)
+          .order("slot_number", { ascending: true });
+        if (lecs) lecMap[lv.id] = lecs;
+      }
+      setLevelLectures(lecMap);
+    }
   };
 
   const fetchMessages = async () => {
@@ -1544,11 +1577,19 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
       }
     } else if (selectedChatType === "level" && selectedLevelId) {
       console.log("Fetching Level messages...");
-      const { data, error } = await supabase
+      let query = supabase
         .from("level_chats")
         .select("*, profiles(username, avatar_url, role)")
         .eq("level_id", selectedLevelId)
         .order("created_at", { ascending: true });
+
+      if (selectedLectureId) {
+        query = query.eq("lecture_id", selectedLectureId);
+      } else {
+        query = query.is("lecture_id", null);
+      }
+
+      const { data, error } = await query;
       
       if (error) {
         console.error("Level Chat Fetch error:", error);
@@ -1581,13 +1622,13 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
         fetchMessages(); // Force immediate refresh
       }
     } else if (selectedChatType === "level" && selectedLevelId) {
-      const { error } = await supabase.from("level_chats").insert([
-        {
-          level_id: selectedLevelId,
-          sender_id: myProfile.id,
-          content: newMessage,
-        },
-      ]);
+      const insertData: any = {
+        level_id: selectedLevelId,
+        sender_id: myProfile.id,
+        content: newMessage,
+      };
+      if (selectedLectureId) insertData.lecture_id = selectedLectureId;
+      const { error } = await supabase.from("level_chats").insert([insertData]);
       if (error) {
         console.error("Chat Send error:", error);
         toast.error(isAr ? "فشل إرسال رسالة الفصل" : "Failed to send classroom message.");
@@ -1601,6 +1642,7 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
 
   const selectChat = (type: "dm" | "level", id: string) => {
     setSelectedChatType(type);
+    setSelectedLectureId(null);
     if (type === "dm") {
       setSelectedUserId(id);
       setSelectedLevelId(null);
@@ -1610,6 +1652,24 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
     }
     setMessages([]); // Clear messages when switching chat
     setNewMessage("");
+  };
+
+  const selectLecture = (levelId: string, lectureId: string) => {
+    setSelectedChatType("level");
+    setSelectedLevelId(levelId);
+    setSelectedLectureId(lectureId);
+    setSelectedUserId(null);
+    setMessages([]);
+    setNewMessage("");
+  };
+
+  const toggleLevelExpand = (levelId: string) => {
+    setExpandedLevels((prev) => {
+      const next = new Set(prev);
+      if (next.has(levelId)) next.delete(levelId);
+      else next.add(levelId);
+      return next;
+    });
   };
 
   const deleteMessage = async (messageId: string) => {
@@ -1629,14 +1689,14 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
   };
 
   return (
-    <div className="h-[600px] flex gap-6">
-      <aside className="w-80 bg-black/40 border border-white/10 rounded-[32px] overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-white/5">
-          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/40 mb-4">
+    <div className="h-[700px] flex gap-6">
+      <aside className="w-96 bg-foreground/20 border border-border rounded-[32px] overflow-hidden flex flex-col">
+        <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
+          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">
             {isAr ? "قنوات التواصل" : "COMMUNICATION CHANNELS"}
           </h3>
 
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-2">
+          <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
             {isAr ? "رسائل مباشرة" : "DIRECT MESSAGES"}
           </h4>
           <div className="space-y-2 mb-4 custom-scrollbar overflow-y-auto max-h-40">
@@ -1644,9 +1704,9 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
               <button
                 key={p.id}
                 onClick={() => selectChat("dm", p.id)}
-                className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all ${selectedChatType === "dm" && selectedUserId === p.id ? "bg-[#CCFF00] text-black shadow-lg shadow-[#CCFF00]/10" : "bg-white/5 hover:bg-white/10"}`}
+                className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all ${selectedChatType === "dm" && selectedUserId === p.id ? "bg-primary text-black shadow-lg shadow-primary/10" : "bg-muted/50 hover:bg-muted"}`}
               >
-                <div className="w-8 h-8 rounded-full bg-black/20 overflow-hidden flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden flex-shrink-0">
                   {p.avatar_url ? (
                     <img src={p.avatar_url} className="w-full h-full object-cover" />
                   ) : (
@@ -1660,60 +1720,104 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
             ))}
           </div>
 
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-2">
+          <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
             {isAr ? "فصول المستوى" : "LEVEL CLASSROOMS"}
           </h4>
-          <div className="space-y-2 custom-scrollbar overflow-y-visible">
-            {levels.map((level) => (
-              <button
-                key={level.id}
-                onClick={() => selectChat("level", level.id)}
-                className={`w-full flex items-center gap-4 p-4 rounded-3xl transition-all border ${selectedChatType === "level" && selectedLevelId === level.id ? "bg-lime-500/10 border-lime-500/30 text-white" : "bg-white/5 hover:bg-white/10 border-white/5"}`}
-              >
-                <div className="w-12 h-12 rounded-2xl bg-black/20 overflow-hidden flex-shrink-0 border border-white/5">
-                  {level.image_url ? (
-                      <img src={level.image_url} className="w-full h-full object-cover" />
-                  ) : (
-                      <MessageSquare className="w-4 h-4 m-auto opacity-20" />
+          <div className="space-y-2 custom-scrollbar overflow-y-auto max-h-[400px]">
+            {levels.map((level) => {
+              const lectures = levelLectures[level.id] || [];
+              const isExpanded = expandedLevels.has(level.id);
+              const isActiveLevel = selectedChatType === "level" && selectedLevelId === level.id;
+              return (
+                <div key={level.id}>
+                  <div className={`flex items-center gap-2 rounded-3xl transition-all border ${isActiveLevel && !selectedLectureId ? "bg-lime-500/10 border-lime-500/30 text-foreground" : "bg-muted/50 hover:bg-muted border-border"}`}>
+                    <button
+                      onClick={() => selectChat("level", level.id)}
+                      className="flex-1 flex items-center gap-4 p-4 text-left"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-foreground/10 overflow-hidden flex-shrink-0 border border-border">
+                        {level.image_url ? (
+                            <img src={level.image_url} className="w-full h-full object-cover" />
+                        ) : (
+                          <MessageSquare className="w-4 h-4 m-auto opacity-20" />
+                        )}
+                      </div>
+                      <div className="text-left overflow-hidden">
+                        <p className="font-black text-sm truncate uppercase tracking-wider">{level.title}</p>
+                        <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest italic">
+                          {lectures.length > 0 ? `${lectures.length} UNITS` : "CLASSROOM CHANNEL"}
+                        </p>
+                      </div>
+                    </button>
+                    {lectures.length > 0 && (
+                      <button
+                        onClick={() => toggleLevelExpand(level.id)}
+                        className="pr-4 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                      </button>
+                    )}
+                  </div>
+                  {isExpanded && lectures.length > 0 && (
+                    <div className="ml-8 mt-1 space-y-1">
+                      {lectures.map((lec) => (
+                        <button
+                          key={lec.id}
+                          onClick={() => selectLecture(level.id, lec.id)}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-all ${
+                            selectedLectureId === lec.id
+                              ? "bg-primary/10 border border-primary/30 text-foreground"
+                              : "hover:bg-muted/50 text-muted-foreground"
+                          }`}
+                        >
+                          <div className="w-2 h-2 rounded-full bg-primary/40 flex-shrink-0" />
+                          <span className="text-[10px] font-black uppercase tracking-widest truncate">
+                            {isAr ? `الدرس ${lec.slot_number}` : `UNIT ${lec.slot_number}`}: {lec.title}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   )}
                 </div>
-                <div className="text-left overflow-hidden">
-                  <p className="font-black text-sm truncate uppercase tracking-wider">{level.title}</p>
-                  <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest italic">CLASSROOM CHANNEL</p>
-                </div>
-              </button>
-            ))}
+              );
+            })}
           </div>
         </div>
       </aside>
 
-      <main className="flex-1 bg-black/40 border border-white/10 rounded-[40px] flex flex-col overflow-hidden">
+      <main className="flex-1 bg-foreground/20 border border-border rounded-[40px] flex flex-col overflow-hidden">
         {selectedChatType && (selectedUserId || selectedLevelId) ? (
           <>
-            <header className="p-6 border-b border-white/5 flex items-center justify-between">
+            <header className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-white/5 overflow-hidden flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-muted/50 overflow-hidden flex-shrink-0">
                   {(() => {
                     const selectedLevel = levels.find((l) => l.id === selectedLevelId);
                     console.log("DEBUG: Selected level in header:", selectedLevel);
                     
                     if (selectedChatType === "dm") {
                        const profile = profiles.find((p) => p.id === selectedUserId);
-                       return profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <MessageSquare className="w-5 h-5 m-auto text-white/40" />;
+                       return profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <MessageSquare className="w-5 h-5 m-auto text-muted-foreground" />;
                     } else if (selectedChatType === "level") {
-                       return selectedLevel?.image_url ? <img src={selectedLevel.image_url} className="w-full h-full object-cover" /> : <MessageSquare className="w-5 h-5 m-auto text-white/40" />;
+                       return selectedLevel?.image_url ? <img src={selectedLevel.image_url} className="w-full h-full object-cover" /> : <MessageSquare className="w-5 h-5 m-auto text-muted-foreground" />;
                     }
-                    return <MessageSquare className="w-5 h-5 m-auto text-white/40" />;
+                    return <MessageSquare className="w-5 h-5 m-auto text-muted-foreground" />;
                   })()}
                 </div>
                 <div>
                   <h3 className="font-bold text-sm">
                     {selectedChatType === "dm"
                       ? profiles.find((p) => p.id === selectedUserId)?.username
-                      : levels.find((l) => l.id === selectedLevelId)?.title}
+                      : selectedLectureId
+                        ? (() => {
+                            const lecs = levelLectures[selectedLevelId || ""] || [];
+                            const lec = lecs.find((l) => l.id === selectedLectureId);
+                            return lec ? `${isAr ? `الدرس ${lec.slot_number}` : `UNIT ${lec.slot_number}`}: ${lec.title}` : levels.find((l) => l.id === selectedLevelId)?.title;
+                          })()
+                        : levels.find((l) => l.id === selectedLevelId)?.title}
                   </h3>
-                  <p className="text-[8px] font-black text-[#CCFF00] uppercase tracking-widest">
-                    Connected
+                  <p className="text-[8px] font-black text-primary uppercase tracking-widest">
+                    {selectedLectureId ? (isAr ? "محادثة الدرس" : "LECTURE CHAT") : "Connected"}
                   </p>
                 </div>
               </div>
@@ -1730,14 +1834,14 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
                       className={`flex ${m.sender_id === myProfile?.id ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`relative group max-w-[70%] p-5 rounded-[24px] ${m.sender_id === myProfile?.id ? "bg-[#CCFF00] text-black rounded-tr-none shadow-lg shadow-[#CCFF00]/10" : "bg-white/5 border border-white/10 rounded-tl-none"}`}
+                        className={`relative group max-w-[70%] p-5 rounded-[24px] ${m.sender_id === myProfile?.id ? "bg-primary text-black rounded-tr-none shadow-lg shadow-primary/10" : "bg-muted/50 border border-border rounded-tl-none"}`}
                       >
                         <p className="text-sm font-medium leading-relaxed">{m.content}</p>
                         <p className="text-[10px] font-bold mt-1 opacity-50">
                           {sender?.username || "Unknown"}
                         </p>
                         <p
-                          className={`text-[8px] font-black uppercase mt-1 opacity-40 ${m.sender_id === myProfile?.id ? "text-black" : "text-white"}`}
+                          className={`text-[8px] font-black uppercase mt-1 opacity-40 ${m.sender_id === myProfile?.id ? "text-black" : "text-foreground"}`}
                         >
                           {new Date(m.created_at).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -1761,7 +1865,7 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
                 })}
             </div>
 
-            <div className="p-6 bg-white/[0.02] border-t border-white/5">
+            <div className="p-6 bg-muted/30 border-t border-border">
               <div className="relative">
                 <input
                   type="text"
@@ -1769,11 +1873,11 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                   placeholder="Type secure message..."
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-5 pl-8 pr-16 font-bold focus:outline-none focus:border-[#CCFF00]/50 transition-all"
+                  className="w-full bg-foreground/20 border border-border rounded-2xl py-5 pl-8 pr-16 font-bold focus:outline-none focus:border-primary/50 transition-all"
                 />
                 <button
                   onClick={sendMessage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-[#CCFF00] text-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-[#CCFF00]/20"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-primary text-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -1790,9 +1894,9 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
                 <button
                   key={level.id}
                   onClick={() => selectChat("level", level.id)}
-                  className="bg-white/5 border border-white/10 p-6 rounded-3xl hover:bg-white/10 transition-all text-left flex items-center gap-4"
+                  className="bg-muted/50 border border-border p-6 rounded-3xl hover:bg-muted transition-all text-left flex items-center gap-4"
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-black/20 overflow-hidden flex-shrink-0">
+                  <div className="w-16 h-16 rounded-2xl bg-foreground/10 overflow-hidden flex-shrink-0">
                     {level.image_url ? (
                       <img src={level.image_url} className="w-full h-full object-cover" />
                     ) : (
@@ -1913,11 +2017,11 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
         toast.error(isAr ? "الرجاء تسجيل الدخول للتحميل" : "Please log in to upload.");
         return;
       }
-      setUploadingFile(true);
       const file = event.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user?.id || "anon"}-${Date.now()}.${fileExt}`;
-      const filePath = `lectures/${fileName}`;
+      const v = validateFile(file, "video", true);
+      if (!v.valid) { toast.error(v.error); return; }
+      setUploadingFile(true);
+      const filePath = safeStoragePath("lectures", file.name, user.id);
 
       const { error: uploadError } = await supabase.storage.from("videos").upload(filePath, file);
 
@@ -2002,15 +2106,16 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
   const handleLevelImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       if (!event.target.files || event.target.files.length === 0) return;
-      setUploadingFile(true);
       const file = event.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const fileName = `levels/${uuidv4()}.${fileExt}`;
+      const v = validateFile(file, "image", true);
+      if (!v.valid) { toast.error(v.error); return; }
+      setUploadingFile(true);
+      const filePath = safeStoragePath("levels", file.name);
 
-      const { error: uploadError } = await supabase.storage.from("course_files").upload(fileName, file);
+      const { error: uploadError } = await supabase.storage.from("course_files").upload(filePath, file);
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage.from("course_files").getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabase.storage.from("course_files").getPublicUrl(filePath);
       setLevelImage(publicUrl);
       toast.success(isAr ? "تم رفع صورة المستوى" : "Level image uploaded");
     } catch (err: any) {
@@ -2022,14 +2127,17 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
 
   const handleFileUpload = async (file: File, lectureIdx: number, blockIdx: number) => {
     try {
+      const blockType = lectures[lectureIdx]?.content_blocks?.[blockIdx]?.type || "download";
+      const ctx: UploadContext = blockType === "image" ? "image" : blockType === "pdf" || blockType === "word" ? "document" : "chatFile";
+      const v = validateFile(file, ctx, true);
+      if (!v.valid) { toast.error(v.error); return; }
       setUploadingFile(true);
-      const fileExt = file.name.split(".").pop();
-      const fileName = `blocks/${uuidv4()}.${fileExt}`;
+      const filePath = safeStoragePath("blocks", file.name);
 
-      const { error: uploadError } = await supabase.storage.from("course_files").upload(fileName, file);
+      const { error: uploadError } = await supabase.storage.from("course_files").upload(filePath, file);
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage.from("course_files").getPublicUrl(fileName);
+      const { data: { publicUrl } } = supabase.storage.from("course_files").getPublicUrl(filePath);
 
       const newLects = [...lectures];
       if (newLects[lectureIdx].content_blocks) {
@@ -2214,30 +2322,30 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
   if (loading)
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#CCFF00] border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
   return (
     <div className="min-h-screen bg-black flex flex-col">
-      <div className="h-20 bg-black/80 backdrop-blur-xl border-b border-white/5 px-8 flex items-center justify-between sticky top-0 z-50">
+      <div className="h-20 bg-card/90 backdrop-blur-xl border-b border-border px-8 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-6">
           <button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"
+            className="w-10 h-10 rounded-xl bg-muted/50 border border-border flex items-center justify-center hover:bg-muted transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h2 className="text-sm font-black text-white/40 uppercase tracking-widest">
+            <h2 className="text-sm font-black text-muted-foreground uppercase tracking-widest">
               {levelId ? "EDIT MODE" : "CREATION MODE"}
             </h2>
             <h1 className="text-xl font-bold tracking-tight">{levelTitle || "Untitled Course"}</h1>
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 mr-4 px-4 py-2 bg-white/5 rounded-full border border-white/5">
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">
+          <div className="hidden md:flex items-center gap-2 mr-4 px-4 py-2 bg-muted/50 rounded-full border border-border">
+            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
               Status:
             </span>
             <select
@@ -2253,7 +2361,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
             onClick={handleSave}
             loading={isSubmitting}
             variant="primary"
-            className="bg-[#CCFF00] text-black px-10 h-12 rounded-xl"
+            className="bg-primary text-black px-10 h-12 rounded-xl"
           >
             <Save className="w-4 h-4 mr-2" />
             {isAr ? "حفظ ونشر" : "DEPLOY"}
@@ -2262,14 +2370,14 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        <aside className="w-80 bg-black border-r border-white/5 flex flex-col overflow-y-auto no-scrollbar">
+        <aside className="w-80 bg-black border-r border-border flex flex-col overflow-y-auto no-scrollbar">
           <div className="p-6">
             <button
               onClick={() => {
                 setActiveTab("info");
                 setSelectedLectureIdx(null);
               }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all mb-8 ${activeTab === "info" ? "bg-[#CCFF00] text-black shadow-lg shadow-[#CCFF00]/10" : "text-white/40 hover:text-white"}`}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all mb-8 ${activeTab === "info" ? "bg-primary text-black shadow-lg shadow-primary/10" : "text-muted-foreground hover:text-foreground"}`}
             >
               <Settings className="w-4 h-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">
@@ -2279,7 +2387,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
 
             <div className="space-y-1 mb-8">
               <div className="flex items-center justify-between px-6 mb-4">
-                <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
+                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                   {isAr ? "المنهج الدراسي" : "Syllabus"}
                 </span>
                 <HeroButton
@@ -2292,7 +2400,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 </HeroButton>
               </div>
               {lectures.length === 0 && (
-                <p className="text-white/30 text-xs text-center px-4 py-2">
+                <p className="text-muted-foreground text-xs text-center px-4 py-2">
                   {isAr
                     ? "لا توجد محاضرات. استخدم 'إضافة محاضرة' أو 'تحميل جماعي'"
                     : "No lectures. Use 'Add Lecture' or 'Bulk Upload'"}
@@ -2303,14 +2411,14 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                   <button
                     onClick={() => moveLecture(i, i - 1)}
                     disabled={i === 0}
-                    className="p-1 rounded-md text-white/20 hover:text-white hover:bg-white/5 disabled:opacity-30"
+                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
                   >
                     <GripVertical className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => moveLecture(i, i + 1)}
                     disabled={i === lectures.length - 1}
-                    className="p-1 rounded-md text-white/20 hover:text-white hover:bg-white/5 disabled:opacity-30"
+                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
                   >
                     <GripVertical className="w-4 h-4" />
                   </button>
@@ -2319,10 +2427,10 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                       setActiveTab("curriculum");
                       setSelectedLectureIdx(i);
                     }}
-                    className={`flex-1 flex items-center gap-4 px-6 py-3 rounded-xl transition-all text-left cursor-pointer ${activeTab === "curriculum" && selectedLectureIdx === i ? "bg-white/10 text-white border border-white/10" : "text-white/30 hover:text-white/60 hover:bg-white/5"}`}
+                    className={`flex-1 flex items-center gap-4 px-6 py-3 rounded-xl transition-all text-left cursor-pointer ${activeTab === "curriculum" && selectedLectureIdx === i ? "bg-muted text-foreground border border-border" : "text-muted-foreground hover:text-foreground/60 hover:bg-muted/50"}`}
                   >
                     <div
-                      className={`w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black ${l.title ? "bg-lime-500/20 text-lime-500" : "bg-white/5 text-white/20"}`}
+                      className={`w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black ${l.title ? "bg-lime-500/20 text-lime-500" : "bg-muted/50 text-muted-foreground"}`}
                     >
                       {i + 1}
                     </div>
@@ -2360,7 +2468,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 setActiveTab("exam");
                 setSelectedLectureIdx(null);
               }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border mb-4 ${activeTab === "exam" ? "bg-yellow-500 text-black border-yellow-400" : "text-white/40 border-white/5 hover:text-white"}`}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border mb-4 ${activeTab === "exam" ? "bg-yellow-500 text-black border-yellow-400" : "text-muted-foreground border-border hover:text-foreground"}`}
             >
               <FileText className="w-4 h-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">
@@ -2373,7 +2481,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 setActiveTab("bulk_upload");
                 setSelectedLectureIdx(null);
               }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border mb-4 ${activeTab === "bulk_upload" ? "bg-purple-500 text-black border-purple-400" : "text-white/40 border-white/5 hover:text-white"}`}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border mb-4 ${activeTab === "bulk_upload" ? "bg-purple-500 text-black border-purple-400" : "text-muted-foreground border-border hover:text-foreground"}`}
             >
               <PlusCircle className="w-4 h-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">
@@ -2386,7 +2494,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 setActiveTab("chat" as any);
                 setSelectedLectureIdx(null);
               }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border ${activeTab === "chat" ? "bg-lime-500 text-black border-lime-400" : "text-white/40 border-white/5 hover:text-white"}`}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border ${activeTab === "chat" ? "bg-lime-500 text-black border-lime-400" : "text-muted-foreground border-border hover:text-foreground"}`}
             >
               <MessageSquare className="w-4 h-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">
@@ -2396,7 +2504,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
           </div>
         </aside>
 
-        <main className="flex-1 bg-black/40 p-12 overflow-y-auto custom-scrollbar">
+        <main className="flex-1 bg-foreground/20 p-12 overflow-y-auto custom-scrollbar">
           <AnimatePresence mode="wait">
             {activeTab === "info" && (
               <motion.div
@@ -2410,23 +2518,23 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                   <h2 className="text-3xl font-black italic tracking-tighter uppercase">
                     {isAr ? "إعدادات المستوى" : "Level Settings"}
                   </h2>
-                  <p className="text-white/30 text-xs font-bold">
+                  <p className="text-muted-foreground text-xs font-bold">
                     {isAr
                       ? "المعلومات الأساسية للمسار التعليمي"
                       : "Define the core parameters for this educational track"}
                   </p>
                 </div>
-                <div className="grid gap-8 bg-white/[0.02] border border-white/5 p-10 rounded-[40px]">
+                <div className="grid gap-8 bg-muted/30 border border-border p-10 rounded-[40px]">
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       {isAr ? "صورة الغلاف" : "Cover Media"}
                     </label>
                     <div className="flex gap-6 items-center">
-                        <div className="w-40 h-40 rounded-3xl bg-black border border-white/5 overflow-hidden flex-shrink-0">
+                        <div className="w-40 h-40 rounded-3xl bg-black border border-border overflow-hidden flex-shrink-0">
                             {levelImage ? (
                                 <img src={levelImage} className="w-full h-full object-cover" />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-white/5">
+                                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                                     <Layout className="w-12 h-12" />
                                 </div>
                             )}
@@ -2448,58 +2556,58 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                             >
                                 {uploadingFile ? <Loader2 className="animate-spin w-4 h-4" /> : (isAr ? "رفع صورة" : "Upload Image")}
                             </HeroButton>
-                            <p className="text-[8px] text-white/20 uppercase font-black">
+                            <p className="text-[8px] text-muted-foreground uppercase font-black">
                                 Recommended: 16:9 Aspect Ratio (800x450px)
                             </p>
                         </div>
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       Level Title
                     </label>
                     <input
                       type="text"
                       value={levelTitle}
                       onChange={(e) => setLevelTitle(e.target.value)}
-                      className="w-full bg-black/60 border border-white/5 rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
+                      className="w-full bg-card/80 border border-border rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
                     />
                   </div>
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       Level Order
                     </label>
                     <input
                       type="number"
                       value={levelOrder}
                       onChange={(e) => setLevelOrder(parseInt(e.target.value))}
-                      className="w-full bg-black/60 border border-white/5 rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
+                      className="w-full bg-card/80 border border-border rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       Published
                     </label>
                     <input
                       type="checkbox"
                       checked={isPublished}
                       onChange={(e) => setIsPublished(e.target.checked)}
-                      className="h-5 w-5 accent-[#CCFF00]"
+                      className="h-5 w-5 accent-primary"
                     />
                   </div>
                   
-                  <div className="space-y-4 pt-4 border-t border-white/5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
+                  <div className="space-y-4 pt-4 border-t border-border">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <Clock className="w-3 h-3 text-emerald-400" /> Global Drip Interval (Days)
                     </label>
                     <input
                       type="number"
                       value={dripInterval}
                       onChange={(e) => setDripInterval(parseInt(e.target.value))}
-                      className="w-full bg-black/60 border border-white/5 rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
+                      className="w-full bg-card/80 border border-border rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
                       placeholder="e.g. 7"
                     />
-                    <p className="text-[8px] text-white/20 uppercase font-black px-2">
+                    <p className="text-[8px] text-muted-foreground uppercase font-black px-2">
                         Controls how many days between each module release. 
                     </p>
                   </div>
@@ -2517,7 +2625,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                   exit={{ opacity: 0, x: -20 }}
                   className="max-w-4xl space-y-10"
                 >
-                  <div className="flex justify-between items-end border-b border-white/5 pb-10">
+                  <div className="flex justify-between items-end border-b border-border pb-10">
                     <div className="space-y-2">
                       <h2 className="text-3xl font-black italic tracking-tighter uppercase">
                         {isAr
@@ -2528,7 +2636,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                         <p className="text-lime-500/60 text-[10px] font-black uppercase tracking-[0.4em]">
                           CONTENT ARCHITECT
                         </p>
-                        <div className="h-4 w-px bg-white/10"></div>
+                        <div className="h-4 w-px bg-muted"></div>
                         <button
                           onClick={() => {
                             const nl = [...lectures];
@@ -2546,7 +2654,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
 
                   <div className="grid gap-10">
                     <div className="space-y-4">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         Lecture Headline
                       </label>
                       <input
@@ -2557,11 +2665,11 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           newLects[selectedLectureIdx].title = e.target.value;
                           setLectures(newLects);
                         }}
-                        className="w-full bg-white/5 border border-white/10 rounded-[32px] px-8 py-6 text-xl font-bold outline-none focus:border-lime-500/50"
+                        className="w-full bg-muted/50 border border-border rounded-[32px] px-8 py-6 text-xl font-bold outline-none focus:border-lime-500/50"
                       />
                     </div>
                     <div className="space-y-4">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         Description
                       </label>
                       <textarea
@@ -2571,14 +2679,14 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           newLects[selectedLectureIdx].description = e.target.value;
                           setLectures(newLects);
                         }}
-                        className="w-full bg-white/5 border border-white/10 rounded-[32px] px-8 py-6 text-sm font-bold outline-none focus:border-lime-500/50 resize-none"
+                        className="w-full bg-muted/50 border border-border rounded-[32px] px-8 py-6 text-sm font-bold outline-none focus:border-lime-500/50 resize-none"
                         rows={4}
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                           <Clock className="w-3 h-3" /> Module Drip Duration (Days)
                         </label>
                         <input
@@ -2589,15 +2697,15 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                             newLects[selectedLectureIdx].drip_days = parseInt(e.target.value);
                             setLectures(newLects);
                           }}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
+                          className="w-full bg-muted/50 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
                         />
                       </div>
-                      <div className="flex items-center justify-between p-6 bg-white/5 border border-white/10 rounded-2xl">
+                      <div className="flex items-center justify-between p-6 bg-muted/50 border border-border rounded-2xl">
                         <div className="flex items-center gap-3">
                             <GraduationCap className="w-5 h-5 text-emerald-400" />
                             <div>
-                                <p className="text-[10px] font-black uppercase text-white">Big Exam Unit</p>
-                                <p className="text-[8px] font-bold text-white/20 uppercase">Marks this as a milestone exam</p>
+                                <p className="text-[10px] font-black uppercase text-foreground">Big Exam Unit</p>
+                                <p className="text-[8px] font-bold text-muted-foreground uppercase">Marks this as a milestone exam</p>
                             </div>
                         </div>
                         <input
@@ -2608,14 +2716,14 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                             newLects[selectedLectureIdx].is_big_exam = e.target.checked;
                             setLectures(newLects);
                           }}
-                          className="h-5 w-5 accent-[#CCFF00]"
+                          className="h-5 w-5 accent-primary"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                           <Video className="w-3 h-3" /> Video Source (URL or Upload)
                         </label>
                         <div className="flex gap-2">
@@ -2628,7 +2736,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                               setLectures(newLects);
                             }}
                             placeholder="YouTube Link or Upload Video"
-                            className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
+                            className="flex-1 bg-muted/50 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
                           />
                           <button
                             onClick={() => videoInputRef.current?.click()}
@@ -2647,7 +2755,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                         </div>
                       </div>
                       <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-white/30 flex items-center gap-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                           <FileText className="w-3 h-3" /> PDF Source (URL)
                         </label>
                         <input
@@ -2659,14 +2767,14 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                             setLectures(newLects);
                           }}
                           placeholder="PDF Link"
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
+                          className="w-full bg-muted/50 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-6">
                       <div className="flex items-center justify-between">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                           Advanced Content Blocks
                         </label>
                         <div className="flex gap-2 flex-wrap">
@@ -2674,7 +2782,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                             <button
                               key={type}
                               onClick={() => addBlock(type as any, selectedLectureIdx)}
-                              className="p-2 bg-white/5 rounded-lg hover:bg-[#CCFF00] hover:text-black transition-colors text-[10px] font-black uppercase"
+                              className="p-2 bg-muted/50 rounded-lg hover:bg-primary hover:text-black transition-colors text-[10px] font-black uppercase"
                             >
                               {type}
                             </button>
@@ -2691,7 +2799,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           return (
                           <div
                             key={block.id}
-                            className="relative group p-6 bg-white/[0.02] border border-white/5 rounded-3xl"
+                            className="relative group p-6 bg-muted/30 border border-border rounded-3xl"
                           >
                             <button
                               onClick={() => {
@@ -2699,12 +2807,12 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                                 nl[selectedLectureIdx].content_blocks!.splice(bIdx, 1);
                                 setLectures(nl);
                               }}
-                              className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                              className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500 text-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                             >
                               <X className="w-4 h-4" />
                             </button>
                             <div className="flex items-center gap-4 mb-4">
-                              <span className="text-[8px] font-black uppercase text-[#CCFF00]">
+                              <span className="text-[8px] font-black uppercase text-primary">
                                 {block.type} BLOCK
                               </span>
                             </div>
@@ -2721,7 +2829,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                                   }
                                 }}
                                 placeholder="Enter text..."
-                                className="w-full bg-black/40 p-4 rounded-xl outline-none text-sm"
+                                className="w-full bg-foreground/20 p-4 rounded-xl outline-none text-sm"
                                 rows={4}
                               />
                             )}
@@ -2737,7 +2845,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                                   }
                                 }}
                                 placeholder="Enter code..."
-                                className="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-sm font-mono text-lime-400"
+                                className="w-full bg-muted/50 border border-border p-4 rounded-xl outline-none text-sm font-mono text-lime-400"
                                 rows={8}
                               />
                             )}
@@ -2755,7 +2863,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                                     }
                                   }}
                                   placeholder={`${block.type} URL...`}
-                                  className="flex-1 bg-black/40 p-4 rounded-xl outline-none text-sm"
+                                  className="flex-1 bg-foreground/20 p-4 rounded-xl outline-none text-sm"
                                 />
                                 <button
                                   onClick={() => {
@@ -2792,7 +2900,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                                     setLectures(nl);
                                   }}
                                   placeholder="Question..."
-                                  className="w-full bg-black/40 p-4 rounded-xl outline-none text-sm mb-2"
+                                  className="w-full bg-foreground/20 p-4 rounded-xl outline-none text-sm mb-2"
                                 />
                                 {(block.metadata?.quiz?.options || [""]).map((opt, oIdx) => (
                                   <div key={oIdx} className="flex gap-2">
@@ -2804,7 +2912,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                                             nl[selectedLectureIdx].content_blocks![bIdx].metadata!.quiz!.options[oIdx] = e.target.value;
                                             setLectures(nl);
                                         }}
-                                        className="flex-1 bg-black/40 p-2 rounded-lg"
+                                        className="flex-1 bg-foreground/20 p-2 rounded-lg"
                                     />
                                     <input 
                                         type="radio" 
@@ -2827,7 +2935,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                                       nl[selectedLectureIdx].content_blocks![bIdx].metadata!.quiz!.options.push("");
                                       setLectures(nl);
                                   }}
-                                  className="text-[10px] text-[#CCFF00]"
+                                  className="text-[10px] text-primary"
                                 >+ Add Option</button>
                               </div>
                             )}
@@ -2852,7 +2960,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                   <h2 className="text-3xl font-black italic tracking-tighter uppercase">
                     {isAr ? "أسئلة الاختبار" : "Exam Questions"}
                   </h2>
-                  <p className="text-white/30 text-xs font-bold">
+                  <p className="text-muted-foreground text-xs font-bold">
                     {isAr
                       ? "إدارة أسئلة الاختبار التقييمي"
                       : "Manage questions for the evaluative exam"}
@@ -2861,16 +2969,16 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 {examQuestions.map((q, qIdx) => (
                   <div
                     key={q.id}
-                    className="p-10 rounded-[40px] bg-white/[0.02] border border-white/5 space-y-6 relative group"
+                    className="p-10 rounded-[40px] bg-muted/30 border border-border space-y-6 relative group"
                   >
                     <button
                       onClick={() => setExamQuestions((prev) => prev.filter((_, i) => i !== qIdx))}
-                      className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                      className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-red-500 text-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <div className="space-y-4">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         Question {qIdx + 1}
                       </label>
                       <textarea
@@ -2880,12 +2988,12 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           newQ[qIdx].text = e.target.value;
                           setExamQuestions(newQ);
                         }}
-                        className="w-full bg-black/60 border border-white/5 rounded-2xl px-8 py-5 text-lg font-bold outline-none resize-none"
+                        className="w-full bg-card/80 border border-border rounded-2xl px-8 py-5 text-lg font-bold outline-none resize-none"
                         rows={3}
                       />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         Options
                       </label>
                       {q.options.map((opt, optIdx) => (
@@ -2899,7 +3007,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                               newQ[qIdx].correct = optIdx;
                               setExamQuestions(newQ);
                             }}
-                            className="h-5 w-5 accent-[#CCFF00]"
+                            className="h-5 w-5 accent-primary"
                           />
                           <input
                             type="text"
@@ -2909,7 +3017,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                               newQ[qIdx].options[optIdx] = e.target.value;
                               setExamQuestions(newQ);
                             }}
-                            className="flex-1 bg-black/60 border border-white/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none"
+                            className="flex-1 bg-card/80 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none"
                           />
                         </div>
                       ))}
@@ -2924,7 +3032,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                     ])
                   }
                   variant="outline"
-                  className="w-full h-12 border-white/10 text-white/70 hover:text-[#CCFF00] hover:border-[#CCFF00]/50"
+                  className="w-full h-12 border-border text-muted-foreground hover:text-primary hover:border-primary/50"
                 >
                   <Plus className="w-4 h-4 mr-2" /> {isAr ? "إضافة سؤال" : "Add Question"}
                 </HeroButton>
@@ -2943,21 +3051,21 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                   <h2 className="text-3xl font-black italic tracking-tighter uppercase">
                     {isAr ? "تحميل المحاضرات دفعة واحدة" : "Bulk Upload Lectures"}
                   </h2>
-                  <p className="text-white/30 text-xs font-bold">
+                  <p className="text-muted-foreground text-xs font-bold">
                     {isAr
                       ? "استورد المحاضرات من ملفات Word أو Excel"
                       : "Import lectures from Word or Excel files"}
                   </p>
                 </div>
-                <div className="grid gap-8 bg-white/[0.02] border border-white/5 p-10 rounded-[40px]">
+                <div className="grid gap-8 bg-muted/30 border border-border p-10 rounded-[40px]">
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-white/30">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       اختر ملف
                     </label>
                     <input
                       type="file"
                       onChange={handleFileChange}
-                      className="w-full text-white/70 bg-black/60 border border-white/5 rounded-2xl px-6 py-4 outline-none focus:border-purple-500/50 transition-all"
+                      className="w-full text-muted-foreground bg-card/80 border border-border rounded-2xl px-6 py-4 outline-none focus:border-purple-500/50 transition-all"
                       accept=".docx, .xlsx"
                     />
                   </div>
@@ -2978,10 +3086,10 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
 
                   {parsedLectures.length > 0 && (
                     <div className="space-y-6 mt-8">
-                      <h3 className="text-xl font-black italic uppercase text-white/80">
+                      <h3 className="text-xl font-black italic uppercase text-muted-foreground">
                         {isAr ? "المحاضرات المحللة (معاينة)" : "Parsed Lectures (Preview)"}
                       </h3>
-                      <p className="text-white/50 text-xs">
+                      <p className="text-muted-foreground text-xs">
                         {isAr
                           ? "سيتم إضافة هذه المحاضرات إلى المنهج الحالي."
                           : "These lectures will be added to the current curriculum."}
@@ -2989,12 +3097,12 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                       {parsedLectures.map((lec, idx) => (
                         <div
                           key={idx}
-                          className="p-4 bg-white/5 border border-white/10 rounded-2xl"
+                          className="p-4 bg-muted/50 border border-border rounded-2xl"
                         >
                           <p className="font-bold text-lg">
                             {lec.title || (isAr ? "بدون عنوان" : "Untitled")}
                           </p>
-                          <p className="text-sm text-white/70">
+                          <p className="text-sm text-muted-foreground">
                             {lec.description
                               ? lec.description.substring(0, 100) +
                                 (lec.description.length > 100 ? "..." : "")
@@ -3007,7 +3115,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                               lec.content_blocks.map((block, bIdx) => (
                                 <span
                                   key={bIdx}
-                                  className="px-2 py-1 bg-white/10 rounded-lg text-xs"
+                                  className="px-2 py-1 bg-muted rounded-lg text-xs"
                                 >
                                   {block.type}
                                 </span>
@@ -3080,8 +3188,8 @@ function LectureChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-black/40 rounded-[40px] border border-white/5 overflow-hidden">
-      <header className="p-6 border-b border-white/5 flex items-center justify-between">
+    <div className="h-full flex flex-col bg-foreground/20 rounded-[40px] border border-border overflow-hidden">
+      <header className="p-6 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-4">
           <MessageSquare className="w-5 h-5 text-lime-400" />
           <h3 className="font-black italic uppercase tracking-widest text-sm">
@@ -3092,7 +3200,7 @@ function LectureChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
       <div className="flex-1 overflow-y-auto p-8 space-y-4 custom-scrollbar">
         {messages.map((m, i) => (
           <div key={i} className="flex gap-4">
-            <div className="w-10 h-10 rounded-xl bg-white/5 overflow-hidden flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-muted/50 overflow-hidden flex-shrink-0">
               {m.profiles?.avatar_url && (
                 <img src={m.profiles.avatar_url} className="w-full h-full object-cover" />
               )}
@@ -3101,19 +3209,19 @@ function LectureChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-bold text-sm">{m.profiles?.username}</span>
                 <span
-                  className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${m.profiles?.role === "admin" ? "bg-red-500/20 text-red-500" : "bg-white/5 text-white/40"}`}
+                  className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded ${m.profiles?.role === "admin" ? "bg-red-500/20 text-red-500" : "bg-muted/50 text-muted-foreground"}`}
                 >
                   {m.profiles?.role}
                 </span>
               </div>
-              <p className="text-sm text-white/70 bg-white/5 p-4 rounded-2xl rounded-tl-none">
+              <p className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-2xl rounded-tl-none">
                 {m.content}
               </p>
             </div>
           </div>
         ))}
       </div>
-      <div className="p-6 bg-black/40 border-t border-white/5">
+      <div className="p-6 bg-foreground/20 border-t border-border">
         <div className="relative max-w-4xl mx-auto">
           <input
             type="text"
@@ -3121,7 +3229,7 @@ function LectureChat({ levelId, isAr }: { levelId: string; isAr: boolean }) {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder="Transmit mission updates..."
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-8 pr-16 font-bold focus:outline-none"
+            className="w-full bg-muted/50 border border-border rounded-2xl py-5 pl-8 pr-16 font-bold focus:outline-none"
           />
           <button
             onClick={sendMessage}
@@ -3252,7 +3360,7 @@ function InternalTasks({ isAr }: { isAr: boolean }) {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-black italic tracking-tighter uppercase">{isAr ? "المهام الداخلية" : "INTERNAL TASKS"}</h2>
-          <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.4em]">{isAr ? "تنسيق العمل بين المشرفين" : "STAFF COORDINATION HUB"}</p>
+          <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.4em]">{isAr ? "تنسيق العمل بين المشرفين" : "STAFF COORDINATION HUB"}</p>
         </div>
         {isAdmin && (
           <HeroButton onClick={() => setIsAdding(!isAdding)} variant="primary" size="sm">
@@ -3266,32 +3374,32 @@ function InternalTasks({ isAr }: { isAr: boolean }) {
           initial={{ height: 0, opacity: 0 }} 
           animate={{ height: "auto", opacity: 1 }} 
           onSubmit={handleAddTask}
-          className="bg-white/5 border border-white/10 rounded-[40px] p-8 space-y-6 overflow-hidden shadow-2xl"
+          className="bg-muted/50 border border-border rounded-[40px] p-8 space-y-6 overflow-hidden shadow-2xl"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[8px] font-black uppercase tracking-widest text-white/40 px-4">Task Title</label>
-              <input required value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50" placeholder="e.g. Update Level 4 Content" />
+              <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground px-4">Task Title</label>
+              <input required value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50" placeholder="e.g. Update Level 4 Content" />
             </div>
             <div className="space-y-2">
-              <label className="text-[8px] font-black uppercase tracking-widest text-white/40 px-4">Section / Category</label>
-              <input value={newTask.section} onChange={e => setNewTask({...newTask, section: e.target.value})} className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50" placeholder="e.g. Curriculum" />
+              <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground px-4">Section / Category</label>
+              <input value={newTask.section} onChange={e => setNewTask({...newTask, section: e.target.value})} className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50" placeholder="e.g. Curriculum" />
             </div>
             <div className="space-y-2">
-              <label className="text-[8px] font-black uppercase tracking-widest text-white/40 px-4">Timeline / Deadline</label>
-              <input value={newTask.timeline} onChange={e => setNewTask({...newTask, timeline: e.target.value})} className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50" placeholder="e.g. June 15th" />
+              <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground px-4">Timeline / Deadline</label>
+              <input value={newTask.timeline} onChange={e => setNewTask({...newTask, timeline: e.target.value})} className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50" placeholder="e.g. June 15th" />
             </div>
             <div className="space-y-2">
-              <label className="text-[8px] font-black uppercase tracking-widest text-white/40 px-4">Course Time / Effort</label>
-              <input value={newTask.course_time} onChange={e => setNewTask({...newTask, course_time: e.target.value})} className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50" placeholder="e.g. 2 Hours" />
+              <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground px-4">Course Time / Effort</label>
+              <input value={newTask.course_time} onChange={e => setNewTask({...newTask, course_time: e.target.value})} className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50" placeholder="e.g. 2 Hours" />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <label className="text-[8px] font-black uppercase tracking-widest text-white/40 px-4">Assign To (Search & Select)</label>
+              <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground px-4">Assign To (Search & Select)</label>
               <div className="relative">
                 <input 
                     type="text"
                     placeholder={isAr ? "ابحث بالاسم أو الهاتف..." : "Search by name or phone..."}
-                    className="w-full bg-black/40 border border-white/5 rounded-t-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50 mb-0.5"
+                    className="w-full bg-foreground/20 border border-border rounded-t-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50 mb-0.5"
                     onChange={e => {
                         const searchTerm = e.target.value.toLowerCase();
                         const firstMatch = moderators.find(m => 
@@ -3301,7 +3409,7 @@ function InternalTasks({ isAr }: { isAr: boolean }) {
                         if(firstMatch) setNewTask({...newTask, assigned_to_id: firstMatch.id});
                     }}
                 />
-                <select value={newTask.assigned_to_id} onChange={e => setNewTask({...newTask, assigned_to_id: e.target.value})} className="w-full bg-black/40 border border-white/5 rounded-b-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50">
+                <select value={newTask.assigned_to_id} onChange={e => setNewTask({...newTask, assigned_to_id: e.target.value})} className="w-full bg-foreground/20 border border-border rounded-b-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50">
                     <option value="">Select Moderator</option>
                     {moderators.map(mod => <option key={mod.id} value={mod.id}>{mod.username} {mod.phone_number ? `(${mod.phone_number})` : ''}</option>)}
                 </select>
@@ -3309,8 +3417,8 @@ function InternalTasks({ isAr }: { isAr: boolean }) {
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-[8px] font-black uppercase tracking-widest text-white/40 px-4">Detailed Instructions</label>
-            <textarea value={newTask.description} onChange={e => setNewTask({...newTask, description: e.target.value})} className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50 h-32 resize-none" placeholder="Enter full task details..." />
+            <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground px-4">Detailed Instructions</label>
+            <textarea value={newTask.description} onChange={e => setNewTask({...newTask, description: e.target.value})} className="w-full bg-foreground/20 border border-border rounded-2xl p-4 text-sm font-bold outline-none focus:border-lime-500/50 h-32 resize-none" placeholder="Enter full task details..." />
           </div>
           <HeroButton type="submit" className="w-full">DISPATCH TASK</HeroButton>
         </motion.form>
@@ -3318,22 +3426,22 @@ function InternalTasks({ isAr }: { isAr: boolean }) {
 
       <div className="grid gap-4">
         {loading ? (
-          <div className="h-40 flex items-center justify-center bg-white/5 rounded-[40px] animate-pulse">
+          <div className="h-40 flex items-center justify-center bg-muted/50 rounded-[40px] animate-pulse">
             <Loader2 className="w-8 h-8 animate-spin opacity-20" />
           </div>
         ) : tasks.length === 0 ? (
-          <div className="p-20 text-center bg-white/5 rounded-[40px] border border-white/5">
-            <CheckCircle2 className="w-12 h-12 mx-auto text-white/10 mb-4" />
-            <p className="font-black uppercase tracking-widest text-[10px] text-white/20">All tasks completed. System synchronized.</p>
+          <div className="p-20 text-center bg-muted/50 rounded-[40px] border border-border">
+            <CheckCircle2 className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
+            <p className="font-black uppercase tracking-widest text-[10px] text-muted-foreground">All tasks completed. System synchronized.</p>
           </div>
         ) : (
           tasks.map(task => (
-            <div key={task.id} className={`bg-black/40 border rounded-[32px] p-6 flex items-center justify-between transition-all ${task.is_completed ? "border-green-500/30 opacity-50 grayscale" : "border-white/10"}`}>
+            <div key={task.id} className={`bg-foreground/20 border rounded-[32px] p-6 flex items-center justify-between transition-all ${task.is_completed ? "border-green-500/30 opacity-50 grayscale" : "border-border"}`}>
                   <div className="flex items-center gap-6">
                 <button
                   disabled={!isAdmin && !isModerator}
                   onClick={() => toggleTaskCompletion(task.id, task.is_completed, task.assigned_to_id || null)}
-                  className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${task.is_completed ? "bg-green-500 border-green-400 text-black" : "bg-white/5 border-white/10 text-white/10 hover:bg-white/10"}`}
+                  className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${task.is_completed ? "bg-green-500 border-green-400 text-black" : "bg-muted/50 border-border text-muted-foreground/30 hover:bg-muted"}`}
                 >
                   <Check className="w-5 h-5" />
                 </button>
@@ -3342,12 +3450,12 @@ function InternalTasks({ isAr }: { isAr: boolean }) {
                     <h3 className="font-bold text-lg leading-none">{task.title}</h3>
                     <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-lime-500/10 text-lime-400 rounded border border-lime-500/20">{task.section}</span>
                     {task.profiles && (
-                      <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-white/5 text-white/60 rounded border border-white/10">
+                      <span className="text-[8px] font-black uppercase px-2 py-0.5 bg-muted/50 text-muted-foreground rounded border border-border">
                         Assigned to: {task.profiles.username}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-4 text-[9px] font-black text-white/30 uppercase tracking-widest">
+                  <div className="flex items-center gap-4 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {task.timeline}</span>
                     <span className="flex items-center gap-1"><Monitor className="w-3 h-3" /> {task.course_time}</span>
                   </div>
@@ -3355,11 +3463,11 @@ function InternalTasks({ isAr }: { isAr: boolean }) {
               </div>
               <div className="flex items-center gap-4">
                 {isAdmin && (
-                  <button onClick={() => deleteTask(task.id)} className="p-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+                  <button onClick={() => deleteTask(task.id)} className="p-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-foreground transition-all">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
-                <div className="w-px h-8 bg-white/5" />
+                <div className="w-px h-8 bg-muted/50" />
                 <button 
                   onClick={() => setSelectedTask(task)}
                   className="text-[10px] font-black uppercase tracking-widest text-lime-500 hover:text-lime-400"
@@ -3373,21 +3481,21 @@ function InternalTasks({ isAr }: { isAr: boolean }) {
       </div>
 
       {selectedTask && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-card/90 backdrop-blur-sm">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }} 
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-[#111] border border-white/10 p-8 rounded-[40px] max-w-lg w-full shadow-2xl"
+            className="bg-[#111] border border-border p-8 rounded-[40px] max-w-lg w-full shadow-2xl"
           >
             <h3 className="text-2xl font-black italic uppercase mb-2">{selectedTask.title}</h3>
-            <p className="text-white/40 text-sm mb-6">{selectedTask.description}</p>
+            <p className="text-muted-foreground text-sm mb-6">{selectedTask.description}</p>
             <div className="grid grid-cols-2 gap-4 mb-8">
-               <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
-                 <p className="text-[8px] font-black uppercase text-white/30">Timeline</p>
+               <div className="p-4 bg-foreground/20 rounded-2xl border border-border">
+                 <p className="text-[8px] font-black uppercase text-muted-foreground">Timeline</p>
                  <p className="text-sm font-bold">{selectedTask.timeline}</p>
                </div>
-               <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
-                 <p className="text-[8px] font-black uppercase text-white/30">Effort</p>
+               <div className="p-4 bg-foreground/20 rounded-2xl border border-border">
+                 <p className="text-[8px] font-black uppercase text-muted-foreground">Effort</p>
                  <p className="text-sm font-bold">{selectedTask.course_time}</p>
                </div>
             </div>
@@ -3493,36 +3601,36 @@ function CourseProgress({ isAr }: { isAr: boolean }) {
     <div className="space-y-8">
       {loading ? (
         <div className="flex items-center justify-center py-10">
-          <div className="w-12 h-12 border-4 border-[#CCFF00] border-t-transparent rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <>
           {/* Top 3 Leaderboard */}
-          <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-[48px] p-8 space-y-6">
-            <h2 className="text-xl font-black italic uppercase text-white/80">
+          <div className="bg-foreground/20 backdrop-blur-xl border border-border rounded-[48px] p-8 space-y-6">
+            <h2 className="text-xl font-black italic uppercase text-muted-foreground">
               {isAr ? "أفضل 3 عملاء" : "TOP 3 AGENTS"}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {top3.map((user, index) => (
                 <div
                   key={user.id}
-                  className="relative p-6 rounded-[32px] bg-white/5 border border-white/10 flex items-center gap-4"
+                  className="relative p-6 rounded-[32px] bg-muted/50 border border-border flex items-center gap-4"
                 >
-                  <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full bg-[#CCFF00] text-black flex items-center justify-center font-black text-xl shadow-lg shadow-[#CCFF00]/20">
+                  <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full bg-primary text-black flex items-center justify-center font-black text-xl shadow-lg shadow-primary/20">
                     {index + 1}
                   </div>
-                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#CCFF00]/50 flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/50 flex-shrink-0">
                     {user.avatar_url ? (
                       <img src={user.avatar_url} className="w-full h-full object-cover" />
                     ) : (
-                      <Users className="w-8 h-8 text-white/20 m-auto" />
+                      <Users className="w-8 h-8 text-muted-foreground m-auto" />
                     )}
                   </div>
                   <div>
                     <p className="font-bold text-lg">{user.username}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <Trophy className="w-4 h-4 text-[#CCFF00]" />
-                      <span className="text-[10px] font-black uppercase text-white/70">
+                      <Trophy className="w-4 h-4 text-primary" />
+                      <span className="text-[10px] font-black uppercase text-muted-foreground">
                         {user.completedLectures} {isAr ? "مهمة مكتملة" : "MISSIONS COMPLETED"}
                       </span>
                     </div>
@@ -3533,38 +3641,38 @@ function CourseProgress({ isAr }: { isAr: boolean }) {
           </div>
 
           {/* All Users Progress */}
-          <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-[48px] p-8 space-y-6">
-            <h2 className="text-xl font-black italic uppercase text-white/80">
+          <div className="bg-foreground/20 backdrop-blur-xl border border-border rounded-[48px] p-8 space-y-6">
+            <h2 className="text-xl font-black italic uppercase text-muted-foreground">
               {isAr ? "تقرير تقدم العميل" : "AGENT PROGRESS REPORT"}
             </h2>
             <div className="space-y-4">
               {processedUsers.map((user) => (
                 <div
                   key={user.id}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-muted/50 border border-border"
                 >
-                  <div className="w-12 h-12 rounded-full overflow-hidden border border-white/10 flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full overflow-hidden border border-border flex-shrink-0">
                     {user.avatar_url ? (
                       <img src={user.avatar_url} className="w-full h-full object-cover" />
                     ) : (
-                      <Users className="w-6 h-6 text-white/20 m-auto" />
+                      <Users className="w-6 h-6 text-muted-foreground m-auto" />
                     )}
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-base">{user.username}</p>
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase text-white/40">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground">
                       <span>
                         {user.completedLectures} / {user.totalLectures} {isAr ? "مهمة" : "MISSIONS"}
                       </span>
-                      <span className="text-[#CCFF00]">{user.completionPercentage}%</span>
+                      <span className="text-primary">{user.completionPercentage}%</span>
                     </div>
                   </div>
-                  <div className="w-32 h-1.5 bg-white/10 rounded-full">
+                  <div className="w-32 h-1.5 bg-muted rounded-full">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${user.completionPercentage}%` }}
                       transition={{ duration: 1, ease: "easeOut" }}
-                      className="h-full bg-[#CCFF00] rounded-full"
+                      className="h-full bg-primary rounded-full"
                     />
                   </div>
                 </div>
@@ -3637,15 +3745,15 @@ function GradingHub({ isAr }: { isAr: boolean }) {
         {submissions.map((sub) => (
           <div
             key={sub.id}
-            className={`p-6 rounded-[32px] bg-white/5 border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-all ${sub.total_grade !== null ? "opacity-60" : ""}`}
+            className={`p-6 rounded-[32px] bg-muted/50 border border-border flex items-center justify-between group hover:bg-muted transition-all ${sub.total_grade !== null ? "opacity-60" : ""}`}
           >
             <div className="flex items-center gap-6">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center font-black text-white/20">
+                <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center font-black text-muted-foreground">
                     {sub.profiles?.username?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                    <h3 className="font-bold text-white">{sub.profiles?.username}</h3>
-                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">
+                    <h3 className="font-bold text-foreground">{sub.profiles?.username}</h3>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                         {sub.lectures?.title} // {new Date(sub.created_at).toLocaleDateString()}
                     </p>
                 </div>
@@ -3655,7 +3763,7 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                 {sub.total_grade !== null ? (
                     <div className="text-right">
                         <p className="text-2xl font-black italic text-emerald-400 leading-none">{sub.total_grade}%</p>
-                        <p className="text-[8px] font-black uppercase text-white/20 mt-1">GRADED</p>
+                        <p className="text-[8px] font-black uppercase text-muted-foreground mt-1">GRADED</p>
                     </div>
                 ) : (
                     <HeroButton 
@@ -3666,7 +3774,7 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                         }}
                         size="sm" 
                         variant="primary"
-                        className="bg-[#CCFF00] text-black px-6"
+                        className="bg-primary text-black px-6"
                     >
                         {isAr ? "بدء التصحيح" : "OPEN FILE"}
                     </HeroButton>
@@ -3678,11 +3786,11 @@ function GradingHub({ isAr }: { isAr: boolean }) {
 
       <AnimatePresence>
         {selectedSub && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/90 backdrop-blur-md">
+            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-card/95 backdrop-blur-md">
                 <motion.div 
                     initial={{ scale: 0.9, opacity: 0 }} 
                     animate={{ scale: 1, opacity: 1 }}
-                    className="bg-[#0a2610] border border-white/10 p-10 rounded-[48px] max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                    className="bg-background border border-border p-10 rounded-[48px] max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                 >
                     <header className="flex justify-between items-start mb-10">
                         <div>
@@ -3693,17 +3801,17 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                                 AGENT: {selectedSub.profiles?.username} // MODULE: {selectedSub.lectures?.title}
                             </p>
                         </div>
-                        <button onClick={() => setSelectedSub(null)} className="p-3 rounded-full bg-white/5 hover:bg-red-500 transition-all">
+                        <button onClick={() => setSelectedSub(null)} className="p-3 rounded-full bg-muted/50 hover:bg-red-500 transition-all">
                             <X className="w-5 h-5" />
                         </button>
                     </header>
 
                     <div className="space-y-8 mb-10">
                         {selectedSub.answers.map((ans: any, idx: number) => (
-                            <div key={idx} className="p-6 bg-white/5 border border-white/5 rounded-3xl">
-                                <p className="text-[9px] font-black uppercase text-white/20 mb-3">QUESTION {idx + 1} // {ans.type.toUpperCase()}</p>
+                            <div key={idx} className="p-6 bg-muted/50 border border-border rounded-3xl">
+                                <p className="text-[9px] font-black uppercase text-muted-foreground mb-3">QUESTION {idx + 1} // {ans.type.toUpperCase()}</p>
                                 <p className="text-lg font-bold mb-4 italic tracking-tight leading-tight">{ans.question}</p>
-                                <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
+                                <div className="p-4 bg-foreground/20 rounded-2xl border border-border">
                                     <p className="text-[9px] font-black uppercase text-emerald-400/40 mb-2">STUDENT RESPONSE:</p>
                                     <p className="text-sm font-medium leading-relaxed">{ans.answer || "No response provided"}</p>
                                 </div>
@@ -3711,23 +3819,23 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                         ))}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 bg-white/5 border border-white/10 rounded-[32px]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 bg-muted/50 border border-border rounded-[32px]">
                         <div className="space-y-4">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Assign Final Grade (%)</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assign Final Grade (%)</label>
                             <input 
                                 type="number" 
                                 value={grade} 
                                 onChange={e => setGrade(parseInt(e.target.value))}
-                                className="w-full bg-black/60 border border-white/5 rounded-2xl px-6 py-4 text-2xl font-black text-[#CCFF00] outline-none"
+                                className="w-full bg-card/80 border border-border rounded-2xl px-6 py-4 text-2xl font-black text-primary outline-none"
                             />
-                            <p className="text-[8px] font-black uppercase text-white/20 px-2">MCQ AUTOMATED BASE: {selectedSub.mcq_score}%</p>
+                            <p className="text-[8px] font-black uppercase text-muted-foreground px-2">MCQ AUTOMATED BASE: {selectedSub.mcq_score}%</p>
                         </div>
                         <div className="space-y-4">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-white/40">Moderator Feedback</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Moderator Feedback</label>
                             <textarea 
                                 value={feedback} 
                                 onChange={e => setFeedback(e.target.value)}
-                                className="w-full bg-black/60 border border-white/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none h-32 resize-none"
+                                className="w-full bg-card/80 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none h-32 resize-none"
                                 placeholder="Strategic guidance for the agent..."
                             />
                         </div>

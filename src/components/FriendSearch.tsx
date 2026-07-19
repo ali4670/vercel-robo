@@ -97,7 +97,7 @@ export const FriendSearch: React.FC = () => {
           <Users className="w-6 h-6 text-emerald-400" />
         </div>
         <div className={isAr ? "text-right" : ""}>
-          <h3 className="text-xl font-black text-white italic tracking-tighter uppercase">
+          <h3 className="text-xl font-black text-foreground italic tracking-tighter uppercase">
             {t.title}
           </h3>
           <p className="text-emerald-500/40 text-[8px] font-black uppercase tracking-[0.4em] mt-1">
@@ -115,7 +115,7 @@ export const FriendSearch: React.FC = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t.placeholder}
-          className={`w-full bg-black/40 border border-white/5 rounded-[24px] py-5 text-white font-bold placeholder:text-white/5 focus:outline-none focus:border-emerald-500/30 focus:bg-white/[0.04] transition-all shadow-2xl ${isAr ? "pr-14 text-right" : "pl-14"}`}
+          className={`w-full bg-foreground/20 border border-border rounded-[24px] py-5 text-foreground font-bold placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500/30 focus:bg-muted/40 transition-all shadow-2xl ${isAr ? "pr-14 text-right" : "pl-14"}`}
         />
         {loading && (
           <div
@@ -134,12 +134,12 @@ export const FriendSearch: React.FC = () => {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className={`flex items-center justify-between p-6 rounded-[32px] bg-white/[0.02] border border-white/5 backdrop-blur-3xl hover:bg-white/[0.05] hover:border-emerald-500/30 transition-all duration-500 shadow-xl group/res ${isAr ? "flex-row-reverse" : ""}`}
+              className={`flex items-center justify-between p-6 rounded-[32px] bg-muted/30 border border-border backdrop-blur-3xl hover:bg-muted/50 hover:border-emerald-500/30 transition-all duration-500 shadow-xl group/res ${isAr ? "flex-row-reverse" : ""}`}
             >
               <div
                 className={`flex items-center gap-4 ${isAr ? "flex-row-reverse" : ""}`}
               >
-                <div className="w-12 h-12 rounded-2xl overflow-hidden bg-black/40 border border-white/10 flex-shrink-0 relative group-hover/res:border-emerald-500/50 transition-colors duration-500">
+                <div className="w-12 h-12 rounded-2xl overflow-hidden bg-foreground/20 border border-border flex-shrink-0 relative group-hover/res:border-emerald-500/50 transition-colors duration-500">
                   {res.avatar_url ? (
                     <img
                       src={res.avatar_url}
@@ -147,7 +147,7 @@ export const FriendSearch: React.FC = () => {
                       className="w-full h-full object-cover group-hover/res:scale-110 transition-transform duration-700"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white/5">
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                       <Users className="w-6 h-6" />
                     </div>
                   )}
@@ -155,7 +155,7 @@ export const FriendSearch: React.FC = () => {
                   <div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:6px_6px]" />
                 </div>
                 <div className={isAr ? "text-right" : ""}>
-                  <div className="font-black text-white text-xs uppercase tracking-widest">
+                  <div className="font-black text-foreground text-xs uppercase tracking-widest">
                     {res.username}
                   </div>
                   <div className="text-[8px] text-emerald-500/40 font-black uppercase tracking-[0.3em] mt-1">

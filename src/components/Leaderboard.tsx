@@ -58,7 +58,7 @@ export const Leaderboard: React.FC = () => {
   };
 
   if (loading)
-    return <div className="animate-pulse h-64 bg-white/5 rounded-3xl" />;
+    return <div className="animate-pulse h-64 bg-muted/50 rounded-3xl" />;
 
   return (
     <div className="w-full max-w-md mx-auto space-y-4 relative z-10">
@@ -68,7 +68,7 @@ export const Leaderboard: React.FC = () => {
         <div className="w-10 h-10 rounded-2xl bg-yellow-500/20 flex items-center justify-center">
           <Trophy className="w-5 h-5 text-yellow-500" />
         </div>
-        <h3 className="text-xl font-bold text-white tracking-tight uppercase italic">
+        <h3 className="text-xl font-bold text-foreground tracking-tight uppercase italic">
           {t.title}
         </h3>
       </div>
@@ -80,12 +80,12 @@ export const Leaderboard: React.FC = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className={`group flex items-center justify-between p-4 rounded-[24px] bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/[0.08] transition-all ${isAr ? "flex-row-reverse" : ""}`}
+            className={`group flex items-center justify-between p-4 rounded-[24px] bg-muted/50 border border-border backdrop-blur-md hover:bg-muted/80 transition-all ${isAr ? "flex-row-reverse" : ""}`}
           >
             <div
               className={`flex items-center gap-3 ${isAr ? "flex-row-reverse" : ""}`}
             >
-              <div className="w-6 h-6 flex items-center justify-center font-black text-white/20 text-xs">
+              <div className="w-6 h-6 flex items-center justify-center font-black text-muted-foreground text-xs">
                 {index === 0 ? (
                   <Medal className="w-5 h-5 text-yellow-500" />
                 ) : index === 1 ? (
@@ -96,7 +96,7 @@ export const Leaderboard: React.FC = () => {
                   index + 1
                 )}
               </div>
-              <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 flex-shrink-0 border border-white/5">
+              <div className="w-10 h-10 rounded-xl overflow-hidden bg-muted flex-shrink-0 border border-border">
                 {p.avatar_url ? (
                   <img
                     src={p.avatar_url}
@@ -111,7 +111,7 @@ export const Leaderboard: React.FC = () => {
               </div>
               <div className="flex flex-col">
                 <span
-                  className={`font-bold text-white text-sm ${isAr ? "text-right" : ""}`}
+                  className={`font-bold text-foreground text-sm ${isAr ? "text-right" : ""}`}
                 >
                   {p.username}
                 </span>
@@ -121,7 +121,7 @@ export const Leaderboard: React.FC = () => {
                   <span className="text-emerald-400 font-black text-xs leading-none">
                     {p.score}
                   </span>
-                  <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
+                  <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">
                     {t.points}
                   </span>
                 </div>
@@ -133,7 +133,7 @@ export const Leaderboard: React.FC = () => {
                 onClick={() => setEditingProfile(p)}
                 variant="outline"
                 size="sm"
-                className="p-2 rounded-xl border-white/10 opacity-0 group-hover:opacity-100"
+                className="p-2 rounded-xl border-border opacity-0 group-hover:opacity-100"
               >
                 <Settings2 className="w-4 h-4" />
               </HeroButton>
