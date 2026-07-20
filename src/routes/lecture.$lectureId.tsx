@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "../lib/supabase-code";
 import { useLanguage } from "../lib/LanguageContext";
 import { useAuth } from "../hooks/use-auth";
@@ -25,6 +26,7 @@ import {
   Loader2,
   FileUp,
   BookOpen,
+  Maximize2,
   ShieldAlert,
 } from "lucide-react";
 import { HeroButton } from "../funs/HeroButton";
@@ -113,10 +115,12 @@ function WordDocumentViewer({ url }: { url: string }) {
 
 function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -181,6 +185,24 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
     }
   }, [loading]);
 
+  const toggleFullscreen = useCallback(() => {
+    if (!isFullscreen) {
+      if (wrapperRef.current?.requestFullscreen) {
+        wrapperRef.current.requestFullscreen();
+      }
+    } else {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    }
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground gap-3">
@@ -190,12 +212,8 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
     );
   }
 
-  return (
-    <div
-      className="relative"
-      onContextMenu={(e) => e.preventDefault()}
-      onDragStart={(e) => e.preventDefault()}
-    >
+  const viewerContent = (
+    <>
       {loading && (
         <div className="flex flex-col items-center justify-center h-[400px] gap-3">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -204,9 +222,55 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
       )}
       <div
         ref={canvasContainerRef}
-        className="p-4 md:p-6 max-h-[70vh] overflow-y-auto custom-scrollbar select-none"
+        className={`p-4 md:p-6 overflow-y-auto custom-scrollbar select-none ${isFullscreen ? "h-[calc(100vh-4rem)]" : "max-h-[70vh]"}`}
         style={{ userSelect: "none", WebkitUserSelect: "none" }}
       />
+    </>
+  );
+
+  if (isFullscreen) {
+    return createPortal(
+      <div
+        ref={wrapperRef}
+        className="fixed inset-0 z-[300] bg-background flex flex-col"
+        onContextMenu={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card shrink-0">
+          <div className="flex items-center gap-3">
+            <FileText className="w-4 h-4 text-primary" />
+            <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+              {isAr ? "وثيقة الدراسة" : "STUDY MATERIAL"}
+            </span>
+          </div>
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 rounded-xl bg-muted hover:bg-muted/80 border border-border transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        {viewerContent}
+      </div>,
+      document.body
+    );
+  }
+
+  return (
+    <div
+      ref={wrapperRef}
+      className="relative"
+      onContextMenu={(e) => e.preventDefault()}
+      onDragStart={(e) => e.preventDefault()}
+    >
+      <button
+        onClick={toggleFullscreen}
+        className="absolute top-3 right-3 z-20 p-2 rounded-xl bg-muted/80 backdrop-blur-sm hover:bg-muted border border-border transition-colors"
+        title={isAr ? "ملء الشاشة" : "Fullscreen"}
+      >
+        <Maximize2 className="w-3.5 h-3.5 text-foreground" />
+      </button>
+      {viewerContent}
       <div className="absolute inset-0 pointer-events-none z-10" />
     </div>
   );
