@@ -26,6 +26,7 @@ import {
   FileUp,
   BookOpen,
   Maximize2,
+  Minimize2,
   ShieldAlert,
 } from "lucide-react";
 import { HeroButton } from "../funs/HeroButton";
@@ -238,7 +239,7 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
             onClick={() => setIsFullscreen(false)}
             className="p-2 rounded-xl bg-muted hover:bg-muted/80 border border-border transition-colors"
           >
-            <X className="w-4 h-4" />
+            <Minimize2 className="w-4 h-4" />
           </button>
         </div>
         {viewerBody}
