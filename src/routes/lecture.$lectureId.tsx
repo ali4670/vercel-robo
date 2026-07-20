@@ -73,6 +73,7 @@ interface Lecture {
   title: string;
   description: string;
   video_url: string;
+  pdf_url?: string;
   level_id: string;
   slot_number: number;
   content_blocks?: ContentBlock[];
@@ -733,6 +734,28 @@ function LecturePage() {
                     className="w-full h-full object-contain"
                   />
                 )}
+              </div>
+            </motion.div>
+          )}
+
+          {lecture.pdf_url && (
+            <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="p-1 rounded-[2.5rem] bg-muted border border-border shadow-2xl">
+              <div className="bg-card border border-border rounded-[calc(2.5rem-0.375rem)] overflow-hidden">
+                <div className="flex items-center gap-3 px-8 py-4 border-b border-border bg-muted/50">
+                  <FileText className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                    {isAr ? "documento الدراسة" : "STUDY MATERIAL"}
+                  </span>
+                </div>
+                <div className="relative" onContextMenu={(e) => e.preventDefault()}>
+                  <iframe
+                    src={lecture.pdf_url}
+                    className="w-full h-[400px] md:h-[600px]"
+                    title="PDF Viewer"
+                    sandbox="allow-same-origin allow-scripts"
+                  />
+                  <div className="absolute inset-0 pointer-events-none" />
+                </div>
               </div>
             </motion.div>
           )}

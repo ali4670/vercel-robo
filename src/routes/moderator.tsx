@@ -1941,6 +1941,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   // Bulk Upload State
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -2036,6 +2037,41 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
       toast.error(err.message || (isAr ? "فشل رفع الفيديو" : "Video upload failed"));
     } finally {
       setUploadingFile(false);
+    }
+  };
+
+  const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!event.target.files || event.target.files.length === 0) return;
+      if (!user) {
+        toast.error(isAr ? "الرجاء تسجيل الدخول للتحميل" : "Please log in to upload.");
+        return;
+      }
+      const file = event.target.files[0];
+      const v = validateFile(file, "pdf", true);
+      if (!v.valid) { toast.error(v.error); return; }
+      setUploadingFile(true);
+      const filePath = safeStoragePath("lectures", file.name, user.id);
+
+      const { error: uploadError } = await supabase.storage.from("videos").upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("videos").getPublicUrl(filePath);
+
+      if (selectedLectureIdx !== null) {
+        const newLects = [...lectures];
+        newLects[selectedLectureIdx].pdf_url = publicUrl;
+        setLectures(newLects);
+        toast.success(isAr ? "تم رفع الملف بنجاح" : "PDF uploaded successfully");
+      }
+    } catch (err: any) {
+      toast.error(err.message || (isAr ? "فشل رفع الملف" : "PDF upload failed"));
+    } finally {
+      setUploadingFile(false);
+      if (pdfInputRef.current) pdfInputRef.current.value = "";
     }
   };
 
@@ -2751,19 +2787,35 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                       </div>
                       <div className="space-y-2 md:space-y-4">
                         <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                          <FileText className="w-3 h-3" /> PDF Source (URL)
+                          <FileText className="w-3 h-3" /> PDF Source (URL or Upload)
                         </label>
-                        <input
-                          type="text"
-                          value={lectures[selectedLectureIdx].pdf_url}
-                          onChange={(e) => {
-                            const newLects = [...lectures];
-                            newLects[selectedLectureIdx].pdf_url = e.target.value;
-                            setLectures(newLects);
-                          }}
-                          placeholder="PDF Link"
-                          className="w-full bg-muted/50 border border-border rounded-xl md:rounded-2xl px-3 md:px-6 py-2.5 md:py-4 text-xs md:text-sm font-bold outline-none focus:border-lime-500/50"
-                        />
+                        <div className="flex gap-1.5 md:gap-2">
+                          <input
+                            type="text"
+                            value={lectures[selectedLectureIdx].pdf_url}
+                            onChange={(e) => {
+                              const newLects = [...lectures];
+                              newLects[selectedLectureIdx].pdf_url = e.target.value;
+                              setLectures(newLects);
+                            }}
+                            placeholder="PDF Link or Upload PDF"
+                            className="flex-1 bg-muted/50 border border-border rounded-xl md:rounded-2xl px-3 md:px-6 py-2.5 md:py-4 text-xs md:text-sm font-bold outline-none focus:border-lime-500/50"
+                          />
+                          <button
+                            onClick={() => pdfInputRef.current?.click()}
+                            disabled={uploadingFile}
+                            className="px-3 md:px-6 rounded-xl md:rounded-2xl bg-lime-500 text-black font-black uppercase text-[9px] md:text-[10px] hover:scale-105 transition-all disabled:opacity-50"
+                          >
+                            {uploadingFile ? <Plus className="w-4 h-4 animate-spin" /> : "Upload"}
+                          </button>
+                          <input
+                            type="file"
+                            ref={pdfInputRef}
+                            onChange={handlePdfUpload}
+                            className="hidden"
+                            accept=".pdf"
+                          />
+                        </div>
                       </div>
                     </div>
 
