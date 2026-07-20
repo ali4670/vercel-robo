@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { createPortal } from "react-dom";
 import { supabase } from "../lib/supabase-code";
 import { useLanguage } from "../lib/LanguageContext";
 import { useAuth } from "../hooks/use-auth";
@@ -115,52 +114,51 @@ function WordDocumentViewer({ url }: { url: string }) {
 
 function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [totalPages, setTotalPages] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const renderPdf = useCallback(async (container: HTMLDivElement, scale: number) => {
+    const pdfjsLib = await import("pdfjs-dist");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+    const res = await fetch(url);
+    const data = await res.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data }).promise;
+    container.innerHTML = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement("canvas");
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.className = "w-full h-auto mb-3 rounded-lg";
+      canvas.style.objectFit = "contain";
+      const ctx = canvas.getContext("2d")!;
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      container.appendChild(canvas);
+    }
+  }, [url]);
 
   useEffect(() => {
     let cancelled = false;
-    const render = async () => {
+    const load = async () => {
       try {
-        const pdfjsLib = await import("pdfjs-dist");
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-
-        const res = await fetch(url);
-        const data = await res.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data }).promise;
-        if (cancelled) return;
-
-        setTotalPages(pdf.numPages);
-        const container = canvasContainerRef.current;
-        if (!container) return;
-        container.innerHTML = "";
-
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const scale = 1.8;
-          const viewport = page.getViewport({ scale });
-          const canvas = document.createElement("canvas");
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          canvas.className = "w-full h-auto mb-3 rounded-lg";
-          canvas.style.maxHeight = "700px";
-          canvas.style.objectFit = "contain";
-          const ctx = canvas.getContext("2d")!;
-          await page.render({ canvasContext: ctx, viewport }).promise;
-          container.appendChild(canvas);
-        }
+        await renderPdf(canvasContainerRef.current!, 1.8);
         if (!cancelled) setLoading(false);
       } catch {
         if (!cancelled) { setError(true); setLoading(false); }
       }
     };
-    render();
+    load();
     return () => { cancelled = true; };
-  }, [url]);
+  }, [url, renderPdf]);
+
+  useEffect(() => {
+    if (isFullscreen && canvasContainerRef.current) {
+      canvasContainerRef.current.innerHTML = "";
+      renderPdf(canvasContainerRef.current, 2.2).catch(() => {});
+    }
+  }, [isFullscreen, renderPdf]);
 
   useEffect(() => {
     if (!loading) {
@@ -170,6 +168,9 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
             e.preventDefault();
             return false;
           }
+        }
+        if (e.key === "Escape" && isFullscreen) {
+          setIsFullscreen(false);
         }
       };
       const ctx = (e: Event) => e.preventDefault();
@@ -183,25 +184,16 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
         document.removeEventListener("dragstart", drag, true);
       };
     }
-  }, [loading]);
-
-  const toggleFullscreen = useCallback(() => {
-    if (!isFullscreen) {
-      if (wrapperRef.current?.requestFullscreen) {
-        wrapperRef.current.requestFullscreen();
-      }
-    } else {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      }
-    }
-  }, [isFullscreen]);
+  }, [loading, isFullscreen]);
 
   useEffect(() => {
-    const handler = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
-  }, []);
+    if (isFullscreen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isFullscreen]);
 
   if (error) {
     return (
@@ -212,7 +204,7 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
     );
   }
 
-  const viewerContent = (
+  const viewerBody = (
     <>
       {loading && (
         <div className="flex flex-col items-center justify-center h-[400px] gap-3">
@@ -229,9 +221,8 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
   );
 
   if (isFullscreen) {
-    return createPortal(
+    return (
       <div
-        ref={wrapperRef}
         className="fixed inset-0 z-[300] bg-background flex flex-col"
         onContextMenu={(e) => e.preventDefault()}
         onDragStart={(e) => e.preventDefault()}
@@ -244,33 +235,31 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
             </span>
           </div>
           <button
-            onClick={toggleFullscreen}
+            onClick={() => setIsFullscreen(false)}
             className="p-2 rounded-xl bg-muted hover:bg-muted/80 border border-border transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
-        {viewerContent}
-      </div>,
-      document.body
+        {viewerBody}
+      </div>
     );
   }
 
   return (
     <div
-      ref={wrapperRef}
       className="relative"
       onContextMenu={(e) => e.preventDefault()}
       onDragStart={(e) => e.preventDefault()}
     >
       <button
-        onClick={toggleFullscreen}
-        className="absolute top-3 right-3 z-20 p-2 rounded-xl bg-muted/80 backdrop-blur-sm hover:bg-muted border border-border transition-colors"
+        onClick={() => setIsFullscreen(true)}
+        className="absolute top-3 right-3 z-20 p-2 rounded-xl bg-muted/80 backdrop-blur-sm hover:bg-muted border border-border transition-colors cursor-pointer"
         title={isAr ? "ملء الشاشة" : "Fullscreen"}
       >
         <Maximize2 className="w-3.5 h-3.5 text-foreground" />
       </button>
-      {viewerContent}
+      {viewerBody}
       <div className="absolute inset-0 pointer-events-none z-10" />
     </div>
   );
