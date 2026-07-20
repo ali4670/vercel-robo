@@ -246,7 +246,7 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
         {viewerBody}
         <button
           onClick={() => setIsFullscreen(false)}
-          className="fixed bottom-6 right-6 z-[310] p-4 rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-110 active:scale-95 transition-all cursor-pointer md:hidden"
+          className="fixed bottom-6 right-6 z-[310] p-4 rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-110 active:scale-95 transition-all cursor-pointer"
         >
           <Minimize2 className="w-5 h-5" />
         </button>
