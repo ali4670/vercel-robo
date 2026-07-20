@@ -237,12 +237,19 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
           </div>
           <button
             onClick={() => setIsFullscreen(false)}
-            className="p-2 rounded-xl bg-muted hover:bg-muted/80 border border-border transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 border border-border transition-colors cursor-pointer"
           >
             <Minimize2 className="w-4 h-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">{isAr ? "تصغير" : "MINIMIZE"}</span>
           </button>
         </div>
         {viewerBody}
+        <button
+          onClick={() => setIsFullscreen(false)}
+          className="fixed bottom-6 right-6 z-[310] p-4 rounded-full bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-110 active:scale-95 transition-all cursor-pointer md:hidden"
+        >
+          <Minimize2 className="w-5 h-5" />
+        </button>
       </div>
     );
   }
@@ -255,10 +262,10 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
     >
       <button
         onClick={() => setIsFullscreen(true)}
-        className="absolute top-3 right-3 z-20 p-2 rounded-xl bg-muted/80 backdrop-blur-sm hover:bg-muted border border-border transition-colors cursor-pointer"
-        title={isAr ? "ملء الشاشة" : "Fullscreen"}
+        className="absolute top-3 right-3 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/90 hover:bg-primary text-primary-foreground border border-primary/30 transition-colors cursor-pointer shadow-lg shadow-primary/20"
       >
-        <Maximize2 className="w-3.5 h-3.5 text-foreground" />
+        <Maximize2 className="w-3.5 h-3.5" />
+        <span className="text-[10px] font-black uppercase tracking-widest">{isAr ? "ملء الشاشة" : "FULLSCREEN"}</span>
       </button>
       {viewerBody}
       <div className="absolute inset-0 pointer-events-none z-10" />
