@@ -25,6 +25,7 @@ import {
   Loader2,
   FileUp,
   BookOpen,
+  ShieldAlert,
 } from "lucide-react";
 import { HeroButton } from "../funs/HeroButton";
 import { AcademicReviewer } from "../components/AcademicReviewer";
@@ -107,6 +108,107 @@ function WordDocumentViewer({ url }: { url: string }) {
       dangerouslySetInnerHTML={{ __html: html }}
       className="prose prose-invert max-w-none"
     />
+  );
+}
+
+function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    let cancelled = false;
+    const render = async () => {
+      try {
+        const pdfjsLib = await import("pdfjs-dist");
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+
+        const res = await fetch(url);
+        const data = await res.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data }).promise;
+        if (cancelled) return;
+
+        setTotalPages(pdf.numPages);
+        const container = canvasContainerRef.current;
+        if (!container) return;
+        container.innerHTML = "";
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const scale = 1.8;
+          const viewport = page.getViewport({ scale });
+          const canvas = document.createElement("canvas");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          canvas.className = "w-full h-auto mb-3 rounded-lg";
+          canvas.style.maxHeight = "700px";
+          canvas.style.objectFit = "contain";
+          const ctx = canvas.getContext("2d")!;
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          container.appendChild(canvas);
+        }
+        if (!cancelled) setLoading(false);
+      } catch {
+        if (!cancelled) { setError(true); setLoading(false); }
+      }
+    };
+    render();
+    return () => { cancelled = true; };
+  }, [url]);
+
+  useEffect(() => {
+    if (!loading) {
+      const block = (e: KeyboardEvent) => {
+        if (e.ctrlKey || e.metaKey) {
+          if (["s", "p", "u", "j"].includes(e.key.toLowerCase())) {
+            e.preventDefault();
+            return false;
+          }
+        }
+      };
+      const ctx = (e: Event) => e.preventDefault();
+      const drag = (e: Event) => e.preventDefault();
+      document.addEventListener("keydown", block, true);
+      document.addEventListener("contextmenu", ctx, true);
+      document.addEventListener("dragstart", drag, true);
+      return () => {
+        document.removeEventListener("keydown", block, true);
+        document.removeEventListener("contextmenu", ctx, true);
+        document.removeEventListener("dragstart", drag, true);
+      };
+    }
+  }, [loading]);
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground gap-3">
+        <ShieldAlert className="w-10 h-10 opacity-30" />
+        <p className="text-xs font-bold uppercase tracking-widest">{isAr ? "فشل تحميل الملف" : "Failed to load document"}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="relative"
+      onContextMenu={(e) => e.preventDefault()}
+      onDragStart={(e) => e.preventDefault()}
+    >
+      {loading && (
+        <div className="flex flex-col items-center justify-center h-[400px] gap-3">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{isAr ? "جارٍ التحميل..." : "LOADING DOCUMENT..."}</p>
+        </div>
+      )}
+      <div
+        ref={canvasContainerRef}
+        className="p-4 md:p-6 max-h-[70vh] overflow-y-auto custom-scrollbar select-none"
+        style={{ userSelect: "none", WebkitUserSelect: "none" }}
+      />
+      <div className="absolute inset-0 pointer-events-none z-10" />
+    </div>
   );
 }
 
@@ -744,18 +846,10 @@ function LecturePage() {
                 <div className="flex items-center gap-3 px-8 py-4 border-b border-border bg-muted/50">
                   <FileText className="w-4 h-4 text-primary" />
                   <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-                    {isAr ? "documento الدراسة" : "STUDY MATERIAL"}
+                    {isAr ? "وثيقة الدراسة" : "STUDY MATERIAL"}
                   </span>
                 </div>
-                <div className="relative" onContextMenu={(e) => e.preventDefault()}>
-                  <iframe
-                    src={lecture.pdf_url}
-                    className="w-full h-[400px] md:h-[600px]"
-                    title="PDF Viewer"
-                    sandbox="allow-same-origin allow-scripts"
-                  />
-                  <div className="absolute inset-0 pointer-events-none" />
-                </div>
+                <SecurePdfViewer url={lecture.pdf_url} isAr={isAr} />
               </div>
             </motion.div>
           )}
