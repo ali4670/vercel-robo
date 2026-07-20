@@ -188,7 +188,7 @@ function ContentRenderer({
         return (
           <iframe
             src={block.content}
-            className="w-full h-[600px] rounded-3xl"
+            className="w-full h-[400px] md:h-[600px] rounded-3xl"
             title="PDF"
           />
         );
@@ -214,7 +214,7 @@ function ContentRenderer({
         return (
           <iframe
             src={block.content}
-            className="w-full h-[500px] rounded-3xl"
+            className="w-full h-[300px] md:h-[500px] rounded-3xl"
             title="Interactive"
           />
         );
@@ -373,17 +373,17 @@ function LectureChat({ lectureId, levelId, isAr }: { lectureId: string; levelId:
   };
 
   return (
-    <div className="h-full flex flex-col bg-card rounded-4xl border border-border overflow-hidden backdrop-blur-xl">
-      <header className="p-6 border-b border-border flex items-center gap-4 bg-card">
-        <MessageSquare className="w-5 h-5 text-primary" />
-        <h3 className="font-black italic uppercase tracking-widest text-sm">
+    <div className="h-full flex flex-col bg-card rounded-2xl md:rounded-4xl border border-border overflow-hidden backdrop-blur-xl">
+      <header className="p-4 md:p-6 border-b border-border flex items-center gap-3 bg-card">
+        <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+        <h3 className="font-black italic uppercase tracking-widest text-xs md:text-sm">
           {isAr ? "محادثة الدرس" : "LECTURE COMM-LINK"}
         </h3>
       </header>
-      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 md:space-y-6 custom-scrollbar">
         {messages.map((m, i) => (
-          <div key={i} className={`flex gap-4 ${m.sender_id === profile?.id ? "flex-row-reverse" : ""}`}>
-            <div className="w-12 h-12 rounded-2xl bg-muted overflow-hidden flex-shrink-0 border border-border">
+          <div key={i} className={`flex gap-3 md:gap-4 ${m.sender_id === profile?.id ? "flex-row-reverse" : ""}`}>
+            <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-muted overflow-hidden flex-shrink-0 border border-border">
               {m.profiles?.avatar_url ? (
                 <img src={m.profiles.avatar_url} className="w-full h-full object-cover" />
               ) : (
@@ -429,7 +429,7 @@ function LectureChat({ lectureId, levelId, isAr }: { lectureId: string; levelId:
           </div>
         )}
       </div>
-      <div className="p-8 bg-card border-t border-border">
+      <div className="p-4 md:p-8 bg-card border-t border-border">
         {!canSend && cooldownRemaining > 0 && (
           <div className="text-center text-xs text-muted-foreground mb-2 font-mono">
             {isAr ? `انتظر ${Math.ceil(cooldownRemaining / 60)}:${String(cooldownRemaining % 60).padStart(2, "0")}` : `Cooldown ${Math.ceil(cooldownRemaining / 60)}:${String(cooldownRemaining % 60).padStart(2, "0")}`}
@@ -442,14 +442,14 @@ function LectureChat({ lectureId, levelId, isAr }: { lectureId: string; levelId:
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder={!canSend ? (isAr ? "في الانتظار..." : "On cooldown...") : (isAr ? "أرسل رسالة..." : "Transmit message...")}
-            className="w-full bg-muted border border-border rounded-3xl py-6 pl-8 pr-20 font-bold focus:outline-none focus:border-primary focus:bg-muted/50 transition-all"
+            className="w-full bg-muted border border-border rounded-3xl py-4 md:py-6 pl-6 md:pl-8 pr-16 md:pr-20 font-bold focus:outline-none focus:border-primary focus:bg-muted/50 transition-all text-sm md:text-base"
           />
           <button
             onClick={sendMessage}
             disabled={isUploading || !canSend}
-            className={`absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 p-4 bg-primary text-primary-foreground rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 disabled:opacity-50`}
+            className={`absolute ${isAr ? "left-2" : "right-2"} top-1/2 -translate-y-1/2 p-3 md:p-4 bg-primary text-primary-foreground rounded-xl md:rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 disabled:opacity-50`}
           >
-            <Send className={`w-5 h-5 ${isAr ? "rotate-180" : ""}`} />
+            <Send className={`w-4 h-4 md:w-5 md:h-5 ${isAr ? "rotate-180" : ""}`} />
           </button>
           {isAdmin && (
             <>
@@ -457,7 +457,7 @@ function LectureChat({ lectureId, levelId, isAr }: { lectureId: string; levelId:
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className={`absolute ${isAr ? "left-20" : "right-20"} top-1/2 -translate-y-1/2 p-4 bg-muted text-muted-foreground border border-border rounded-2xl flex items-center justify-center hover:bg-border transition-all`}
+                className={`absolute ${isAr ? "left-14" : "right-14"} top-1/2 -translate-y-1/2 p-3 md:p-4 bg-muted text-muted-foreground border border-border rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-border transition-all`}
               >
                 {isUploading ? <Loader2 className="w-5 h-5 animate-spin text-primary" /> : <FileUp className="w-5 h-5" />}
               </button>
@@ -679,7 +679,7 @@ function LecturePage() {
         }}
       />
 
-      <div ref={contentScrollRef} className="flex-1 relative z-20 pt-32 pb-32 px-6 max-w-[900px] mx-auto w-full overflow-y-auto h-screen">
+      <div ref={contentScrollRef} className="flex-1 relative z-20 pt-20 md:pt-32 pb-24 md:pb-32 px-4 md:px-6 max-w-[900px] mx-auto w-full overflow-y-auto h-screen">
         <header className="mb-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-3 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full mb-6">
             <span className="text-primary text-[9px] font-black uppercase tracking-[0.3em]">Module {lecture.slot_number}</span>
@@ -687,25 +687,25 @@ function LecturePage() {
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black italic tracking-tighter mb-6 leading-[0.9] uppercase">{lecture.title}</motion.h1>
         </header>
 
-        <div className="flex gap-3 mb-8 justify-center">
+        <div className="flex gap-2 md:gap-3 mb-6 md:mb-8 justify-center overflow-x-auto px-2">
           <button
             onClick={() => setActiveTab("content")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${activeTab === "content" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+            className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs transition-all whitespace-nowrap ${activeTab === "content" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
           >
-            <BookOpen className="w-4 h-4" />
+            <BookOpen className="w-3.5 h-3.5 md:w-4 md:h-4" />
             {isAr ? "المحتوى" : "CONTENT"}
           </button>
           <button
             onClick={() => setActiveTab("chat")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-xs transition-all ${activeTab === "chat" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+            className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs transition-all whitespace-nowrap ${activeTab === "chat" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4" />
             {isAr ? "المحادثة" : "CHAT"}
           </button>
         </div>
 
         {activeTab === "chat" ? (
-          <div className="h-[600px]">
+          <div className="h-[50dvh] md:h-[600px]">
             <LectureChat lectureId={lectureId} levelId={lecture.level_id} isAr={isAr} />
           </div>
         ) : (

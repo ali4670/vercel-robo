@@ -335,3 +335,22 @@
 video::-webkit-media-controls-download-button { display: none !important; }
 video::-webkit-media-controls-enclosure { overflow: hidden; }
 video::-internal-media-controls-overflow-button { display: none !important; }
+
+/* Mobile safe area utilities */
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-area-top { padding-top: env(safe-area-inset-top, 0px); }
+
+/* Mobile-specific utilities */
+@media (max-width: 767px) {
+  .touch-target { min-height: 44px; min-width: 44px; }
+  .mobile-full { width: 100%; margin-left: 0; margin-right: 0; }
+  .mobile-stack { flex-direction: column; }
+  .mobile-hidden { display: none; }
+  .mobile-py { padding-top: 1rem; padding-bottom: 1rem; }
+  .mobile-px { padding-left: 1rem; padding-right: 1rem; }
+  .mobile-text-sm { font-size: 0.75rem; line-height: 1rem; }
+}
+
+/* Hide scrollbar */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

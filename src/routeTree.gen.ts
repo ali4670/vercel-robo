@@ -13,13 +13,15 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ParentDashboardRouteImport } from './routes/parent-dashboard'
 import { Route as ModeratorRouteImport } from './routes/moderator'
-import { Route as MessagesRouteImport } from './routes/messages'
+
 import { Route as HeroDemoRouteImport } from './routes/hero-demo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LevelsIndexRouteImport } from './routes/levels/index'
 import { Route as LectureLectureIdRouteImport } from './routes/lecture.$lectureId'
 import { Route as ExamLevelIdRouteImport } from './routes/exam.$levelId'
 import { Route as LevelsClassroomLevelIdRouteImport } from './routes/levels/classroom/$levelId'
+import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -41,11 +43,7 @@ const ModeratorRoute = ModeratorRouteImport.update({
   path: '/moderator',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => rootRouteImport,
-} as any)
+
 const HeroDemoRoute = HeroDemoRouteImport.update({
   id: '/hero-demo',
   path: '/hero-demo',
@@ -76,11 +74,21 @@ const LevelsClassroomLevelIdRoute = LevelsClassroomLevelIdRouteImport.update({
   path: '/levels/classroom/$levelId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
+  id: '/terms-of-service',
+  path: '/terms-of-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/hero-demo': typeof HeroDemoRoute
-  '/messages': typeof MessagesRoute
+
   '/moderator': typeof ModeratorRoute
   '/parent-dashboard': typeof ParentDashboardRoute
   '/profile': typeof ProfileRoute
@@ -89,11 +97,13 @@ export interface FileRoutesByFullPath {
   '/lecture/$lectureId': typeof LectureLectureIdRoute
   '/levels/': typeof LevelsIndexRoute
   '/levels/classroom/$levelId': typeof LevelsClassroomLevelIdRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/hero-demo': typeof HeroDemoRoute
-  '/messages': typeof MessagesRoute
+
   '/moderator': typeof ModeratorRoute
   '/parent-dashboard': typeof ParentDashboardRoute
   '/profile': typeof ProfileRoute
@@ -102,12 +112,14 @@ export interface FileRoutesByTo {
   '/lecture/$lectureId': typeof LectureLectureIdRoute
   '/levels': typeof LevelsIndexRoute
   '/levels/classroom/$levelId': typeof LevelsClassroomLevelIdRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/hero-demo': typeof HeroDemoRoute
-  '/messages': typeof MessagesRoute
+
   '/moderator': typeof ModeratorRoute
   '/parent-dashboard': typeof ParentDashboardRoute
   '/profile': typeof ProfileRoute
@@ -116,13 +128,14 @@ export interface FileRoutesById {
   '/lecture/$lectureId': typeof LectureLectureIdRoute
   '/levels/': typeof LevelsIndexRoute
   '/levels/classroom/$levelId': typeof LevelsClassroomLevelIdRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/hero-demo'
-    | '/messages'
     | '/moderator'
     | '/parent-dashboard'
     | '/profile'
@@ -131,11 +144,12 @@ export interface FileRouteTypes {
     | '/lecture/$lectureId'
     | '/levels/'
     | '/levels/classroom/$levelId'
+    | '/terms-of-service'
+    | '/privacy-policy'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/hero-demo'
-    | '/messages'
     | '/moderator'
     | '/parent-dashboard'
     | '/profile'
@@ -144,11 +158,12 @@ export interface FileRouteTypes {
     | '/lecture/$lectureId'
     | '/levels'
     | '/levels/classroom/$levelId'
+    | '/terms-of-service'
+    | '/privacy-policy'
   id:
     | '__root__'
     | '/'
     | '/hero-demo'
-    | '/messages'
     | '/moderator'
     | '/parent-dashboard'
     | '/profile'
@@ -157,12 +172,13 @@ export interface FileRouteTypes {
     | '/lecture/$lectureId'
     | '/levels/'
     | '/levels/classroom/$levelId'
+    | '/terms-of-service'
+    | '/privacy-policy'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HeroDemoRoute: typeof HeroDemoRoute
-  MessagesRoute: typeof MessagesRoute
   ModeratorRoute: typeof ModeratorRoute
   ParentDashboardRoute: typeof ParentDashboardRoute
   ProfileRoute: typeof ProfileRoute
@@ -171,6 +187,8 @@ export interface RootRouteChildren {
   LectureLectureIdRoute: typeof LectureLectureIdRoute
   LevelsIndexRoute: typeof LevelsIndexRoute
   LevelsClassroomLevelIdRoute: typeof LevelsClassroomLevelIdRoute
+  TermsOfServiceRoute: typeof TermsOfServiceRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -201,13 +219,6 @@ declare module '@tanstack/react-router' {
       path: '/parent-dashboard'
       fullPath: '/parent-dashboard'
       preLoaderRoute: typeof ParentDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hero-demo': {
@@ -252,13 +263,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LevelsClassroomLevelIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms-of-service': {
+      id: '/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof TermsOfServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HeroDemoRoute: HeroDemoRoute,
-  MessagesRoute: MessagesRoute,
   ModeratorRoute: ModeratorRoute,
   ParentDashboardRoute: ParentDashboardRoute,
   ProfileRoute: ProfileRoute,
@@ -267,6 +291,8 @@ const rootRouteChildren: RootRouteChildren = {
   LectureLectureIdRoute: LectureLectureIdRoute,
   LevelsIndexRoute: LevelsIndexRoute,
   LevelsClassroomLevelIdRoute: LevelsClassroomLevelIdRoute,
+  TermsOfServiceRoute: TermsOfServiceRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

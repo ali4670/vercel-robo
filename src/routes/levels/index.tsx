@@ -13,8 +13,12 @@ import {
   GraduationCap,
   ChevronDown,
   ArrowRight,
+  Search,
+  X,
 } from "lucide-react";
 import { HeroButton } from "../../funs/HeroButton";
+import { AuthModal } from "../../components/AuthModal";
+import { LogIn } from "lucide-react";
 
 export const Route = createFileRoute("/levels/")({
   component: LevelsPage,
@@ -56,6 +60,9 @@ function LevelsPage() {
   const [access, setAccess] = useState<{ level_id: string; granted_at: string }[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const fetchInitialData = useCallback(async () => {
     setLoading(true);
@@ -115,7 +122,7 @@ function LevelsPage() {
   if (loading)
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
@@ -167,19 +174,19 @@ function LevelsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6 pb-20 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-background text-foreground p-3 md:p-6 pb-24 md:pb-20 relative overflow-hidden font-sans">
       <div className="fixed inset-0 bg-background z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-muted blur-[120px] rounded-full animate-pulse"></div>
         <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-muted/50 blur-[100px] rounded-full"></div>
       </div>
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-10 opacity-20"></div>
 
-      <div className="container mx-auto max-w-5xl relative z-10 pt-10">
-        <header className="mb-20 text-center">
+      <div className="container mx-auto max-w-5xl relative z-10 pt-4 md:pt-8">
+        <header className="mb-6 md:mb-12 text-center">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-8xl font-black italic tracking-tighter mb-4 uppercase"
+            className="text-2xl md:text-4xl lg:text-6xl font-black italic tracking-tighter mb-2 md:mb-3 uppercase"
           >
             {isAr ? "مسار المهمات" : "MISSION TRACK"}
           </motion.h1>
@@ -192,12 +199,96 @@ function LevelsPage() {
           </div>
         </header>
 
-        <div className="space-y-16">
-          {levels.map((level) => {
-              const levelLectures = lectures.filter((l) => {
+        {/* Sign-in prompt for guests */}
+        {!user && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 md:mb-8 p-4 md:p-5 rounded-2xl bg-primary/5 border border-primary/20 flex flex-col sm:flex-row items-center justify-between gap-3"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <LogIn className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-sm font-bold text-foreground text-center sm:text-left">
+                {isAr
+                  ? "سجّل دخولك للوصول إلى جميع الدورات والمحتوى التعليمي"
+                  : "Sign in to access all courses and learning content"}
+              </p>
+            </div>
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="shrink-0 px-5 py-2.5 rounded-xl bg-primary text-background text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/15 active:scale-95 transition-all"
+            >
+              {isAr ? "تسجيل الدخول" : "Sign In"}
+            </button>
+          </motion.div>
+        )}
+
+        {/* Search + Module Picker */}
+        <div className="mb-6 md:mb-8 space-y-3">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={isAr ? "ابحث عن محاضرة..." : "Search lectures..."}
+              className="w-full bg-muted/50 border border-border rounded-xl md:rounded-2xl py-3 md:py-4 pl-10 md:pl-12 pr-10 md:pr-12 text-sm font-bold outline-none focus:border-primary/50 transition-all placeholder:text-muted-foreground"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Module chips */}
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <button
+              onClick={() => setSelectedLevelId(null)}
+              className={`shrink-0 px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest border transition-all ${
+                selectedLevelId === null
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-muted/50 text-muted-foreground border-border hover:border-primary/30"
+              }`}
+            >
+              {isAr ? "الكل" : "ALL"}
+            </button>
+            {levels
+              .filter((l) => isLevelAccessible(l))
+              .map((level) => (
+                <button
+                  key={level.id}
+                  onClick={() => setSelectedLevelId(selectedLevelId === level.id ? null : level.id)}
+                  className={`shrink-0 px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest border transition-all ${
+                    selectedLevelId === level.id
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-muted/50 text-muted-foreground border-border hover:border-primary/30"
+                  }`}
+                >
+                  {level.title}
+                </button>
+              ))}
+          </div>
+        </div>
+
+        <div className="space-y-6 md:space-y-10">
+          {levels
+            .filter((level) => {
+              if (selectedLevelId && level.id !== selectedLevelId) return false;
+              return isLevelAccessible(level);
+            })
+            .map((level) => {
+              const levelLectures = lectures
+                .filter((l) => {
                   const belongsToLevel = l.level_id === level.id;
                   const canSee = l.is_live !== false || isAdmin || isModerator;
-                  return belongsToLevel && canSee;
+                  const matchesSearch = !searchQuery || l.title.toLowerCase().includes(searchQuery.toLowerCase());
+                  return belongsToLevel && canSee && matchesSearch;
                 })
                 .sort((a, b) => a.slot_number - b.slot_number);
               const hasExam = exams.some((e) => e.level_id === level.id);
@@ -205,8 +296,7 @@ function LevelsPage() {
                 progress.includes(l.id),
               ).length;
 
-              const isUnlocked = isLevelAccessible(level);
-              if (!isUnlocked) return null;
+              if (levelLectures.length === 0) return null;
 
               return (
                 <motion.section
@@ -214,16 +304,16 @@ function LevelsPage() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className={`relative bg-muted backdrop-blur-xl border border-border rounded-[3rem] p-8 md:p-12 overflow-hidden shadow-2xl transition-all duration-500`}
+                  className={`relative bg-muted backdrop-blur-xl border border-border rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 overflow-hidden shadow-2xl transition-all duration-500`}
                 >
                   <>
-                    <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-                      <div className="flex items-end gap-6">
-                        <div className="text-8xl font-black italic text-muted-foreground/20 leading-none select-none">
+                    <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 mb-4 md:mb-6">
+                      <div className="flex items-end gap-3 md:gap-4">
+                        <div className="text-4xl md:text-6xl lg:text-8xl font-black italic text-muted-foreground/20 leading-none select-none">
                           {String(level.level_order).padStart(2, "0")}
                         </div>
                         <div className="mb-2 text-left">
-                          <h2 className="text-3xl md:text-4xl font-black italic uppercase tracking-tight text-foreground">
+                          <h2 className="text-lg md:text-2xl lg:text-3xl font-black italic uppercase tracking-tight text-foreground">
                             {level.title}
                           </h2>
                           <div className="flex items-center gap-4 mt-2">
@@ -273,7 +363,7 @@ function LevelsPage() {
                               className={`h-full block`}
                             >
                               <div
-                                className={`h-full p-8 rounded-3xl border transition-all duration-300 ${
+                                className={`h-full p-4 md:p-6 rounded-xl md:rounded-2xl border transition-all duration-300 ${
                                   !isUnlocked
                                     ? "bg-foreground/10 border-border"
                                     : isCompleted
@@ -349,20 +439,20 @@ function LevelsPage() {
                         );
                       })}
 
-                      <div className="md:col-span-full mt-4 flex gap-4">
+                      <div className="md:col-span-full mt-3 flex flex-col sm:flex-row gap-2 md:gap-3">
                         <Link
                           to="/levels/classroom/$levelId"
                           params={{ levelId: level.id }}
                           className={`flex-1`}
                         >
-                          <HeroButton className="w-full bg-white text-black h-14 rounded-2xl uppercase font-black tracking-widest italic flex items-center justify-center gap-3">
-                            <MessageSquare className="w-5 h-5" />
+                          <HeroButton className="w-full bg-white text-black h-10 md:h-12 rounded-xl md:rounded-2xl uppercase font-black tracking-widest italic flex items-center justify-center gap-2 text-[10px] md:text-xs">
+                            <MessageSquare className="w-4 h-4 md:w-5 md:h-5" />
                             {isAr ? "دخول غرفة المحادثة" : "ENTER CLASSROOM"}
                           </HeroButton>
                         </Link>
                         {hasExam && (
                           <Link to={`/exam/${level.id}`} className={`flex-1`}>
-                            <HeroButton className="w-full bg-muted border-border text-foreground h-14 rounded-2xl uppercase font-black tracking-widest italic flex items-center justify-center gap-3">
+                            <HeroButton className="w-full bg-muted border-border text-foreground h-10 md:h-12 rounded-xl md:rounded-2xl uppercase font-black tracking-widest italic flex items-center justify-center gap-2 text-[10px] md:text-xs">
                               <GraduationCap className="w-5 h-5" />
                               {isAr ? "بدء الاختبار" : "INITIATE EXAM"}
                             </HeroButton>
@@ -374,8 +464,17 @@ function LevelsPage() {
                 </motion.section>
               );
             })}
+          {levels.filter((l) => isLevelAccessible(l)).length > 0 && searchQuery && (
+            <div className="text-center py-12 md:py-20">
+              <Search className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
+              <p className="text-muted-foreground font-bold text-sm">
+                {isAr ? "لا توجد نتائج" : "No lectures found"}
+              </p>
+            </div>
+          )}
         </div>
       </div>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }

@@ -152,15 +152,15 @@ function Index() {
       </div>
 
       {/* Mission Section */}
-      <section className="py-24 relative bg-card/20 overflow-hidden border-y border-border flex flex-col items-center justify-center min-h-[40vh]">
+      <section className="py-8 md:py-16 relative bg-card/20 overflow-hidden border-y border-border flex flex-col items-center justify-center min-h-[20vh] md:min-h-[30vh]">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-center px-6 relative z-10"
+          className="text-center px-4 md:px-6 relative z-10"
         >
           <motion.h2
-            className="text-4xl md:text-7xl font-black tracking-tighter italic mb-6"
+            className="text-2xl md:text-4xl lg:text-6xl font-black tracking-tighter italic mb-3 md:mb-4"
             style={{ fontFamily: '"Arial Black", Impact, sans-serif' }}
           >
             <ScrambledText
@@ -195,7 +195,7 @@ function Index() {
       {/* Arena Section */}
       <section
         id="arena-section"
-        className="py-40 px-6 bg-background relative overflow-hidden border-t border-border"
+        className="py-12 md:py-24 px-4 md:px-6 bg-background relative overflow-hidden border-t border-border"
       >
         {/* Raining X and O Background */}
         <div className="absolute inset-0 opacity-10">
@@ -207,18 +207,18 @@ function Index() {
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="container mx-auto max-w-7xl relative z-10">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-8">
+          <div className="flex flex-col md:flex-row items-end justify-between mb-8 md:mb-16 gap-4 md:gap-6">
             <div className="text-left">
               <motion.h2
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                className="text-6xl md:text-9xl font-black italic tracking-tighter leading-none mb-4"
+                className="text-3xl md:text-5xl lg:text-7xl font-black italic tracking-tighter leading-none mb-3"
               >
                 {isAr ? "الدورات" : "OUR COURSES"}
               </motion.h2>
               <div className="flex items-center gap-4">
                 <div className="h-0.5 w-12 bg-primary" />
-                <p className="text-primary font-black uppercase tracking-[0.5em] text-[10px]">
+                <p className="text-primary font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-[8px] md:text-[10px]">
                   {isAr
                     ? "مسارات المهندسين المبدعين"
                     : "Architecting the next generation of engineers"}
@@ -235,7 +235,7 @@ function Index() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {levels.map((level, idx) => (
               <motion.div
                 key={level.id}
@@ -246,7 +246,7 @@ function Index() {
               >
                 <Link
                   to="/levels"
-                  className="group relative block aspect-[4/5] rounded-4xl overflow-hidden border border-border bg-card hover:border-primary/30 transition-all duration-500 shadow-2xl"
+                  className="group relative block aspect-[3/4] rounded-2xl md:rounded-3xl overflow-hidden border border-border bg-card hover:border-primary/30 transition-all duration-500 shadow-2xl"
                 >
                   {/* Image with Parallax-like effect on hover */}
                   <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-110">
@@ -265,17 +265,17 @@ function Index() {
                   <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors" />
 
                   {/* Content */}
-                  <div className="absolute inset-x-0 bottom-0 p-10 flex flex-col justify-end h-full">
+                  <div className="absolute inset-x-0 bottom-0 p-4 md:p-6 flex flex-col justify-end h-full">
                     <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span className="px-3 py-1 bg-primary text-primary-foreground text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-[0_0_20px_rgba(var(--primary),0.3)]">
+                      <div className="flex items-center gap-3 mb-3 md:mb-4">
+                        <span className="px-2 md:px-3 py-1 bg-primary text-primary-foreground text-[7px] md:text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-[0_0_20px_rgba(var(--primary),0.3)]">
                           {isAr
                             ? `المستوى ${level.level_order}`
                             : `UNIT-${String(level.level_order).padStart(2, "0")}`}
                         </span>
                         <div className="h-[1px] flex-1 bg-border" />
                       </div>
-                      <h3 className="text-3xl font-black italic uppercase text-foreground tracking-tighter leading-tight mb-2 group-hover:text-primary transition-colors">
+                      <h3 className="text-xl md:text-3xl font-black italic uppercase text-foreground tracking-tighter leading-tight mb-2 group-hover:text-primary transition-colors">
                         {level.title}
                       </h3>
                       <div className="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
@@ -292,7 +292,7 @@ function Index() {
               </motion.div>
             ))}
             {levels.length === 0 && (
-              <div className="col-span-full py-32 flex flex-col items-center justify-center gap-6 border border-dashed border-border rounded-4xl bg-card">
+              <div className="col-span-full py-16 md:py-32 flex flex-col items-center justify-center gap-4 md:gap-6 border border-dashed border-border rounded-2xl md:rounded-4xl bg-card">
                 <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
                 <p className="text-muted-foreground font-black uppercase tracking-[0.5em] text-xs italic">
                   {isAr
@@ -308,20 +308,20 @@ function Index() {
       {/* Services Section */}
       <section
         id="missions-section"
-        className="py-40 px-6 bg-muted/50 relative overflow-hidden border-y border-border"
+        className="py-12 md:py-24 px-4 md:px-6 bg-muted/50 relative overflow-hidden border-y border-border"
       >
         <div className="container mx-auto max-w-7xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
             <div className="lg:col-span-5">
-              <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full mb-8">
-                <span className="text-primary text-[10px] font-black uppercase tracking-[0.3em]">
+              <div className="inline-flex items-center gap-3 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full mb-4 md:mb-6">
+                <span className="text-primary text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">
                   {isAr ? "مجالات الخبرة" : "EXPERT DOMAINS"}
                 </span>
               </div>
-              <h2 className="text-6xl md:text-8xl font-black italic tracking-[calc(-0.05em)] mb-8 uppercase leading-[0.85] text-foreground">
+              <h2 className="text-3xl md:text-5xl lg:text-7xl font-black italic tracking-[calc(-0.05em)] mb-4 md:mb-6 uppercase leading-[0.85] text-foreground">
                 {isAr ? "الخدمات الجوهرية" : "CORE SERVICES"}
               </h2>
-              <p className="text-muted-foreground font-bold uppercase tracking-[0.4em] text-[10px] mb-12">
+              <p className="text-muted-foreground font-bold uppercase tracking-[0.3em] md:tracking-[0.4em] text-[9px] md:text-[10px] mb-6 md:mb-8">
                 {isAr
                   ? "تطوير الكفاءات التقنية المتقدمة"
                   : "ADVANCING TECHNICAL COMPETENCY AT SCALE"}
@@ -360,22 +360,22 @@ function Index() {
                   key={i}
                   className="p-1 rounded-[2.5rem] bg-primary/5 border border-border hover:border-primary/40 transition-all duration-700 group"
                 >
-                  <div className="bg-card/60 backdrop-blur-3xl p-8 md:p-10 rounded-[calc(2.5rem-0.25rem)] flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div className="flex items-center gap-8 text-center md:text-left flex-col md:flex-row">
-                      <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-2xl">
+                  <div className="bg-card/60 backdrop-blur-3xl p-4 md:p-6 rounded-2xl md:rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+                    <div className="flex items-center gap-4 md:gap-6 text-center md:text-left flex-col md:flex-row">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-500 shadow-2xl">
                         {s.icon}
                       </div>
                       <div>
-                        <div className="flex items-center gap-3 mb-2 justify-center md:justify-start">
-                          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+                        <div className="flex items-center gap-2 md:gap-3 mb-2 justify-center md:justify-start">
+                          <span className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                             {s.tag}
                           </span>
                           <div className="h-px w-6 bg-border"></div>
                         </div>
-                        <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter text-foreground uppercase leading-none">
+                        <h3 className="text-lg md:text-xl font-black italic tracking-tighter text-foreground uppercase leading-none">
                           {s.t}
                         </h3>
-                        <p className="text-muted-foreground font-medium mt-3 text-sm md:text-base">
+                        <p className="text-muted-foreground font-medium mt-2 text-xs md:text-sm">
                           {s.d}
                         </p>
                       </div>
@@ -392,13 +392,13 @@ function Index() {
       </section>
 
       {/* Missions Tracker Section */}
-      <section className="py-32 px-6 bg-card backdrop-blur-sm border-t border-border">
+      <section className="py-12 md:py-20 px-4 md:px-6 bg-card backdrop-blur-sm border-t border-border">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-4">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-3xl lg:text-5xl font-black italic uppercase tracking-tighter mb-2 md:mb-3">
               {isAr ? "متتبع المهمات" : "MISSION CONTROL"}
             </h2>
-            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.5em]">
+            <p className="text-muted-foreground text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em]">
               {isAr
                 ? "تحكم في أهدافك اليومية"
                 : "Command your daily objectives"}
@@ -408,94 +408,195 @@ function Index() {
         </div>
       </section>
 
-      {/* Enhanced Footer */}
-      <footer className="bg-card py-20 px-8 border-t border-border mt-auto">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
-            {/* Brand */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <img 
-                  src="/logo-2026, 12_38_18 PM.png" 
-                  alt="ST-Company Logo" 
-                  className="w-28 h-20 rounded-full object-cover border-2 border-border shadow-lg p-0.5 bg-card"
-                />
-                <div>
-                  <h3 className="text-2xl font-black italic tracking-tighter text-foreground">
-                    ST<span className="text-primary">-</span>COMPANY<span className="text-primary">.</span>
-                  </h3>
+      {/* Footer */}
+      <footer className="bg-card border-t border-border mt-auto">
+        {/* ── Desktop Footer (md+) ── */}
+        <div className="hidden md:block py-12 px-8">
+          <div className="container mx-auto max-w-7xl">
+            <div className="grid grid-cols-4 gap-8 text-left">
+              {/* Brand */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/logo-2026, 12_38_18 PM.png"
+                    alt="ST-Company Logo"
+                    className="w-28 h-20 rounded-full object-cover border-2 border-border shadow-lg p-0.5 bg-card"
+                  />
+                  <div>
+                    <h3 className="text-2xl font-black italic tracking-tighter text-foreground">
+                      ST<span className="text-primary">-</span>COMPANY<span className="text-primary">.</span>
+                    </h3>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">
+                  {isAr ? "نحن نبني المستقبل" : "ENGINEERING THE UNKNOWN"}
+                </p>
+              </div>
+
+              {/* Links */}
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">
+                  {isAr ? "الروابط" : "NAVIGATION"}
+                </h4>
+                <nav className="flex flex-col gap-2">
+                  {["Levels", "Profile"].map((link) => (
+                    <Link
+                      key={link}
+                      to={`/${link.toLowerCase()}` as any}
+                      className="text-sm font-bold text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {link}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Socials */}
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">
+                  {isAr ? "تواصل" : "CONNECT"}
+                </h4>
+                <div className="flex gap-3">
+                  {["IG", "TW", "LI", "FB"].map((s) => (
+                    <button
+                      key={s}
+                      className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-[10px] font-black hover:bg-primary hover:text-background transition-all"
+                    >
+                      {s}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">
-                {isAr ? "نحن نبني المستقبل" : "ENGINEERING THE UNKNOWN"}
-              </p>
-            </div>
 
-            {/* Links */}
-            <div className="space-y-4">
-              <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">
-                {isAr ? "الروابط" : "NAVIGATION"}
-              </h4>
-              <nav className="flex flex-col gap-2">
-                {["Levels", "Messages", "Profile"].map((link) => (
-                  <Link
-                    key={link}
-                    to={`/${link.toLowerCase()}` as any}
-                    className="text-sm font-bold text-muted-foreground hover:text-primary transition-colors"
+              {/* Copyright */}
+              <div className="text-muted-foreground text-[9px] font-black uppercase tracking-widest flex flex-col justify-end gap-1">
+                <p>© 2026 ST-COMPANY CORP.</p>
+                <p>
+                  Designed by{" "}
+                  <a
+                    href="https://www.instagram.com/aliahmed.sabry/"
+                    target="_blank"
+                    className="text-primary hover:underline"
                   >
-                    {link}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-
-            {/* Socials */}
-            <div className="space-y-4">
-              <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">
-                {isAr ? "تواصل" : "CONNECT"}
-              </h4>
-              <div className="flex gap-3 justify-center md:justify-start">
-                {["IG", "TW", "LI", "FB"].map((s) => (
-                  <button
-                    key={s}
-                    className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-[10px] font-black hover:bg-primary hover:text-background transition-all"
+                    Ali El-hwashy
+                  </a>
+                </p>
+                <div className="flex gap-2 text-[8px]">
+                  <a
+                    href="https://www.instagram.com/aliahmed.sabry/"
+                    target="_blank"
+                    className="hover:text-primary"
                   >
-                    {s}
-                  </button>
-                ))}
+                    INSTAGRAM
+                  </a>
+                  <a
+                    href="https://www.tiktok.com/@_codebyali"
+                    target="_blank"
+                    className="hover:text-primary"
+                  >
+                    TIKTOK
+                  </a>
+                </div>
+                <p className="mt-1 opacity-50">
+                  ALL RIGHTS RESERVED // UNIT-ST-OS
+                </p>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Copyright */}
-            <div className="text-muted-foreground text-[9px] font-black uppercase tracking-widest flex flex-col justify-end gap-1">
-              <p>© 2026 ST-COMPANY CORP.</p>
-              <p>
-                Designed by{" "}
+        {/* ── Mobile Footer ── */}
+        <div className="md:hidden">
+          {/* Brand + tagline */}
+          <div className="px-5 pt-8 pb-6">
+            <div className="flex items-center gap-3 mb-3">
+              <img
+                src="/logo-2026, 12_38_18 PM.png"
+                alt="ST-Company Logo"
+                className="w-12 h-12 rounded-2xl object-cover border border-border bg-card"
+              />
+              <div>
+                <h3 className="text-lg font-black italic tracking-tighter text-foreground">
+                  ST<span className="text-primary">-</span>COMPANY<span className="text-primary">.</span>
+                </h3>
+                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">
+                  {isAr ? "نحن نبني المستقبل" : "ENGINEERING THE UNKNOWN"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation pills */}
+          <div className="px-5 pb-6">
+            <h4 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-3">
+              {isAr ? "الروابط" : "NAVIGATION"}
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { link: "Levels", label: isAr ? "الدورات" : "Courses" },
+                { link: "Profile", label: isAr ? "الملف" : "Profile" },
+              ].map((item) => (
+                <Link
+                  key={item.link}
+                  to={`/${item.link.toLowerCase()}` as any}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-background border border-border text-xs font-bold text-muted-foreground hover:text-primary hover:border-primary/30 transition-all"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Social row */}
+          <div className="px-5 pb-6">
+            <h4 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-3">
+              {isAr ? "تواصل" : "CONNECT"}
+            </h4>
+            <div className="flex gap-2">
+              {["IG", "TW", "LI", "FB"].map((s) => (
+                <button
+                  key={s}
+                  className="w-11 h-11 rounded-2xl bg-background border border-border flex items-center justify-center text-[10px] font-black text-muted-foreground hover:bg-primary hover:text-background hover:border-primary transition-all"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="px-5 py-5 border-t border-border bg-background/50">
+            <div className="flex flex-col items-center gap-2 text-center">
+              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
+                © 2026 ST-COMPANY CORP.
+              </p>
+              <p className="text-[9px] font-bold text-muted-foreground">
+                {isAr ? "تصميم" : "Designed by"}{" "}
                 <a
                   href="https://www.instagram.com/aliahmed.sabry/"
                   target="_blank"
-                  className="text-primary hover:underline"
+                  className="text-primary"
                 >
                   Ali El-hwashy
                 </a>
               </p>
-              <div className="flex gap-2 text-[8px]">
+              <div className="flex gap-3 text-[8px] font-bold uppercase tracking-wider">
                 <a
                   href="https://www.instagram.com/aliahmed.sabry/"
                   target="_blank"
-                  className="hover:text-primary"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  INSTAGRAM
+                  Instagram
                 </a>
                 <a
                   href="https://www.tiktok.com/@_codebyali"
                   target="_blank"
-                  className="hover:text-primary"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  TIKTOK
+                  TikTok
                 </a>
               </div>
-              <p className="mt-1 opacity-50">
+              <p className="text-[7px] text-muted-foreground/50 font-bold uppercase tracking-widest mt-1">
                 ALL RIGHTS RESERVED // UNIT-ST-OS
               </p>
             </div>
@@ -506,16 +607,16 @@ function Index() {
       {/* Challenge Modal */}
       <AnimatePresence>
         {incomingChallenge && (
-          <div className="fixed bottom-8 left-8 right-8 md:left-auto md:right-8 md:w-[320px] z-[150]">
+          <div className="fixed bottom-20 md:bottom-8 left-4 right-4 md:left-auto md:right-8 md:w-[320px] z-[150]">
             <motion.div
               initial={{ opacity: 0, y: 100, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="bg-card/90 border border-border backdrop-blur-2xl rounded-4xl p-6 shadow-2xl"
+              className="bg-card/90 border border-border backdrop-blur-2xl rounded-2xl md:rounded-4xl p-4 md:p-6 shadow-2xl"
             >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center animate-pulse shadow-[0_0_20px_rgba(var(--primary),0.4)]">
-                  <Gamepad2 className="w-6 h-6 text-background" />
+              <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-primary flex items-center justify-center animate-pulse shadow-[0_0_20px_rgba(var(--primary),0.4)]">
+                  <Gamepad2 className="w-5 h-5 md:w-6 md:h-6 text-background" />
                 </div>
                 <div>
                   <h4 className="text-foreground font-bold">

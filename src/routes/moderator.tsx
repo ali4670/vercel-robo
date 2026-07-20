@@ -224,7 +224,7 @@ function ModeratorDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden font-sans selection:bg-primary/30">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-x-hidden font-sans selection:bg-primary/30">
       {/* Cinematic Background */}
       <div className="fixed inset-0 bg-background z-0">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full animate-pulse"></div>
@@ -232,7 +232,7 @@ function ModeratorDashboard() {
       </div>
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-10 opacity-20"></div>
 
-      <div className="flex-1 flex flex-col md:flex-row relative z-20 pt-12 px-6 max-w-[1400px] mx-auto w-full gap-12">
+      <div className="flex-1 flex flex-col md:flex-row relative z-20 pt-16 md:pt-12 px-2 md:px-6 max-w-[1400px] mx-auto w-full gap-3 md:gap-12">
         {/* Floating Glass Sidebar - Horizontal on Mobile */}
         <aside className="w-full md:w-64 sticky top-12 h-fit space-y-1.5 p-1.5 bg-muted border border-border backdrop-blur-3xl rounded-[2rem] shadow-2xl flex md:flex-col overflow-x-auto md:overflow-visible custom-scrollbar">
           <div className="hidden md:block px-5 py-3 border-b border-border mb-1">
@@ -356,7 +356,7 @@ function ModeratorDashboard() {
           )}
         </aside>
 
-        <main className="flex-1 pb-32">
+        <main className="flex-1 pb-24 overflow-x-hidden">
           <header className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
             <div className={isAr ? "text-right" : "text-left"}>
               <div className="flex items-center gap-3 mb-3">
@@ -388,10 +388,10 @@ function ModeratorDashboard() {
                   setSelectedLevelId(null);
                   setIsEditing(true);
                 }}
-                className="bg-primary text-black px-8 h-12 rounded-[1.5rem] shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                className="bg-primary text-black px-4 md:px-6 h-9 md:h-10 rounded-xl md:rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
               >
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="font-black italic uppercase tracking-widest text-xs">DEPLOY LEVEL</span>
+                <Plus className="w-3.5 h-3.5 mr-1.5" />
+                <span className="font-black italic uppercase tracking-widest text-[10px] md:text-xs">DEPLOY LEVEL</span>
               </HeroButton>
             )}
           </header>
@@ -403,25 +403,25 @@ function ModeratorDashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid gap-5"
+                className="grid gap-2 md:gap-3"
               >
                 {levels.map((level) => (
                   <div
                     key={level.id}
-                    className="p-1 rounded-[2rem] bg-muted border border-border hover:border-border transition-all group"
+                    className="p-0.5 rounded-xl md:rounded-2xl bg-muted border border-border hover:border-border transition-all group"
                   >
-                    <div className="bg-muted/50 border border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-[calc(2rem-0.25rem)] p-6 flex items-center justify-between">
-                      <div className="flex items-center gap-8">
-                        <div className="text-4xl font-black italic text-muted-foreground w-16 leading-none">
+                    <div className="bg-muted/50 border border-border shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-[calc(1.5rem-0.125rem)] md:rounded-[calc(2rem-0.25rem)] p-3 md:p-5 flex items-center justify-between">
+                      <div className="flex items-center gap-3 md:gap-6">
+                        <div className="text-2xl md:text-4xl font-black italic text-muted-foreground w-10 md:w-16 leading-none">
                           {String(level.level_order).padStart(2, "0")}
                         </div>
                         <div>
-                          <h3 className="text-lg font-black uppercase tracking-tight mb-1 group-hover:text-primary transition-colors">
+                          <h3 className="text-sm md:text-base font-black uppercase tracking-tight mb-0.5 group-hover:text-primary transition-colors">
                             {level.title}
                           </h3>
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2 md:gap-3">
                             <span
-                              className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full border ${level.is_published ? "bg-green-500/10 border-green-500/20 text-green-500" : "bg-muted/50 border-border text-muted-foreground"}`}
+                              className={`text-[7px] md:text-[8px] font-black uppercase px-1.5 md:px-2 py-0.5 rounded-full border ${level.is_published ? "bg-green-500/10 border-green-500/20 text-green-500" : "bg-muted/50 border-border text-muted-foreground"}`}
                             >
                               {level.is_published ? "LIVE STATUS" : "DRAFT ARCHIVE"}
                             </span>
@@ -430,13 +430,13 @@ function ModeratorDashboard() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5 md:gap-2">
                         <button
                           onClick={() => {
                             setSelectedLevelId(level.id);
                             setIsEditing(true);
                           }}
-                          className="p-3 rounded-full bg-muted/50 border border-border hover:bg-primary hover:text-black transition-all duration-500 hover:scale-110"
+                          className="p-2 md:p-2.5 rounded-full bg-muted/50 border border-border hover:bg-primary hover:text-black transition-all duration-500 hover:scale-110"
                         >
                           <Settings className="w-4 h-4" />
                         </button>
@@ -451,7 +451,7 @@ function ModeratorDashboard() {
                                     fetchLevels();
                                 }
                               }}
-                              className="p-3 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-foreground transition-all duration-500 hover:scale-110 text-red-500"
+                              className="p-2 md:p-2.5 rounded-full bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-foreground transition-all duration-500 hover:scale-110 text-red-500"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -505,9 +505,9 @@ function UserDirectory({ isAr }: { isAr: boolean }) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="bg-muted/50 border border-border rounded-[32px] p-8">
-        <div className="relative group mb-8">
+    <div className="space-y-4 md:space-y-6">
+      <div className="bg-muted/50 border border-border rounded-2xl md:rounded-3xl p-4 md:p-6">
+        <div className="relative group mb-4 md:mb-6">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
                 type="text"
@@ -819,16 +819,16 @@ function SpotlightManagement({ isAr }: { isAr: boolean }) {
   };
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-3xl font-black italic uppercase tracking-tighter">
+    <div className="space-y-4 md:space-y-6">
+      <h2 className="text-xl md:text-2xl font-black italic uppercase tracking-tighter">
         {isAr ? "إدارة بطاقة التميز" : "HERO CARD CONTROL"}
       </h2>
-      <div className="bg-muted/50 border border-border p-10 rounded-[40px] space-y-8 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-8 opacity-5">
-            <Zap className="w-32 h-32 text-primary" />
+      <div className="bg-muted/50 border border-border p-5 md:p-8 rounded-2xl md:rounded-3xl space-y-5 md:space-y-8 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-6 opacity-5">
+            <Zap className="w-24 h-24 text-primary" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 relative z-10">
             <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] px-2">{isAr ? "اختيار العميل المميز" : "SELECT ELITE AGENT"}</label>
                 <div className="flex flex-col gap-2">
@@ -1070,28 +1070,28 @@ function UserManagement({ isAr }: { isAr: boolean }) {
   const rest = filteredUsers;
 
   return (
-    <div className="space-y-12">
-      <div className="flex flex-col gap-6">
-        <div className="flex gap-4">
+    <div className="space-y-5 md:space-y-8">
+      <div className="flex flex-col gap-3 md:gap-4">
+        <div className="flex gap-3">
             <div className="relative group flex-1">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
                 type="text"
-                placeholder={isAr ? "البحث عن عميل (الاسم/الهاتف)..." : "Search for agent (Name/Phone)..."}
+                placeholder={isAr ? "بحث بالاسم أو الهاتف..." : "Search by name or phone..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-muted border border-border rounded-2xl py-5 pl-16 pr-6 font-bold text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border0 transition-all"
+                className="w-full bg-muted border border-border rounded-xl md:rounded-2xl py-3 md:py-4 pl-10 md:pl-12 pr-4 md:pr-6 font-bold text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all"
             />
             </div>
         </div>
 
         {/* Tab-based Role Filter */}
-        <div className="flex bg-muted/50 p-1 rounded-2xl border border-border w-fit">
+        <div className="flex bg-muted/50 p-1 rounded-xl md:rounded-2xl border border-border w-fit overflow-x-auto scrollbar-hide">
             {(["all", "student", "parent", "moderator", "admin"] as const).map((role) => (
                 <button
                     key={role}
                     onClick={() => setRoleFilter(role)}
-                    className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${roleFilter === role ? "bg-primary text-black shadow-lg" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                    className={`px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${roleFilter === role ? "bg-primary text-black shadow-lg" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                 >
                     {role}
                 </button>
@@ -1100,34 +1100,34 @@ function UserManagement({ isAr }: { isAr: boolean }) {
       </div>
 
       {/* Top 3 Leaderboard */}
-      <section className="space-y-6">
-          <h2 className="text-2xl font-black italic uppercase tracking-tighter text-muted-foreground">{isAr ? "أعلى 3 طلاب" : "TOP 3 AGENTS"}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="space-y-4 md:space-y-6">
+          <h2 className="text-lg md:text-xl font-black italic uppercase tracking-tighter text-muted-foreground">{isAr ? "أعلى 3 طلاب" : "TOP 3 AGENTS"}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
               {top3.map((user, i) => (
-                  <div key={user.id} className="relative p-0.5 rounded-[2.5rem] bg-gradient-to-br from-white/20 to-white/5 overflow-hidden">
-                      <div className="bg-muted backdrop-blur-3xl p-8 rounded-[calc(2.5rem-0.125rem)] text-center">
-                          <div className="absolute top-4 right-8 text-4xl font-black italic text-muted-foreground/30">#{i + 1}</div>
-                          <div className="w-20 h-20 rounded-full bg-muted mx-auto mb-6 flex items-center justify-center border-2 border-border overflow-hidden">
-                              {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-10 h-10 text-muted-foreground" />}
+                  <div key={user.id} className="relative p-0.5 rounded-xl md:rounded-2xl bg-gradient-to-br from-white/20 to-white/5 overflow-hidden">
+                      <div className="bg-muted backdrop-blur-3xl p-3 md:p-6 rounded-[calc(2rem-0.125rem)] text-center">
+                          <div className="absolute top-3 right-6 text-3xl font-black italic text-muted-foreground/30">#{i + 1}</div>
+                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-muted mx-auto mb-3 md:mb-4 flex items-center justify-center border-2 border-border overflow-hidden">
+                              {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-7 h-7 text-muted-foreground" />}
                           </div>
-                          <h3 className="text-xl font-black uppercase tracking-tight text-foreground mb-2">{user.username}</h3>
-                          <div className="flex flex-col items-center gap-2">
-                              <span className="px-3 py-1 bg-muted rounded-full text-[10px] font-black text-foreground">{user.xp} XP</span>
+                          <h3 className="text-sm md:text-base font-black uppercase tracking-tight text-foreground mb-1">{user.username}</h3>
+                          <div className="flex flex-col items-center gap-1">
+                              <span className="px-2 py-0.5 bg-muted rounded-full text-[9px] font-black text-foreground">{user.xp} XP</span>
                               <span className="text-[8px] font-black uppercase text-muted-foreground">{user.role}</span>
                           </div>
 
-                          <div className="mt-8 flex flex-col gap-2">
+                          <div className="mt-3 md:mt-6 flex flex-col gap-1.5 md:gap-2">
                               <div className="flex gap-2">
                                 <button
                                     onClick={() => toggleApproval(user.id, user.is_approved)}
-                                    className={`flex-1 h-10 rounded-xl text-[9px] font-black uppercase transition-all ${user.is_approved ? "bg-green-500 text-black" : "bg-muted text-foreground border border-border"}`}
+                                    className={`flex-1 h-8 md:h-9 rounded-lg text-[8px] md:text-[9px] font-black uppercase transition-all ${user.is_approved ? "bg-green-500 text-black" : "bg-muted text-foreground border border-border"}`}
                                 >
                                     {user.is_approved ? (isAr ? "معتمد" : "APPROVED") : (isAr ? "غير معتمد" : "PENDING")}
                                 </button>
                                 {isAdmin && (
                                     <button
                                         onClick={() => deleteUser(user.id)}
-                                        className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-foreground transition-all flex items-center justify-center"
+                                        className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-foreground transition-all flex items-center justify-center"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
@@ -1139,7 +1139,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                     value={user.role}
                                     onChange={(e) => changeRole(user.id, e.target.value)}
                                     disabled={user.id === profile?.id || (!isAdmin && user.role === 'admin')}
-                                    className="flex-1 bg-foreground/20 border border-border rounded-xl p-2 text-[10px] text-foreground disabled:opacity-50"
+                                    className="flex-1 bg-foreground/20 border border-border rounded-lg p-1.5 text-[9px] text-foreground disabled:opacity-50"
                                 >
                                     <option value="student">Student</option>
                                     <option value="parent">Parent</option>
@@ -1151,7 +1151,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                         setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
                                         if (selectedUserId !== user.id) fetchUserAccess(user.id);
                                     }}
-                                    className={`w-10 h-10 rounded-xl bg-muted/50 border border-border hover:bg-muted text-foreground hover:text-foreground transition-all flex items-center justify-center ${selectedUserId === user.id ? "bg-primary text-primary-foreground" : ""}`}
+                                    className={`w-8 h-8 md:w-9 md:h-9 rounded-lg bg-muted/50 border border-border hover:bg-muted text-foreground hover:text-foreground transition-all flex items-center justify-center ${selectedUserId === user.id ? "bg-primary text-primary-foreground" : ""}`}
                                 >
                                     <Lock className="w-4 h-4" />
                                 </button>
@@ -1162,7 +1162,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                     setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
                                     if (selectedUserId !== user.id) fetchUserAccess(user.id);
                                 }}
-                                className="w-full bg-primary text-primary-foreground h-12 rounded-2xl font-black text-[10px] uppercase tracking-widest mt-2"
+                                className="w-full bg-primary text-primary-foreground h-9 md:h-10 rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-widest mt-2"
                               >
                                 {isAr ? "إدارة الصلاحيات" : "MANAGE ACCESS"}
                               </HeroButton>
@@ -1174,37 +1174,37 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden border-t border-border mt-6 pt-6 text-left"
+                                className="overflow-hidden border-t border-border mt-3 pt-3 text-left"
                               >
-                                <div className="grid grid-cols-1 gap-3">
-                                  <div className="flex gap-2 mb-2">
-                                    <HeroButton onClick={() => grantAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-green-500/20 text-green-500 hover:bg-green-500/10 h-8 text-[8px]">
+                                <div className="grid grid-cols-1 gap-2">
+                                  <div className="flex gap-2 mb-1">
+                                    <HeroButton onClick={() => grantAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-green-500/20 text-green-500 hover:bg-green-500/10 h-8 text-[9px]">
                                       {isAr ? "منح الكل" : "GRANT ALL"}
                                     </HeroButton>
-                                    <HeroButton onClick={() => revokeAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-red-500/20 text-red-500 hover:bg-red-500/10 h-8 text-[8px]">
+                                    <HeroButton onClick={() => revokeAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-red-500/20 text-red-500 hover:bg-red-500/10 h-8 text-[9px]">
                                       {isAr ? "إلغاء الكل" : "REVOKE ALL"}
                                     </HeroButton>
                                   </div>
-                                  <div className="grid grid-cols-2 gap-2">
+                                  <div className="grid grid-cols-2 gap-1.5">
                                     {levels.map((level) => {
                                       const hasAccess = userAccess.includes(level.id);
                                       return (
                                         <button
                                           key={level.id}
                                           onClick={() => toggleLevelAccess(user.id, level.id, hasAccess)}
-                                          className={`p-2 rounded-xl border text-left transition-all group ${hasAccess ? "bg-lime-500/10 border-lime-500/50 text-lime-400 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : "bg-muted/50 border-border text-muted-foreground hover:border-border"}`}
+                                          className={`p-2.5 rounded-xl border text-left transition-all ${hasAccess ? "bg-green-500/10 border-green-500/50 text-green-400" : "bg-muted/50 border-border text-muted-foreground"}`}
                                         >
                                           <div className="flex items-center justify-between mb-1">
-                                            <span className="text-[8px] font-black uppercase tracking-tighter">
+                                            <span className="text-[10px] font-black uppercase">
                                               L{level.level_order}
                                             </span>
                                             {hasAccess ? (
-                                              <CheckCircle2 className="w-2.5 h-2.5" />
+                                              <CheckCircle2 className="w-3 h-3 text-green-400" />
                                             ) : (
-                                              <Lock className="w-2.5 h-2.5 opacity-20" />
+                                              <Lock className="w-3 h-3 opacity-20" />
                                             )}
                                           </div>
-                                          <p className="text-[8px] font-bold truncate">
+                                          <p className="text-[10px] font-bold truncate">
                                             {level.title}
                                           </p>
                                         </button>
@@ -1222,9 +1222,9 @@ function UserManagement({ isAr }: { isAr: boolean }) {
       </section>
 
       {/* Rest of Students */}
-      <section className="space-y-6">
-          <h2 className="text-xl font-black italic uppercase tracking-tighter text-muted-foreground">{isAr ? "بقية الطلاب" : "OPERATIVE ROSTER"}</h2>
-          <div className="grid gap-3">
+      <section className="space-y-3 md:space-y-4">
+          <h2 className="text-sm md:text-base font-black italic uppercase tracking-tighter text-muted-foreground">{isAr ? "بقية الطلاب" : "OPERATIVE ROSTER"}</h2>
+          <div className="grid gap-2 md:gap-3">
             {rest.map((user) => {
               const currentLinks = user.role === 'parent' 
                 ? parentStudentLinks.filter(l => l.parent_id === user.id)
@@ -1233,7 +1233,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
               return (
               <div
                 key={user.id}
-                className="bg-muted/50 backdrop-blur-xl border border-border rounded-3xl p-5 flex flex-col gap-6 group hover:bg-muted transition-all"
+                className="bg-muted/50 backdrop-blur-xl border border-border rounded-xl md:rounded-2xl p-2 md:p-4 flex flex-col gap-1.5 md:gap-4 group hover:bg-muted transition-all"
               >
                 {user.role === 'student' && (
                     <div className="px-2">
@@ -1252,22 +1252,22 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                         })()}
                     </div>
                 )}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                        <div className="w-12 h-12 rounded-2xl bg-muted border border-border overflow-hidden flex items-center justify-center">
-                            {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-5 h-5 text-muted-foreground" />}
+                    <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 md:gap-4">
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-muted border border-border overflow-hidden flex items-center justify-center shrink-0">
+                            {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : <Users className="w-3.5 h-3.5 text-muted-foreground" />}
                         </div>
-                        <div>
-                            <h3 className="font-bold text-foreground">{user.username}</h3>
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{user.xp} XP • {user.role}</p>
-                            <div className="flex flex-wrap gap-1 mt-1">
+                        <div className="min-w-0">
+                            <h3 className="font-bold text-xs md:text-sm text-foreground truncate">{user.username}</h3>
+                            <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest">{user.xp} XP · {user.role}</p>
+                            <div className="flex flex-wrap gap-0.5 md:gap-1 mt-0.5 md:mt-1">
                                 {currentLinks.map(link => {
                                     const linkedUser = users.find(u => u.id === (user.role === 'parent' ? link.student_id : link.parent_id));
                                     return linkedUser ? (
-                                        <div key={link.id} className="flex items-center gap-1 bg-muted rounded-full px-2 py-0.5 text-[7px] font-black text-muted-foreground">
+                                        <div key={link.id} className="flex items-center gap-0.5 bg-muted rounded-full px-1.5 py-0.5 text-[6px] md:text-[7px] font-black text-muted-foreground">
                                             {linkedUser.username}
                                             <button onClick={() => unlinkStudentFromParent(user.role === 'parent' ? linkedUser.id : user.id, user.role === 'parent' ? user.id : linkedUser.id)}>
-                                                <X className="w-2 h-2 hover:text-red-500" />
+                                                <X className="w-1.5 h-1.5 md:w-2 md:h-2 hover:text-red-500" />
                                             </button>
                                         </div>
                                     ) : null;
@@ -1276,130 +1276,101 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 md:gap-1.5 shrink-0">
                         <button
                           onClick={() => toggleApproval(user.id, user.is_approved)}
-                          className={`px-4 h-10 rounded-xl text-[9px] font-black uppercase transition-all ${user.is_approved ? "bg-green-500 text-black" : "bg-muted text-foreground border border-border"}`}
+                          className={`px-1.5 md:px-3 h-7 md:h-9 rounded-md md:rounded-lg text-[7px] md:text-[9px] font-black uppercase transition-all ${user.is_approved ? "bg-green-500 text-black" : "bg-muted text-foreground border border-border"}`}
                         >
-                          {user.is_approved ? "APPROVED" : "PENDING"}
+                          {user.is_approved ? "OK" : "PEND"}
                         </button>
                         <button
                             onClick={() => {
                                 setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
                                 if (selectedUserId !== user.id) fetchUserAccess(user.id);
                             }}
-                            className={`p-3 rounded-2xl bg-muted/50 border border-border hover:bg-muted text-foreground hover:text-foreground transition-all ${selectedUserId === user.id ? "bg-primary text-primary-foreground" : ""}`}
+                            className={`p-1.5 md:p-2 rounded-md md:rounded-lg bg-muted/50 border border-border hover:bg-muted text-foreground transition-all ${selectedUserId === user.id ? "bg-primary text-primary-foreground" : ""}`}
                         >
-                            <Lock className="w-4 h-4" />
+                            <Lock className="w-3 h-3 md:w-3.5 md:h-3.5" />
                         </button>
 
                         <select
                             value={user.role}
                             onChange={(e) => changeRole(user.id, e.target.value)}
                             disabled={user.id === profile?.id || (!isAdmin && user.role === 'admin')}
-                            className="bg-foreground/20 border border-border rounded-xl p-2 text-[10px] text-foreground disabled:opacity-50"
+                            className="bg-foreground/20 border border-border rounded-md md:rounded-lg p-1 text-[8px] md:text-[9px] text-foreground disabled:opacity-50 max-w-[60px] md:max-w-none"
                         >
-                            <option value="student">Student</option>
-                            <option value="parent">Parent</option>
-                            <option value="moderator">Moderator</option>
-                            {isAdmin && <option value="admin">Admin</option>}
+                            <option value="student">Stu</option>
+                            <option value="parent">Par</option>
+                            <option value="moderator">Mod</option>
+                            {isAdmin && <option value="admin">Adm</option>}
                         </select>
-
-                        {user.role === 'student' && (
-                            <div className="flex flex-col gap-2 w-full">
-                                <div className="flex flex-col gap-1">
-                                    <input
-                                        type="text"
-                                        placeholder={isAr ? "ربط ولي أمر (اسم/هاتف)" : "Link Parent (Name/Phone)"}
-                                        className="bg-foreground/20 border border-border rounded-xl p-1 text-[8px] text-foreground w-32"
-                                        onChange={(e) => {
-                                            const val = e.target.value.toLowerCase();
-                                            const parentSelect = e.target.nextSibling as HTMLSelectElement;
-                                            Array.from(parentSelect.options).forEach(opt => {
-                                                const text = opt.text.toLowerCase();
-                                                opt.style.display = text.includes(val) || opt.value === "" ? "" : "none";
-                                            });
-                                        }}
-                                        onKeyDown={(e) => e.stopPropagation()}
-                                    />
-                                    <select
-                                        className="bg-foreground/20 border border-border rounded-xl p-1 text-[8px] text-foreground w-32"
-                                        onChange={(e) => {
-                                            if (e.target.value) linkStudentToParent(user.id, e.target.value);
-                                        }}
-                                        defaultValue=""
-                                    >
-                                        <option value="">{isAr ? "اختر ولي الأمر" : "Select Parent"}</option>
-                                        {users.filter(u => u.role === 'parent').map(parent => (
-                                            <option key={parent.id} value={parent.id}>{parent.username} {parent.phone_number ? `(${parent.phone_number})` : ''}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <textarea
-                                        placeholder={isAr ? "أضف ملاحظة لولي الأمر..." : "Add note for parent..."}
-                                        className="bg-foreground/20 border border-border rounded-xl p-2 text-[8px] text-foreground w-full h-16"
-                                        onBlur={(e) => {
-                                            if(e.target.value) {
-                                                supabase.from("moderator_notes").insert({
-                                                    student_id: user.id,
-                                                    moderator_id: profile?.id,
-                                                    content: e.target.value
-                                                }).then(() => toast.success("Note added"));
-                                                e.target.value = "";
-                                            }
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        )}
-
-                        {user.role === 'parent' && (
-                            <div className="flex flex-col gap-2 w-full">
-                                <div className="flex flex-col gap-1">
-                                    <input
-                                        type="text"
-                                        placeholder={isAr ? "ربط طالب (اسم/هاتف)" : "Link Student (Name/Phone)"}
-                                        className="bg-foreground/20 border border-border rounded-xl p-1 text-[8px] text-foreground w-32"
-                                        onChange={(e) => {
-                                            const val = e.target.value.toLowerCase();
-                                            const studentSelect = e.target.nextSibling as HTMLSelectElement;
-                                            Array.from(studentSelect.options).forEach(opt => {
-                                                const text = opt.text.toLowerCase();
-                                                opt.style.display = text.includes(val) || opt.value === "" ? "" : "none";
-                                            });
-                                        }}
-                                        onKeyDown={(e) => e.stopPropagation()}
-                                    />
-                                    <select
-                                        className="bg-foreground/20 border border-border rounded-xl p-1 text-[8px] text-foreground w-32"
-                                        onChange={(e) => {
-                                            if (e.target.value) linkStudentToParent(e.target.value, user.id);
-                                        }}
-                                        defaultValue=""
-                                    >
-                                        <option value="">{isAr ? "اختر الطالب" : "Select Student"}</option>
-                                        {users.filter(u => u.role === 'student').map(student => (
-                                            <option key={student.id} value={student.id}>{student.username} {student.phone_number ? `(${student.phone_number})` : ''}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter">
-                                    {isAr ? "اربط الطلاب لرؤية بياناتهم" : "Link students to see info"}
-                                </div>
-                            </div>
-                        )}
 
                         {isAdmin && (
                             <button
                                 onClick={() => deleteUser(user.id)}
-                                className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-foreground transition-all"
+                                className="p-1.5 md:p-3 rounded-lg md:rounded-2xl bg-red-500/10 border border-red-500/20 hover:bg-red-500 text-red-500 hover:text-foreground transition-all"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                             </button>
                         )}
                     </div>
                 </div>
+
+                {user.role === 'student' && (
+                    <div className="flex flex-col gap-1 px-1">
+                        <input
+                            type="text"
+                            placeholder={isAr ? "ربط ولي أمر" : "Link Parent"}
+                            className="bg-foreground/20 border border-border rounded-lg p-1.5 text-[8px] text-foreground w-full"
+                            onChange={(e) => {
+                                const val = e.target.value.toLowerCase();
+                                const parentSelect = e.target.nextElementSibling as HTMLSelectElement;
+                                if (parentSelect) Array.from(parentSelect.options).forEach(opt => {
+                                    opt.style.display = opt.text.toLowerCase().includes(val) || opt.value === "" ? "" : "none";
+                                });
+                            }}
+                            onKeyDown={(e) => e.stopPropagation()}
+                        />
+                        <select
+                            className="bg-foreground/20 border border-border rounded-lg p-1.5 text-[8px] text-foreground w-full"
+                            onChange={(e) => { if (e.target.value) linkStudentToParent(user.id, e.target.value); }}
+                            defaultValue=""
+                        >
+                            <option value="">{isAr ? "ولي الأمر" : "Parent"}</option>
+                            {users.filter(u => u.role === 'parent').map(parent => (
+                                <option key={parent.id} value={parent.id}>{parent.username}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                {user.role === 'parent' && (
+                    <div className="flex flex-col gap-1 px-1">
+                        <input
+                            type="text"
+                            placeholder={isAr ? "ربط طالب" : "Link Student"}
+                            className="bg-foreground/20 border border-border rounded-lg p-1.5 text-[8px] text-foreground w-full"
+                            onChange={(e) => {
+                                const val = e.target.value.toLowerCase();
+                                const studentSelect = e.target.nextElementSibling as HTMLSelectElement;
+                                if (studentSelect) Array.from(studentSelect.options).forEach(opt => {
+                                    opt.style.display = opt.text.toLowerCase().includes(val) || opt.value === "" ? "" : "none";
+                                });
+                            }}
+                            onKeyDown={(e) => e.stopPropagation()}
+                        />
+                        <select
+                            className="bg-foreground/20 border border-border rounded-lg p-1.5 text-[8px] text-foreground w-full"
+                            onChange={(e) => { if (e.target.value) linkStudentToParent(e.target.value, user.id); }}
+                            defaultValue=""
+                        >
+                            <option value="">{isAr ? "طالب" : "Student"}</option>
+                            {users.filter(u => u.role === 'student').map(student => (
+                                <option key={student.id} value={student.id}>{student.username}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
                 <AnimatePresence>
                   {selectedUserId === user.id && (
@@ -1407,14 +1378,14 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden border-t border-border pt-6"
+                      className="overflow-hidden border-t border-border pt-3"
                     >
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="col-span-2 md:col-span-4 flex gap-2 mb-2">
-                          <HeroButton onClick={() => grantAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-green-500/20 text-green-500 hover:bg-green-500/10">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div className="col-span-2 md:col-span-4 flex gap-2 mb-1">
+                          <HeroButton onClick={() => grantAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-green-500/20 text-green-500 hover:bg-green-500/10 h-8 text-[9px]">
                             {isAr ? "منح الكل" : "GRANT ALL"}
                           </HeroButton>
-                          <HeroButton onClick={() => revokeAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-red-500/20 text-red-500 hover:bg-red-500/10">
+                          <HeroButton onClick={() => revokeAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-red-500/20 text-red-500 hover:bg-red-500/10 h-8 text-[9px]">
                             {isAr ? "إلغاء الكل" : "REVOKE ALL"}
                           </HeroButton>
                         </div>
@@ -1424,19 +1395,19 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                             <button
                               key={level.id}
                               onClick={() => toggleLevelAccess(user.id, level.id, hasAccess)}
-                              className={`p-4 rounded-2xl border text-left transition-all group ${hasAccess ? "bg-lime-500/10 border-lime-500/50 text-lime-400 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : "bg-muted/50 border-border text-muted-foreground hover:border-border"}`}
+                              className={`p-2.5 rounded-xl border text-left transition-all ${hasAccess ? "bg-green-500/10 border-green-500/50 text-green-400" : "bg-muted/50 border-border text-muted-foreground"}`}
                             >
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-[10px] font-black uppercase tracking-tighter">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-[10px] font-black uppercase">
                                   Level {level.level_order}
                                 </span>
                                 {hasAccess ? (
-                                  <CheckCircle2 className="w-3 h-3" />
+                                  <CheckCircle2 className="w-3 h-3 text-green-400" />
                                 ) : (
-                                  <Lock className="w-3 h-3 opacity-20" />
+                                  <Lock className="w-3 h-3 opacity-30" />
                                 )}
                               </div>
-                              <p className="text-[10px] font-bold truncate group-hover:whitespace-normal group-hover:break-words">
+                              <p className="text-[10px] font-bold truncate">
                                 {level.title}
                               </p>
                             </button>
@@ -1468,6 +1439,7 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
   const [expandedLevels, setExpandedLevels] = useState<Set<string>>(new Set());
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [chatSearch, setChatSearch] = useState("");
   const { profile: myProfile } = useAuth();
   const chatContainerRef = useRef<HTMLDivElement>(null); // Ref for scrolling
 
@@ -1478,7 +1450,6 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
   useEffect(() => {
     let subscription: any;
     if (selectedChatType === "dm" && selectedUserId) {
-      // Direct Message Subscription
       fetchMessages();
       subscription = supabase
         .channel(`direct_message:${selectedUserId}`)
@@ -1488,15 +1459,17 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
             event: "INSERT",
             schema: "public",
             table: "direct_messages",
-            filter: `receiver_id=eq.${myProfile?.id}`,
           },
-          () => {
-            fetchMessages();
+          (payload: any) => {
+            const msg = payload.new;
+            const involved =
+              (msg.sender_id === myProfile?.id && msg.receiver_id === selectedUserId) ||
+              (msg.sender_id === selectedUserId && msg.receiver_id === myProfile?.id);
+            if (involved) fetchMessages();
           },
         )
         .subscribe();
     } else if (selectedChatType === "level" && selectedLevelId) {
-      // Level Chat Subscription
       fetchMessages();
       const channelName = selectedLectureId
         ? `lecture_chat:${selectedLectureId}`
@@ -1688,91 +1661,94 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
     }
   };
 
+  const filteredProfiles = profiles.filter(p =>
+    p.username?.toLowerCase().includes(chatSearch.toLowerCase()) ||
+    p.phone_number?.includes(chatSearch)
+  );
+
+  const hasChatOpen = selectedChatType && (selectedUserId || selectedLevelId);
+
   return (
-    <div className="h-[700px] flex gap-6">
-      <aside className="w-96 bg-foreground/20 border border-border rounded-[32px] overflow-hidden flex flex-col">
-        <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
-          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">
-            {isAr ? "قنوات التواصل" : "COMMUNICATION CHANNELS"}
+    <div className="h-[calc(100dvh-200px)] md:h-[600px] lg:h-[700px] flex flex-col md:flex-row gap-0 md:gap-4 relative">
+      {/* Sidebar */}
+      <aside className={`${hasChatOpen ? 'hidden md:flex' : 'flex'} w-full md:w-72 lg:w-80 bg-foreground/20 border border-border rounded-xl md:rounded-2xl overflow-hidden flex-col shrink-0 ${hasChatOpen ? '' : 'flex-1 md:flex-none'}`}>
+        <div className="p-2 md:p-4 flex flex-col h-full overflow-hidden">
+          <h3 className="text-[9px] md:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground mb-2">
+            {isAr ? "قنوات التواصل" : "CHATS"}
           </h3>
 
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
-            {isAr ? "رسائل مباشرة" : "DIRECT MESSAGES"}
-          </h4>
-          <div className="space-y-2 mb-4 custom-scrollbar overflow-y-auto max-h-40">
-            {profiles.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => selectChat("dm", p.id)}
-                className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all ${selectedChatType === "dm" && selectedUserId === p.id ? "bg-primary text-black shadow-lg shadow-primary/10" : "bg-muted/50 hover:bg-muted"}`}
-              >
-                <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden flex-shrink-0">
-                  {p.avatar_url ? (
-                    <img src={p.avatar_url} className="w-full h-full object-cover" />
-                  ) : (
-                    <Users className="w-3 h-3 m-auto opacity-20" />
-                  )}
-                </div>
-                <div className="text-left overflow-hidden">
-                  <p className="font-bold text-sm truncate">{p.username}</p>
-                </div>
+          {/* Search */}
+          <div className="relative mb-2">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <input
+              type="text"
+              value={chatSearch}
+              onChange={(e) => setChatSearch(e.target.value)}
+              placeholder={isAr ? "بحث بالاسم أو الرقم..." : "Search name or number..."}
+              className="w-full bg-background/50 border border-border rounded-lg py-1.5 pl-8 pr-3 text-xs font-bold focus:outline-none focus:border-primary/50 transition-all placeholder:text-muted-foreground"
+            />
+            {chatSearch && (
+              <button onClick={() => setChatSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                <X className="w-3 h-3" />
               </button>
-            ))}
+            )}
           </div>
 
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
-            {isAr ? "فصول المستوى" : "LEVEL CLASSROOMS"}
-          </h4>
-          <div className="space-y-2 custom-scrollbar overflow-y-auto max-h-[400px]">
+          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1">
+            <h4 className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+              {isAr ? "فصول المستوى" : "LEVELS"}
+            </h4>
             {levels.map((level) => {
               const lectures = levelLectures[level.id] || [];
               const isExpanded = expandedLevels.has(level.id);
               const isActiveLevel = selectedChatType === "level" && selectedLevelId === level.id;
               return (
                 <div key={level.id}>
-                  <div className={`flex items-center gap-2 rounded-3xl transition-all border ${isActiveLevel && !selectedLectureId ? "bg-lime-500/10 border-lime-500/30 text-foreground" : "bg-muted/50 hover:bg-muted border-border"}`}>
+                  <div className={`flex items-center gap-2 rounded-xl transition-all border ${isActiveLevel && !selectedLectureId ? "bg-primary/10 border-primary/30 text-foreground" : "hover:bg-muted border-transparent"}`}>
                     <button
                       onClick={() => selectChat("level", level.id)}
-                      className="flex-1 flex items-center gap-4 p-4 text-left"
+                      className="flex-1 flex items-center gap-2.5 p-2 text-left"
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-foreground/10 overflow-hidden flex-shrink-0 border border-border">
+                      <div className="w-10 h-10 rounded-full bg-foreground/10 overflow-hidden flex-shrink-0 border border-border">
                         {level.image_url ? (
                             <img src={level.image_url} className="w-full h-full object-cover" />
                         ) : (
-                          <MessageSquare className="w-4 h-4 m-auto opacity-20" />
+                          <div className="w-full h-full flex items-center justify-center">
+                            <MessageSquare className="w-4 h-4 text-muted-foreground/30" />
+                          </div>
                         )}
                       </div>
-                      <div className="text-left overflow-hidden">
-                        <p className="font-black text-sm truncate uppercase tracking-wider">{level.title}</p>
-                        <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest italic">
-                          {lectures.length > 0 ? `${lectures.length} UNITS` : "CLASSROOM CHANNEL"}
+                      <div className="text-left overflow-hidden flex-1 min-w-0">
+                        <p className="font-bold text-sm truncate">{level.title}</p>
+                        <p className="text-[8px] text-muted-foreground">
+                          {lectures.length > 0 ? `${lectures.length} units` : "Channel"}
                         </p>
                       </div>
                     </button>
                     {lectures.length > 0 && (
                       <button
                         onClick={() => toggleLevelExpand(level.id)}
-                        className="pr-4 text-muted-foreground hover:text-foreground transition-colors"
+                        className="pr-3 text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
                       </button>
                     )}
                   </div>
                   {isExpanded && lectures.length > 0 && (
-                    <div className="ml-8 mt-1 space-y-1">
+                    <div className="ml-8 mt-0.5 space-y-0.5">
                       {lectures.map((lec) => (
                         <button
                           key={lec.id}
                           onClick={() => selectLecture(level.id, lec.id)}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-all ${
+                          className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-all ${
                             selectedLectureId === lec.id
-                              ? "bg-primary/10 border border-primary/30 text-foreground"
+                              ? "bg-primary/10 text-foreground"
                               : "hover:bg-muted/50 text-muted-foreground"
                           }`}
                         >
-                          <div className="w-2 h-2 rounded-full bg-primary/40 flex-shrink-0" />
-                          <span className="text-[10px] font-black uppercase tracking-widest truncate">
-                            {isAr ? `الدرس ${lec.slot_number}` : `UNIT ${lec.slot_number}`}: {lec.title}
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary/40 flex-shrink-0" />
+                          <span className="text-[11px] font-bold truncate">
+                            {lec.slot_number}: {lec.title}
                           </span>
                         </button>
                       ))}
@@ -1781,135 +1757,154 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
                 </div>
               );
             })}
+
+            <h4 className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-3 mb-1">
+              {isAr ? "رسائل مباشرة" : "DIRECT MESSAGES"}
+            </h4>
+            {filteredProfiles.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => selectChat("dm", p.id)}
+                className={`w-full flex items-center gap-2.5 p-2 rounded-xl transition-all ${selectedChatType === "dm" && selectedUserId === p.id ? "bg-primary text-black shadow-lg shadow-primary/10" : "hover:bg-muted"}`}
+              >
+                <div className="w-10 h-10 rounded-full bg-foreground/10 overflow-hidden flex-shrink-0 border border-border">
+                  {p.avatar_url ? (
+                    <img src={p.avatar_url} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[14px] font-black text-muted-foreground/40 uppercase">
+                      {p.username?.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div className="text-left overflow-hidden flex-1 min-w-0">
+                  <p className="font-bold text-sm truncate">{p.username}</p>
+                  {p.phone_number && <p className="text-[9px] text-muted-foreground truncate">{p.phone_number}</p>}
+                </div>
+              </button>
+            ))}
+            {filteredProfiles.length === 0 && chatSearch && (
+              <p className="text-[10px] text-muted-foreground text-center py-3">{isAr ? "لا نتائج" : "No results"}</p>
+            )}
           </div>
         </div>
       </aside>
 
-      <main className="flex-1 bg-foreground/20 border border-border rounded-[40px] flex flex-col overflow-hidden">
+      {/* Chat area */}
+      <div className={`${hasChatOpen ? 'flex' : 'hidden md:flex'} flex-1 bg-foreground/20 border border-border rounded-xl md:rounded-2xl flex-col overflow-hidden min-w-0`}>
         {selectedChatType && (selectedUserId || selectedLevelId) ? (
           <>
-            <header className="p-6 border-b border-border flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-muted/50 overflow-hidden flex-shrink-0">
-                  {(() => {
-                    const selectedLevel = levels.find((l) => l.id === selectedLevelId);
-                    console.log("DEBUG: Selected level in header:", selectedLevel);
-                    
-                    if (selectedChatType === "dm") {
-                       const profile = profiles.find((p) => p.id === selectedUserId);
-                       return profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <MessageSquare className="w-5 h-5 m-auto text-muted-foreground" />;
-                    } else if (selectedChatType === "level") {
-                       return selectedLevel?.image_url ? <img src={selectedLevel.image_url} className="w-full h-full object-cover" /> : <MessageSquare className="w-5 h-5 m-auto text-muted-foreground" />;
-                    }
-                    return <MessageSquare className="w-5 h-5 m-auto text-muted-foreground" />;
-                  })()}
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm">
-                    {selectedChatType === "dm"
-                      ? profiles.find((p) => p.id === selectedUserId)?.username
-                      : selectedLectureId
-                        ? (() => {
-                            const lecs = levelLectures[selectedLevelId || ""] || [];
-                            const lec = lecs.find((l) => l.id === selectedLectureId);
-                            return lec ? `${isAr ? `الدرس ${lec.slot_number}` : `UNIT ${lec.slot_number}`}: ${lec.title}` : levels.find((l) => l.id === selectedLevelId)?.title;
-                          })()
-                        : levels.find((l) => l.id === selectedLevelId)?.title}
-                  </h3>
-                  <p className="text-[8px] font-black text-primary uppercase tracking-widest">
-                    {selectedLectureId ? (isAr ? "محادثة الدرس" : "LECTURE CHAT") : "Connected"}
-                  </p>
-                </div>
+            {/* WhatsApp-style header */}
+            <header className="bg-muted/80 backdrop-blur-md px-3 py-2.5 border-b border-border flex items-center gap-3">
+              <button
+                onClick={() => { setSelectedChatType(null); setSelectedUserId(null); setSelectedLevelId(null); setSelectedLectureId(null); setMessages([]); }}
+                className="md:hidden p-1.5 rounded-full hover:bg-muted transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div className="w-9 h-9 rounded-full bg-foreground/10 overflow-hidden flex-shrink-0 border border-border">
+                {(() => {
+                  if (selectedChatType === "dm") {
+                    const profile = profiles.find((p) => p.id === selectedUserId);
+                    return profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-sm font-black text-muted-foreground/40">{profile?.username?.charAt(0)}</div>;
+                  }
+                  const selectedLevel = levels.find((l) => l.id === selectedLevelId);
+                  return selectedLevel?.image_url ? <img src={selectedLevel.image_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><MessageSquare className="w-4 h-4 text-muted-foreground/30" /></div>;
+                })()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-sm truncate">
+                  {selectedChatType === "dm"
+                    ? profiles.find((p) => p.id === selectedUserId)?.username
+                    : selectedLectureId
+                      ? (() => {
+                          const lecs = levelLectures[selectedLevelId || ""] || [];
+                          const lec = lecs.find((l) => l.id === selectedLectureId);
+                          return lec ? `Unit ${lec.slot_number}: ${lec.title}` : levels.find((l) => l.id === selectedLevelId)?.title;
+                        })()
+                      : levels.find((l) => l.id === selectedLevelId)?.title}
+                </h3>
+                <p className="text-[10px] text-muted-foreground truncate">
+                  {selectedChatType === "dm" ? "online" : selectedLectureId ? "lecture chat" : "classroom"}
+                </p>
               </div>
             </header>
+
+            {/* Messages area */}
             <div
               ref={chatContainerRef}
-              className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar"
+              className="flex-1 overflow-y-auto px-3 py-4 space-y-1.5 custom-scrollbar"
+              style={{ background: 'linear-gradient(to bottom, rgba(15,15,15,0.3), rgba(10,10,10,0.5))' }}
             >
               {messages.map((m, i) => {
                   const sender = m.sender || m.profiles;
+                  const isMe = m.sender_id === myProfile?.id;
+                  const showSender = !isMe && (i === 0 || messages[i - 1]?.sender_id !== m.sender_id);
                   return (
                     <div
                       key={i}
-                      className={`flex ${m.sender_id === myProfile?.id ? "justify-end" : "justify-start"}`}
+                      className={`flex ${isMe ? "justify-end" : "justify-start"} ${showSender ? "mt-3" : "mt-0.5"}`}
                     >
                       <div
-                        className={`relative group max-w-[70%] p-5 rounded-[24px] ${m.sender_id === myProfile?.id ? "bg-primary text-black rounded-tr-none shadow-lg shadow-primary/10" : "bg-muted/50 border border-border rounded-tl-none"}`}
+                        className={`relative group max-w-[85%] md:max-w-[65%] ${isMe ? "bg-primary text-black rounded-2xl rounded-br-md shadow-md" : "bg-muted border border-border/50 rounded-2xl rounded-bl-md"} px-3 py-2`}
                       >
-                        <p className="text-sm font-medium leading-relaxed">{m.content}</p>
-                        <p className="text-[10px] font-bold mt-1 opacity-50">
-                          {sender?.username || "Unknown"}
-                        </p>
-                        <p
-                          className={`text-[8px] font-black uppercase mt-1 opacity-40 ${m.sender_id === myProfile?.id ? "text-black" : "text-foreground"}`}
-                        >
-                          {new Date(m.created_at).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
+                        {!isMe && showSender && (
+                          <p className="text-[10px] font-black text-primary/80 mb-0.5">{sender?.username}</p>
+                        )}
+                        <p className="text-[13px] leading-relaxed">{m.content}</p>
+                        <div className={`flex items-center justify-end gap-1.5 mt-0.5 ${isMe ? "text-black/50" : "text-muted-foreground"}`}>
+                          <span className="text-[9px]">
+                            {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                          {isMe && <Check className="w-3 h-3" />}
+                        </div>
 
-                        {/* Delete button for Admins (any message) or original sender */}
-                        {(isAdmin || m.sender_id === myProfile?.id) && (
+                        {(isAdmin || isMe) && (
                           <button
                             onClick={() => deleteMessage(m.id)}
-                            className={`absolute ${m.sender_id === myProfile?.id ? "-left-10" : "-right-10"} top-1/2 -translate-y-1/2 p-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity`}
+                            className="absolute -bottom-4 right-0 p-1.5 rounded-full bg-red-500/90 text-white opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3 h-3" />
                           </button>
                         )}
-
                       </div>
                     </div>
                   );
                 })}
+              {messages.length === 0 && (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest">{isAr ? "ابدأ المحادثة" : "Start chatting"}</p>
+                </div>
+              )}
             </div>
 
-            <div className="p-6 bg-muted/30 border-t border-border">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  placeholder="Type secure message..."
-                  className="w-full bg-foreground/20 border border-border rounded-2xl py-5 pl-8 pr-16 font-bold focus:outline-none focus:border-primary/50 transition-all"
-                />
-                <button
-                  onClick={sendMessage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-primary text-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
+            {/* WhatsApp-style input bar */}
+            <div className="bg-muted/60 backdrop-blur-md px-2 py-2 border-t border-border flex items-center gap-2">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                placeholder={isAr ? "رسالة..." : "Message..."}
+                className="flex-1 bg-background border border-border rounded-full py-2.5 px-4 text-sm focus:outline-none focus:border-primary/50 transition-all"
+              />
+              <button
+                onClick={sendMessage}
+                disabled={!newMessage.trim()}
+                className="w-10 h-10 rounded-full bg-primary text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:hover:scale-100 shadow-lg shadow-primary/20"
+              >
+                <Send className="w-4 h-4" />
+              </button>
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col p-8 gap-6">
-            <h3 className="font-black italic uppercase tracking-widest text-lg">
-              {isAr ? "اختيار غرفة محادثة" : "SELECT CLASSROOM CHANNEL"}
+          <div className="hidden md:flex flex-1 flex-col items-center justify-center gap-4">
+            <MessageSquare className="w-12 h-12 text-muted-foreground/20" />
+            <h3 className="font-black italic uppercase tracking-widest text-sm text-muted-foreground">
+              {isAr ? "اختر محادثة" : "Select a chat"}
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              {levels.map((level) => (
-                <button
-                  key={level.id}
-                  onClick={() => selectChat("level", level.id)}
-                  className="bg-muted/50 border border-border p-6 rounded-3xl hover:bg-muted transition-all text-left flex items-center gap-4"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-foreground/10 overflow-hidden flex-shrink-0">
-                    {level.image_url ? (
-                      <img src={level.image_url} className="w-full h-full object-cover" />
-                    ) : (
-                      <MessageSquare className="w-6 h-6 m-auto opacity-20" />
-                    )}
-                  </div>
-                  <p className="font-bold text-sm">{level.title}</p>
-                </button>
-              ))}
-            </div>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }
@@ -2321,37 +2316,37 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
 
   if (loading)
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      <div className="h-20 bg-card/90 backdrop-blur-xl border-b border-border px-8 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-6">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+      <div className="h-12 md:h-16 bg-card/90 backdrop-blur-xl border-b border-border px-2 md:px-6 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-3 md:gap-4">
           <button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-muted/50 border border-border flex items-center justify-center hover:bg-muted transition-all"
+            className="w-8 h-8 md:w-9 md:h-9 rounded-lg md:rounded-xl bg-muted/50 border border-border flex items-center justify-center hover:bg-muted transition-all"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <h2 className="text-sm font-black text-muted-foreground uppercase tracking-widest">
+            <h2 className="text-[9px] md:text-xs font-black text-muted-foreground uppercase tracking-widest">
               {levelId ? "EDIT MODE" : "CREATION MODE"}
             </h2>
-            <h1 className="text-xl font-bold tracking-tight">{levelTitle || "Untitled Course"}</h1>
+            <h1 className="text-sm md:text-base font-bold tracking-tight truncate max-w-[120px] md:max-w-none">{levelTitle || "Untitled Course"}</h1>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 mr-4 px-4 py-2 bg-muted/50 rounded-full border border-border">
-            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="hidden md:flex items-center gap-2 mr-4 px-3 py-1.5 bg-muted/50 rounded-full border border-border">
+            <span className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest">
               Status:
             </span>
             <select
               value={isPublished ? "true" : "false"}
               onChange={(e) => setIsPublished(e.target.value === "true")}
-              className="bg-transparent text-[9px] font-black uppercase text-lime-400 outline-none"
+              className="bg-transparent text-[8px] md:text-[9px] font-black uppercase text-lime-400 outline-none"
             >
               <option value="true">Live</option>
               <option value="false">Draft</option>
@@ -2361,7 +2356,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
             onClick={handleSave}
             loading={isSubmitting}
             variant="primary"
-            className="bg-primary text-black px-10 h-12 rounded-xl"
+            className="bg-primary text-black px-5 md:px-8 h-9 md:h-10 rounded-xl md:rounded-2xl text-[10px] md:text-xs"
           >
             <Save className="w-4 h-4 mr-2" />
             {isAr ? "حفظ ونشر" : "DEPLOY"}
@@ -2369,32 +2364,32 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
         </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
-        <aside className="w-80 bg-black border-r border-border flex flex-col overflow-y-auto no-scrollbar">
-          <div className="p-6">
+      <div className="flex-1 flex overflow-hidden flex-col md:flex-row">
+        <aside className="w-full md:w-64 lg:w-80 bg-card border-b md:border-b-0 md:border-r border-border flex flex-col overflow-y-auto no-scrollbar max-h-[140px] md:max-h-none shrink-0">
+          <div className="p-3 md:p-4 lg:p-6">
             <button
               onClick={() => {
                 setActiveTab("info");
                 setSelectedLectureIdx(null);
               }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all mb-8 ${activeTab === "info" ? "bg-primary text-black shadow-lg shadow-primary/10" : "text-muted-foreground hover:text-foreground"}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 md:py-3.5 rounded-xl md:rounded-2xl transition-all mb-4 md:mb-6 ${activeTab === "info" ? "bg-primary text-black shadow-lg shadow-primary/10" : "text-muted-foreground hover:text-foreground"}`}
             >
-              <Settings className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">
+              <Settings className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">
                 {isAr ? "معلومات الكورس" : "Course Info"}
               </span>
             </button>
 
-            <div className="space-y-1 mb-8">
-              <div className="flex items-center justify-between px-6 mb-4">
-                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+            <div className="space-y-0.5 md:space-y-1 mb-4 md:mb-6">
+              <div className="flex items-center justify-between px-4 mb-2 md:mb-3">
+                <span className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                   {isAr ? "المنهج الدراسي" : "Syllabus"}
                 </span>
                 <HeroButton
                   onClick={addLecture}
                   size="sm"
                   variant="outline"
-                  className="px-3 h-8 border-lime-500/20 text-lime-500 hover:bg-lime-500/10"
+                  className="px-2 md:px-3 h-7 md:h-8 border-lime-500/20 text-lime-500 hover:bg-lime-500/10"
                 >
                   <Plus className="w-3 h-3" />
                 </HeroButton>
@@ -2407,34 +2402,34 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 </p>
               )}
               {lectures.map((l, i) => (
-                <div key={l.id || `new-lec-${i}`} className="flex items-center gap-2">
+                <div key={l.id || `new-lec-${i}`} className="flex items-center gap-1">
                   <button
                     onClick={() => moveLecture(i, i - 1)}
                     disabled={i === 0}
-                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
+                    className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
                   >
-                    <GripVertical className="w-4 h-4" />
+                    <GripVertical className="w-3 h-3" />
                   </button>
                   <button
                     onClick={() => moveLecture(i, i + 1)}
                     disabled={i === lectures.length - 1}
-                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
+                    className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
                   >
-                    <GripVertical className="w-4 h-4" />
+                    <GripVertical className="w-3 h-3" />
                   </button>
                   <div
                     onClick={() => {
                       setActiveTab("curriculum");
                       setSelectedLectureIdx(i);
                     }}
-                    className={`flex-1 flex items-center gap-4 px-6 py-3 rounded-xl transition-all text-left cursor-pointer ${activeTab === "curriculum" && selectedLectureIdx === i ? "bg-muted text-foreground border border-border" : "text-muted-foreground hover:text-foreground/60 hover:bg-muted/50"}`}
+                    className={`flex-1 flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 rounded-lg md:rounded-xl transition-all text-left cursor-pointer ${activeTab === "curriculum" && selectedLectureIdx === i ? "bg-muted text-foreground border border-border" : "text-muted-foreground hover:text-foreground/60 hover:bg-muted/50"}`}
                   >
                     <div
-                      className={`w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black ${l.title ? "bg-lime-500/20 text-lime-500" : "bg-muted/50 text-muted-foreground"}`}
+                      className={`w-4 h-4 md:w-5 md:h-5 rounded flex items-center justify-center text-[8px] md:text-[9px] font-black ${l.title ? "bg-lime-500/20 text-lime-500" : "bg-muted/50 text-muted-foreground"}`}
                     >
                       {i + 1}
                     </div>
-                    <span className="text-[10px] font-bold truncate flex-1">
+                    <span className="text-[9px] md:text-[10px] font-bold truncate flex-1">
                       {l.title || (isAr ? `محاضرة ${i + 1}` : `Lecture ${i + 1}`)}
                     </span>
                     <button
@@ -2468,10 +2463,10 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 setActiveTab("exam");
                 setSelectedLectureIdx(null);
               }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border mb-4 ${activeTab === "exam" ? "bg-yellow-500 text-black border-yellow-400" : "text-muted-foreground border-border hover:text-foreground"}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl md:rounded-2xl transition-all border mb-3 md:mb-4 ${activeTab === "exam" ? "bg-yellow-500 text-black border-yellow-400" : "text-muted-foreground border-border hover:text-foreground"}`}
             >
-              <FileText className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">
+              <FileText className="w-3.5 h-3.5" />
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">
                 {isAr ? "الاختبار النهائي" : "Final Exam"}
               </span>
             </button>
@@ -2481,10 +2476,10 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 setActiveTab("bulk_upload");
                 setSelectedLectureIdx(null);
               }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border mb-4 ${activeTab === "bulk_upload" ? "bg-purple-500 text-black border-purple-400" : "text-muted-foreground border-border hover:text-foreground"}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl md:rounded-2xl transition-all border mb-3 md:mb-4 ${activeTab === "bulk_upload" ? "bg-purple-500 text-black border-purple-400" : "text-muted-foreground border-border hover:text-foreground"}`}
             >
-              <PlusCircle className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">
                 {isAr ? "تحميل جماعي" : "BULK UPLOAD"}
               </span>
             </button>
@@ -2494,17 +2489,17 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 setActiveTab("chat" as any);
                 setSelectedLectureIdx(null);
               }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all border ${activeTab === "chat" ? "bg-lime-500 text-black border-lime-400" : "text-muted-foreground border-border hover:text-foreground"}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl md:rounded-2xl transition-all border ${activeTab === "chat" ? "bg-lime-500 text-black border-lime-400" : "text-muted-foreground border-border hover:text-foreground"}`}
             >
-              <MessageSquare className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">
                 {isAr ? "غرفة المحادثة" : "LEVEL CHAT"}
               </span>
             </button>
           </div>
         </aside>
 
-        <main className="flex-1 bg-foreground/20 p-12 overflow-y-auto custom-scrollbar">
+        <main className="flex-1 bg-foreground/20 p-3 md:p-8 lg:p-12 overflow-y-auto custom-scrollbar">
           <AnimatePresence mode="wait">
             {activeTab === "info" && (
               <motion.div
@@ -2512,30 +2507,30 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="max-w-3xl space-y-10"
+                className="max-w-3xl space-y-6 md:space-y-8"
               >
-                <div className="space-y-2">
-                  <h2 className="text-3xl font-black italic tracking-tighter uppercase">
+                <div className="space-y-1.5">
+                  <h2 className="text-xl md:text-2xl font-black italic tracking-tighter uppercase">
                     {isAr ? "إعدادات المستوى" : "Level Settings"}
                   </h2>
-                  <p className="text-muted-foreground text-xs font-bold">
+                  <p className="text-muted-foreground text-[10px] md:text-xs font-bold">
                     {isAr
                       ? "المعلومات الأساسية للمسار التعليمي"
                       : "Define the core parameters for this educational track"}
                   </p>
                 </div>
-                <div className="grid gap-8 bg-muted/30 border border-border p-10 rounded-[40px]">
-                  <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <div className="grid gap-3 md:gap-6 bg-muted/30 border border-border p-3 md:p-6 rounded-xl md:rounded-3xl">
+                  <div className="space-y-2">
+                    <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       {isAr ? "صورة الغلاف" : "Cover Media"}
                     </label>
-                    <div className="flex gap-6 items-center">
-                        <div className="w-40 h-40 rounded-3xl bg-black border border-border overflow-hidden flex-shrink-0">
+                    <div className="flex gap-4 md:gap-6 items-center">
+                        <div className="w-28 h-28 md:w-36 md:h-36 rounded-2xl md:rounded-3xl bg-muted border border-border overflow-hidden flex-shrink-0">
                             {levelImage ? (
                                 <img src={levelImage} className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                    <Layout className="w-12 h-12" />
+                                    <Layout className="w-8 h-8 md:w-10 md:h-10" />
                                 </div>
                             )}
                         </div>
@@ -2570,7 +2565,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                       type="text"
                       value={levelTitle}
                       onChange={(e) => setLevelTitle(e.target.value)}
-                      className="w-full bg-card/80 border border-border rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
+                      className="w-full bg-card/80 border border-border rounded-xl md:rounded-2xl px-4 md:px-8 py-3 md:py-5 text-sm md:text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
                     />
                   </div>
                   <div className="space-y-4">
@@ -2581,7 +2576,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                       type="number"
                       value={levelOrder}
                       onChange={(e) => setLevelOrder(parseInt(e.target.value))}
-                      className="w-full bg-card/80 border border-border rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
+                      className="w-full bg-card/80 border border-border rounded-xl md:rounded-2xl px-4 md:px-8 py-3 md:py-5 text-sm md:text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -2604,7 +2599,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                       type="number"
                       value={dripInterval}
                       onChange={(e) => setDripInterval(parseInt(e.target.value))}
-                      className="w-full bg-card/80 border border-border rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
+                      className="w-full bg-card/80 border border-border rounded-xl md:rounded-2xl px-4 md:px-8 py-3 md:py-5 text-sm md:text-lg font-bold outline-none focus:border-lime-500/50 transition-all"
                       placeholder="e.g. 7"
                     />
                     <p className="text-[8px] text-muted-foreground uppercase font-black px-2">
@@ -2653,8 +2648,8 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                   </div>
 
                   <div className="grid gap-10">
-                    <div className="space-y-4">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <div className="space-y-2 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         Lecture Headline
                       </label>
                       <input
@@ -2665,11 +2660,11 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           newLects[selectedLectureIdx].title = e.target.value;
                           setLectures(newLects);
                         }}
-                        className="w-full bg-muted/50 border border-border rounded-[32px] px-8 py-6 text-xl font-bold outline-none focus:border-lime-500/50"
+                        className="w-full bg-muted/50 border border-border rounded-xl md:rounded-2xl px-4 md:px-8 py-3 md:py-5 text-sm md:text-xl font-bold outline-none focus:border-lime-500/50"
                       />
                     </div>
-                    <div className="space-y-4">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <div className="space-y-2 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         Description
                       </label>
                       <textarea
@@ -2679,14 +2674,14 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           newLects[selectedLectureIdx].description = e.target.value;
                           setLectures(newLects);
                         }}
-                        className="w-full bg-muted/50 border border-border rounded-[32px] px-8 py-6 text-sm font-bold outline-none focus:border-lime-500/50 resize-none"
-                        rows={4}
+                        className="w-full bg-muted/50 border border-border rounded-2xl md:rounded-[32px] px-4 md:px-8 py-3 md:py-6 text-xs md:text-sm font-bold outline-none focus:border-lime-500/50 resize-none"
+                        rows={3}
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                      <div className="space-y-2 md:space-y-4">
+                        <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                           <Clock className="w-3 h-3" /> Module Drip Duration (Days)
                         </label>
                         <input
@@ -2697,10 +2692,10 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                             newLects[selectedLectureIdx].drip_days = parseInt(e.target.value);
                             setLectures(newLects);
                           }}
-                          className="w-full bg-muted/50 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
+                          className="w-full bg-muted/50 border border-border rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-bold outline-none focus:border-lime-500/50"
                         />
                       </div>
-                      <div className="flex items-center justify-between p-6 bg-muted/50 border border-border rounded-2xl">
+                      <div className="flex items-center justify-between p-3 md:p-6 bg-muted/50 border border-border rounded-xl md:rounded-2xl">
                         <div className="flex items-center gap-3">
                             <GraduationCap className="w-5 h-5 text-emerald-400" />
                             <div>
@@ -2721,12 +2716,12 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                      <div className="space-y-2 md:space-y-4">
+                        <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                           <Video className="w-3 h-3" /> Video Source (URL or Upload)
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1.5 md:gap-2">
                           <input
                             type="text"
                             value={lectures[selectedLectureIdx].video_url}
@@ -2736,12 +2731,12 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                               setLectures(newLects);
                             }}
                             placeholder="YouTube Link or Upload Video"
-                            className="flex-1 bg-muted/50 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
+                            className="flex-1 bg-muted/50 border border-border rounded-xl md:rounded-2xl px-3 md:px-6 py-2.5 md:py-4 text-xs md:text-sm font-bold outline-none focus:border-lime-500/50"
                           />
                           <button
                             onClick={() => videoInputRef.current?.click()}
                             disabled={uploadingFile}
-                            className="px-6 rounded-2xl bg-lime-500 text-black font-black uppercase text-[10px] hover:scale-105 transition-all disabled:opacity-50"
+                            className="px-3 md:px-6 rounded-xl md:rounded-2xl bg-lime-500 text-black font-black uppercase text-[9px] md:text-[10px] hover:scale-105 transition-all disabled:opacity-50"
                           >
                             {uploadingFile ? <Plus className="w-4 h-4 animate-spin" /> : "Upload"}
                           </button>
@@ -2754,8 +2749,8 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           />
                         </div>
                       </div>
-                      <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                      <div className="space-y-2 md:space-y-4">
+                        <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                           <FileText className="w-3 h-3" /> PDF Source (URL)
                         </label>
                         <input
@@ -2767,7 +2762,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                             setLectures(newLects);
                           }}
                           placeholder="PDF Link"
-                          className="w-full bg-muted/50 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-lime-500/50"
+                          className="w-full bg-muted/50 border border-border rounded-xl md:rounded-2xl px-3 md:px-6 py-2.5 md:py-4 text-xs md:text-sm font-bold outline-none focus:border-lime-500/50"
                         />
                       </div>
                     </div>
@@ -2777,12 +2772,12 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                         <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                           Advanced Content Blocks
                         </label>
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-1 md:gap-2 flex-wrap">
                           {["text", "code", "image", "pdf", "download", "word", "quiz", "canvas"].map(type => (
                             <button
                               key={type}
                               onClick={() => addBlock(type as any, selectedLectureIdx)}
-                              className="p-2 bg-muted/50 rounded-lg hover:bg-primary hover:text-black transition-colors text-[10px] font-black uppercase"
+                              className="p-1.5 md:p-2 bg-muted/50 rounded-md md:rounded-lg hover:bg-primary hover:text-black transition-colors text-[8px] md:text-[10px] font-black uppercase"
                             >
                               {type}
                             </button>
@@ -2799,7 +2794,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           return (
                           <div
                             key={block.id}
-                            className="relative group p-6 bg-muted/30 border border-border rounded-3xl"
+                            className="relative group p-3 md:p-6 bg-muted/30 border border-border rounded-xl md:rounded-3xl"
                           >
                             <button
                               onClick={() => {
@@ -2811,7 +2806,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                             >
                               <X className="w-4 h-4" />
                             </button>
-                            <div className="flex items-center gap-4 mb-4">
+                            <div className="flex items-center gap-2 md:gap-4 mb-2 md:mb-4">
                               <span className="text-[8px] font-black uppercase text-primary">
                                 {block.type} BLOCK
                               </span>
@@ -2969,7 +2964,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                 {examQuestions.map((q, qIdx) => (
                   <div
                     key={q.id}
-                    className="p-10 rounded-[40px] bg-muted/30 border border-border space-y-6 relative group"
+                    className="p-4 md:p-6 rounded-xl md:rounded-2xl bg-muted/30 border border-border space-y-4 md:space-y-6 relative group"
                   >
                     <button
                       onClick={() => setExamQuestions((prev) => prev.filter((_, i) => i !== qIdx))}
@@ -2977,8 +2972,8 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                    <div className="space-y-4">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <div className="space-y-3 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         Question {qIdx + 1}
                       </label>
                       <textarea
@@ -2988,8 +2983,8 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           newQ[qIdx].text = e.target.value;
                           setExamQuestions(newQ);
                         }}
-                        className="w-full bg-card/80 border border-border rounded-2xl px-8 py-5 text-lg font-bold outline-none resize-none"
-                        rows={3}
+                        className="w-full bg-card/80 border border-border rounded-xl md:rounded-2xl px-4 md:px-8 py-3 md:py-5 text-sm md:text-lg font-bold outline-none resize-none"
+                        rows={2}
                       />
                     </div>
                     <div className="space-y-3">
@@ -2997,7 +2992,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                         Options
                       </label>
                       {q.options.map((opt, optIdx) => (
-                        <div key={optIdx} className="flex items-center gap-4">
+                        <div key={optIdx} className="flex items-center gap-2 md:gap-4">
                           <input
                             type="radio"
                             name={`question-${qIdx}`}
@@ -3007,7 +3002,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                               newQ[qIdx].correct = optIdx;
                               setExamQuestions(newQ);
                             }}
-                            className="h-5 w-5 accent-primary"
+                            className="h-4 w-4 md:h-5 md:w-5 accent-primary"
                           />
                           <input
                             type="text"
@@ -3017,7 +3012,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                               newQ[qIdx].options[optIdx] = e.target.value;
                               setExamQuestions(newQ);
                             }}
-                            className="flex-1 bg-card/80 border border-border rounded-2xl px-6 py-4 text-sm font-bold outline-none"
+                            className="flex-1 bg-card/80 border border-border rounded-xl md:rounded-2xl px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm font-bold outline-none"
                           />
                         </div>
                       ))}
@@ -3032,7 +3027,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                     ])
                   }
                   variant="outline"
-                  className="w-full h-12 border-border text-muted-foreground hover:text-primary hover:border-primary/50"
+                  className="w-full h-10 md:h-12 border-border text-muted-foreground hover:text-primary hover:border-primary/50"
                 >
                   <Plus className="w-4 h-4 mr-2" /> {isAr ? "إضافة سؤال" : "Add Question"}
                 </HeroButton>
@@ -3057,8 +3052,8 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                       : "Import lectures from Word or Excel files"}
                   </p>
                 </div>
-                <div className="grid gap-8 bg-muted/30 border border-border p-10 rounded-[40px]">
-                  <div className="space-y-4">
+                <div className="grid gap-4 md:gap-6 bg-muted/30 border border-border p-5 md:p-8 rounded-2xl md:rounded-3xl">
+                  <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       اختر ملف
                     </label>
@@ -3606,15 +3601,15 @@ function CourseProgress({ isAr }: { isAr: boolean }) {
       ) : (
         <>
           {/* Top 3 Leaderboard */}
-          <div className="bg-foreground/20 backdrop-blur-xl border border-border rounded-[48px] p-8 space-y-6">
-            <h2 className="text-xl font-black italic uppercase text-muted-foreground">
+          <div className="bg-foreground/20 backdrop-blur-xl border border-border rounded-2xl md:rounded-3xl p-5 md:p-8 space-y-4 md:space-y-6">
+            <h2 className="text-lg md:text-xl font-black italic uppercase text-muted-foreground">
               {isAr ? "أفضل 3 عملاء" : "TOP 3 AGENTS"}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               {top3.map((user, index) => (
                 <div
                   key={user.id}
-                  className="relative p-6 rounded-[32px] bg-muted/50 border border-border flex items-center gap-4"
+                  className="relative p-4 md:p-6 rounded-2xl bg-muted/50 border border-border flex items-center gap-3 md:gap-4"
                 >
                   <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full bg-primary text-black flex items-center justify-center font-black text-xl shadow-lg shadow-primary/20">
                     {index + 1}
@@ -3641,8 +3636,8 @@ function CourseProgress({ isAr }: { isAr: boolean }) {
           </div>
 
           {/* All Users Progress */}
-          <div className="bg-foreground/20 backdrop-blur-xl border border-border rounded-[48px] p-8 space-y-6">
-            <h2 className="text-xl font-black italic uppercase text-muted-foreground">
+          <div className="bg-foreground/20 backdrop-blur-xl border border-border rounded-2xl md:rounded-3xl p-5 md:p-8 space-y-4 md:space-y-6">
+            <h2 className="text-lg md:text-xl font-black italic uppercase text-muted-foreground">
               {isAr ? "تقرير تقدم العميل" : "AGENT PROGRESS REPORT"}
             </h2>
             <div className="space-y-4">
@@ -3745,7 +3740,7 @@ function GradingHub({ isAr }: { isAr: boolean }) {
         {submissions.map((sub) => (
           <div
             key={sub.id}
-            className={`p-6 rounded-[32px] bg-muted/50 border border-border flex items-center justify-between group hover:bg-muted transition-all ${sub.total_grade !== null ? "opacity-60" : ""}`}
+            className={`p-4 md:p-6 rounded-xl md:rounded-2xl bg-muted/50 border border-border flex items-center justify-between group hover:bg-muted transition-all ${sub.total_grade !== null ? "opacity-60" : ""}`}
           >
             <div className="flex items-center gap-6">
                 <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center font-black text-muted-foreground">
@@ -3790,7 +3785,7 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                 <motion.div 
                     initial={{ scale: 0.9, opacity: 0 }} 
                     animate={{ scale: 1, opacity: 1 }}
-                    className="bg-background border border-border p-10 rounded-[48px] max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                    className="bg-background border border-border p-5 md:p-8 rounded-2xl md:rounded-3xl max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                 >
                     <header className="flex justify-between items-start mb-10">
                         <div>
@@ -3819,7 +3814,7 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                         ))}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 bg-muted/50 border border-border rounded-[32px]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 p-5 md:p-8 bg-muted/50 border border-border rounded-2xl md:rounded-3xl">
                         <div className="space-y-4">
                             <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Assign Final Grade (%)</label>
                             <input 

@@ -182,7 +182,7 @@ export const Component = () => {
 
         {/* Language & Auth */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-muted">
+          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-muted">
             <span className={cn("text-[9px] font-black", !isAr ? "text-foreground" : "text-muted-foreground")}>EN</span>
             <LeverSwitch checked={isAr} onChange={() => setLanguage(language === "en" ? "ar" : "en")} />
             <span className={cn("text-[9px] font-black", isAr ? "text-foreground" : "text-muted-foreground")}>AR</span>
@@ -320,7 +320,7 @@ export const Component = () => {
       </main>
 
       {/* Bottom Features Section */}
-      <section className="bg-card text-card-foreground rounded-t-[2.5rem] md:rounded-t-[3.5rem] px-6 py-12 md:px-10 md:py-16 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.1)] mt-auto w-full border-t border-border">
+      <section className="hidden md:block bg-card text-card-foreground rounded-t-[2.5rem] md:rounded-t-[3.5rem] px-6 py-12 md:px-10 md:py-16 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.1)] mt-auto w-full border-t border-border">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {/* Card 1 */}
           <div className="bg-muted rounded-[2rem] p-8 flex flex-col items-center text-center relative h-64 border border-border">

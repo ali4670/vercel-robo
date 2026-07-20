@@ -93,41 +93,40 @@ function LevelClassroomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-6 relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-background text-foreground p-4 md:p-6 relative overflow-hidden flex flex-col">
       <div className="fixed inset-0 bg-[linear-gradient(to_right,oklch(0.98_0.01_110/0.05)_1px,transparent_1px),linear-gradient(to_bottom,oklch(0.98_0.01_110/0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0"></div>
 
-      <div className="container mx-auto max-w-7xl relative z-10 pt-10 flex-1 flex flex-col">
-        <div className="flex justify-between items-center mb-12">
+      <div className="container mx-auto max-w-7xl relative z-10 pt-6 md:pt-10 flex-1 flex flex-col">
+        <div className="flex justify-between items-center mb-6 md:mb-12 gap-4">
           <button
             onClick={() => navigate({ to: "/levels" })}
-            className="group flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
+            className="group flex items-center gap-2 md:gap-3 text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
           >
-            <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center group-hover:border-primary">
-              <ArrowLeft className="w-5 h-5" />
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-card border border-border flex items-center justify-center group-hover:border-primary">
+              <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
             </div>
-            <span className="text-xs font-black uppercase tracking-widest">
+            <span className="text-[10px] md:text-xs font-black uppercase tracking-widest hidden sm:inline">
               {isAr ? "العودة" : "RETURN"}
             </span>
           </button>
-          <h1 className="text-3xl font-black italic uppercase tracking-tighter">
+          <h1 className="text-lg md:text-3xl font-black italic uppercase tracking-tighter text-right truncate">
             {isAr ? `فصل: ${levelTitle}` : `CLASSROOM: ${levelTitle}`}
           </h1>
-          <div className="w-20"></div>
         </div>
 
-        <div className="flex gap-4 mb-6">
+        <div className="flex gap-2 md:gap-4 mb-4 md:mb-6 overflow-x-auto pb-1">
           <button
             onClick={() => setActiveTab("chat")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black uppercase tracking-widest ${activeTab === "chat" ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`}
+            className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs whitespace-nowrap transition-all ${activeTab === "chat" ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`}
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4" />
             {isAr ? "المحادثة" : "CHAT"}
           </button>
           <button
             onClick={() => setActiveTab("review")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black uppercase tracking-widest ${activeTab === "review" ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`}
+            className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs whitespace-nowrap transition-all ${activeTab === "review" ? "bg-primary text-primary-foreground" : "bg-card text-foreground"}`}
           >
-            <BookOpen className="w-4 h-4" />
+            <BookOpen className="w-3.5 h-3.5 md:w-4 md:h-4" />
             {isAr ? "المراجعة" : "STUDY REVIEW"}
           </button>
         </div>
@@ -332,14 +331,14 @@ function LevelChat({ levelId, lectureId, isAr }: { levelId: string; lectureId?: 
       </header>
       <div
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar"
+        className="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 md:space-y-6 custom-scrollbar"
       >
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`flex gap-4 ${m.sender_id === profile?.id ? "flex-row-reverse" : ""}`}
+            className={`flex gap-3 md:gap-4 ${m.sender_id === profile?.id ? "flex-row-reverse" : ""}`}
           >
-            <div className="w-12 h-12 rounded-2xl bg-muted overflow-hidden flex-shrink-0 border border-border">
+            <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-muted overflow-hidden flex-shrink-0 border border-border">
               {m.profiles?.avatar_url ? (
                 <img
                   src={m.profiles.avatar_url}
@@ -397,7 +396,7 @@ function LevelChat({ levelId, lectureId, isAr }: { levelId: string; lectureId?: 
           </div>
         )}
       </div>
-      <div className="p-8 bg-card border-t border-border">
+      <div className="p-4 md:p-8 bg-card border-t border-border">
         {!canSend && cooldownRemaining > 0 && (
           <div className="text-center text-xs text-muted-foreground mb-2 font-mono">
             {isAr ? `انتظر ${Math.ceil(cooldownRemaining / 60)}:${String(cooldownRemaining % 60).padStart(2, "0")}` : `Cooldown ${Math.ceil(cooldownRemaining / 60)}:${String(cooldownRemaining % 60).padStart(2, "0")}`}
@@ -414,14 +413,14 @@ function LevelChat({ levelId, lectureId, isAr }: { levelId: string; lectureId?: 
                 ? (isAr ? "في الانتظار..." : "On cooldown...")
                 : (isAr ? "أرسل تحديثات المهمة..." : "Transmit mission updates...")
             }
-            className="w-full bg-muted border border-border rounded-3xl py-6 pl-8 pr-20 font-bold focus:outline-none focus:border-primary focus:bg-muted/50 transition-all"
+            className="w-full bg-muted border border-border rounded-3xl py-4 md:py-6 pl-6 md:pl-8 pr-16 md:pr-20 font-bold focus:outline-none focus:border-primary focus:bg-muted/50 transition-all text-sm md:text-base"
           />
           <button
             onClick={sendMessage}
             disabled={isUploading || !canSend}
-            className={`absolute ${isAr ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 p-4 bg-primary text-primary-foreground rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 disabled:opacity-50`}
+            className={`absolute ${isAr ? "left-2" : "right-2"} top-1/2 -translate-y-1/2 p-3 md:p-4 bg-primary text-primary-foreground rounded-xl md:rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 disabled:opacity-50`}
           >
-            <Send className={`w-5 h-5 ${isAr ? "rotate-180" : ""}`} />
+            <Send className={`w-4 h-4 md:w-5 md:h-5 ${isAr ? "rotate-180" : ""}`} />
           </button>
 
           {isAdmin && (
@@ -436,7 +435,7 @@ function LevelChat({ levelId, lectureId, isAr }: { levelId: string; lectureId?: 
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className={`absolute ${isAr ? "left-20" : "right-20"} top-1/2 -translate-y-1/2 p-4 bg-muted text-muted-foreground border border-border rounded-2xl flex items-center justify-center hover:bg-border transition-all`}
+                className={`absolute ${isAr ? "left-14" : "right-14"} top-1/2 -translate-y-1/2 p-3 md:p-4 bg-muted text-muted-foreground border border-border rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-border transition-all`}
               >
                 {isUploading ? (
                   <Loader2 className="w-5 h-5 animate-spin text-primary" />

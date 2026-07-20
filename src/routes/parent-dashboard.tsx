@@ -169,18 +169,7 @@ function ParentDashboard() {
             </button>
           ))}
 
-          <div className="mt-8 pt-8 border-t border-border">
-            <h2 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-4">
-              {isAr ? "مركز الرسائل" : "Message Hub"}
-            </h2>
-            <Link
-              to="/messages"
-              className="w-full bg-primary text-black font-black py-4 rounded-xl text-xs uppercase flex items-center justify-center gap-2"
-            >
-              <MessageSquare className="w-4 h-4" />
-              {isAr ? "الانتقال للرسائل" : "Go to Messages"}
-            </Link>
-          </div>
+
         </aside>
 
         <main className="md:col-span-3 space-y-8">
