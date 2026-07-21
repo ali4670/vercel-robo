@@ -28,10 +28,14 @@ import {
   Maximize2,
   Minimize2,
   ShieldAlert,
+  Camera,
+  ImagePlus,
+  CheckCircle2 as CheckCircleSolid,
 } from "lucide-react";
 import { HeroButton } from "../funs/HeroButton";
 import { AcademicReviewer } from "../components/AcademicReviewer";
 import { LectureExam } from "../components/LectureExam";
+import { VideoWatermark } from "../components/VideoWatermark";
 import { toast } from "sonner";
 import { validateFile, sanitizeFilename, safeStoragePath } from "../lib/upload-security";
 import {
@@ -82,6 +86,8 @@ interface Lecture {
   content_blocks?: ContentBlock[];
   quiz_data?: any[];
   is_big_exam?: boolean;
+  assignment_required?: boolean;
+  assignment_description?: string;
 }
 
 function WordDocumentViewer({ url }: { url: string }) {
@@ -113,11 +119,39 @@ function WordDocumentViewer({ url }: { url: string }) {
   );
 }
 
-function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
+function SecurePdfViewer({ url, isAr, userEmail, userPhone }: { url: string; isAr: boolean; userEmail: string; userPhone: string }) {
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const watermarkText = `${userEmail} | ${userPhone}`;
+
+  const drawWatermark = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+    ctx.fillStyle = "#000000";
+    ctx.font = `bold ${Math.max(14, w / 30)}px monospace`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const spacing = Math.max(180, w / 3);
+    const cols = Math.ceil(w / spacing) + 2;
+    const rows = Math.ceil(h / spacing) + 2;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const x = col * spacing + (row % 2 === 0 ? 0 : spacing / 2);
+        const y = row * spacing;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(-0.4);
+        ctx.fillText(watermarkText, 0, 0);
+        ctx.restore();
+      }
+    }
+    ctx.restore();
+  };
 
   const renderPdf = useCallback(async (container: HTMLDivElement, scale: number) => {
     const pdfjsLib = await import("pdfjs-dist");
@@ -134,11 +168,47 @@ function SecurePdfViewer({ url, isAr }: { url: string; isAr: boolean }) {
       canvas.height = viewport.height;
       canvas.className = "w-full h-auto mb-3 rounded-lg";
       canvas.style.objectFit = "contain";
+      canvas.style.pointerEvents = "none";
       const ctx = canvas.getContext("2d")!;
       await page.render({ canvasContext: ctx, viewport }).promise;
+
+      drawWatermark(ctx, canvas.width, canvas.height);
+
+      const origToDataURL = canvas.toDataURL.bind(canvas);
+      canvas.toDataURL = function (...args: any[]) {
+        const c = document.createElement("canvas");
+        c.width = canvas.width;
+        c.height = canvas.height;
+        const cctx = c.getContext("2d")!;
+        cctx.fillStyle = "#000";
+        cctx.fillRect(0, 0, c.width, c.height);
+        cctx.fillStyle = "#fff";
+        cctx.font = `${Math.max(16, c.width / 20)}px sans-serif`;
+        cctx.textAlign = "center";
+        cctx.textBaseline = "middle";
+        cctx.fillText("PROTECTED — Screenshots blocked", c.width / 2, c.height / 2);
+        return origToDataURL(...args);
+      };
+
+      const origToBlob = canvas.toBlob.bind(canvas);
+      (canvas as any).toBlob = function (cb: any, ...args: any[]) {
+        const c = document.createElement("canvas");
+        c.width = canvas.width;
+        c.height = canvas.height;
+        const cctx = c.getContext("2d")!;
+        cctx.fillStyle = "#000";
+        cctx.fillRect(0, 0, c.width, c.height);
+        cctx.fillStyle = "#fff";
+        cctx.font = `${Math.max(16, c.width / 20)}px sans-serif`;
+        cctx.textAlign = "center";
+        cctx.textBaseline = "middle";
+        cctx.fillText("PROTECTED — Screenshots blocked", c.width / 2, c.height / 2);
+        return origToBlob(cb, ...args);
+      };
+
       container.appendChild(canvas);
     }
-  }, [url]);
+  }, [url, watermarkText]);
 
   useEffect(() => {
     let cancelled = false;
@@ -321,12 +391,16 @@ function ContentRenderer({
   quizAnswers,
   quizStatus,
   isAr,
+  userEmail,
+  userPhone,
 }: {
   block: ContentBlock;
   onQuizAnswer: (id: string, idx: number, correct: number) => void;
   quizAnswers: Record<string, number>;
   quizStatus: Record<string, "correct" | "incorrect">;
   isAr: boolean;
+  userEmail: string;
+  userPhone: string;
 }) {
   if (!block || !block.type) return null;
 
@@ -350,11 +424,13 @@ function ContentRenderer({
         );
       case "pdf":
         return (
-          <iframe
-            src={block.content}
-            className="w-full h-[400px] md:h-[600px] rounded-3xl"
-            title="PDF"
-          />
+          <div
+            onContextMenu={(e) => e.preventDefault()}
+            onDragStart={(e) => e.preventDefault()}
+            className="relative"
+          >
+            <SecurePdfViewer url={block.content} isAr={isAr} userEmail={userEmail} userPhone={userPhone} />
+          </div>
         );
       case "download":
         return (
@@ -421,7 +497,7 @@ function ContentRenderer({
   }
 }
 
-function LectureChat({ lectureId, levelId, isAr }: { lectureId: string; levelId: string; isAr: boolean }) {
+function LectureChat({ lectureId, levelId, groupId, isAr }: { lectureId: string; levelId: string; groupId?: string | null; isAr: boolean }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const { profile, isAdmin, isModerator } = useAuth();
@@ -488,16 +564,17 @@ function LectureChat({ lectureId, levelId, isAr }: { lectureId: string; levelId:
       toast.error(isAr ? `انتظر ${mins}د ${secs}ث` : `Wait ${mins}m ${secs}s`);
       return;
     }
-    const { error } = await supabase.from("level_chats").insert([
-      {
-        level_id: levelId,
-        lecture_id: lectureId,
-        sender_id: profile.id,
-        content: newMessage,
-      },
-    ]);
+    const insertData: any = {
+      level_id: levelId,
+      lecture_id: lectureId,
+      sender_id: profile.id,
+      content: newMessage,
+      group_id: groupId,
+    };
+    const { error } = await supabase.from("level_chats").insert([insertData]);
     if (error) {
-      toast.error(isAr ? "فشل إرسال الرسالة" : "Failed to send message");
+      console.error("Chat insert error:", error);
+      toast.error(isAr ? `فشل إرسال: ${error.message}` : `Failed: ${error.message}`);
     } else {
       setNewMessage("");
       if (!isAdmin && !isModerator) {
@@ -519,14 +596,14 @@ function LectureChat({ lectureId, levelId, isAr }: { lectureId: string; levelId:
       if (error) throw error;
       const { data: { publicUrl } } = supabase.storage.from("course_files").getPublicUrl(filePath);
       const safeName = sanitizeFilename(file.name);
-      const { error: insertError } = await supabase.from("level_chats").insert([
-        {
-          level_id: levelId,
-          lecture_id: lectureId,
-          sender_id: profile.id,
-          content: `📎 ${isAr ? "ملف" : "FILE"}: ${safeName}\n${publicUrl}`,
-        },
-      ]);
+      const insertData: any = {
+        level_id: levelId,
+        lecture_id: lectureId,
+        sender_id: profile.id,
+        content: `📎 ${isAr ? "ملف" : "FILE"}: ${safeName}\n${publicUrl}`,
+        group_id: groupId,
+      };
+      const { error: insertError } = await supabase.from("level_chats").insert([insertData]);
       if (insertError) throw insertError;
       toast.success(isAr ? "تم رفع الملف" : "File uploaded");
     } catch (err: any) {
@@ -659,6 +736,16 @@ function LecturePage() {
   const youtubePlayerRef = useRef<any>(null);
 
   const contentScrollRef = useRef<HTMLDivElement>(null);
+  const taskFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Task submission state
+  const [taskImageUrl, setTaskImageUrl] = useState<string | null>(null);
+  const [taskSubmitting, setTaskSubmitting] = useState(false);
+  const [taskUploading, setTaskUploading] = useState(false);
+  const [taskStatus, setTaskStatus] = useState<string | null>(null);
+  const [taskFeedback, setTaskFeedback] = useState<string | null>(null);
+  const [canProgress, setCanProgress] = useState(true);
+  const [groupId, setGroupId] = useState<string | null>(null);
 
   const handleVideoEnded = useCallback(() => {
     setIsVideoFinished(true);
@@ -668,6 +755,46 @@ function LecturePage() {
         : "Video completed! You can now execute the mission",
     );
   }, [isAr]);
+
+  const handleTaskImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!event.target.files || event.target.files.length === 0) return;
+      if (!user) return;
+      const file = event.target.files[0];
+      const v = validateFile(file, "taskSubmission", false);
+      if (!v.valid) { toast.error(v.error); return; }
+
+      setTaskUploading(true);
+      const filePath = safeStoragePath("task-submissions", file.name, user.id);
+
+      const { error: uploadError } = await supabase.storage.from("submissions").upload(filePath, file);
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from("submissions").getPublicUrl(filePath);
+
+      // Upsert the submission
+      const { error: dbError } = await supabase.from("lecture_task_submissions").upsert({
+        student_id: user.id,
+        lecture_id: lectureId,
+        image_url: publicUrl,
+        file_url: publicUrl,
+        status: "pending",
+        group_id: groupId,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "student_id,lecture_id" });
+      if (dbError) throw dbError;
+
+      setTaskImageUrl(publicUrl);
+      setTaskStatus("pending");
+      setTaskFeedback(null);
+      toast.success(isAr ? "تم رفع المهمة — في انتظار المراجعة" : "Assignment submitted — awaiting review");
+    } catch (err: any) {
+      toast.error(err.message || (isAr ? "فشل رفع الصورة" : "Upload failed"));
+    } finally {
+      setTaskUploading(false);
+      if (taskFileInputRef.current) taskFileInputRef.current.value = "";
+    }
+  };
 
   // Load YouTube API
   useEffect(() => {
@@ -687,22 +814,46 @@ function LecturePage() {
     }
   }, [lecture?.video_url]);
 
+  // Pause video when window loses focus (blocks Win+G / Win+Shift+S recordings)
+  useEffect(() => {
+    const pauseAll = () => {
+      if (videoRef.current && !videoRef.current.paused) {
+        videoRef.current.pause();
+      }
+      if (youtubePlayerRef.current?.pauseVideo) {
+        youtubePlayerRef.current.pauseVideo();
+      }
+    };
+
+    const handleBlur = () => pauseAll();
+    const handleVisibility = () => {
+      if (document.hidden) pauseAll();
+    };
+
+    window.addEventListener("blur", handleBlur);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("blur", handleBlur);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
   const fetchLecture = useCallback(async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from("lectures")
+        .from("lecture_templates")
         .select("*")
         .eq("id", lectureId)
         .single();
 
       if (error) throw error;
       if (data) {
-        setLecture(data);
+        setLecture({ ...data, level_id: data.level_template_id });
       }
 
       if (user) {
-        const [progressDataRes, levelAccessRes, canAccessRes] =
+        const [progressDataRes, profileRes, canAccessRes] =
           await Promise.all([
             supabase
               .from("student_progress")
@@ -711,18 +862,69 @@ function LecturePage() {
               .eq("lecture_id", lectureId)
               .single(),
             supabase
-              .from("level_access")
-              .select("level_id")
-              .eq("user_id", user.id)
-              .eq("level_id", data.level_id),
+              .from("profiles")
+              .select("group_id")
+              .eq("id", user.id)
+              .single(),
             supabase.rpc("can_student_access_level", {
               u_id: user.id,
-              target_level_id: data.level_id,
+              target_level_id: data.level_template_id,
             }),
           ]);
 
         setIsCompleted(!!progressDataRes.data);
-        const manual = !!(levelAccessRes.data && levelAccessRes.data.length > 0);
+        
+        // Gather all group_ids from junction table + legacy
+        const allGroupIds = new Set<string>();
+        if (profileRes.data?.group_id) allGroupIds.add(profileRes.data.group_id);
+        const { data: sgData } = await supabase
+          .from("student_groups")
+          .select("group_id")
+          .eq("student_id", user.id);
+        sgData?.forEach((sg) => allGroupIds.add(sg.group_id));
+
+        let manual = false;
+        if (allGroupIds.size > 0) {
+          const groupIds = Array.from(allGroupIds);
+          const { data: groupAccess } = await supabase
+            .from("group_level_assignments")
+            .select("level_template_id, group_id")
+            .in("group_id", groupIds)
+            .eq("level_template_id", data.level_template_id);
+          manual = !!(groupAccess && groupAccess.length > 0);
+          // Use the group that has access to this level
+          if (groupAccess && groupAccess.length > 0) {
+            setGroupId(groupAccess[0].group_id);
+          } else if (profileRes.data?.group_id) {
+            setGroupId(profileRes.data.group_id);
+          } else {
+            setGroupId(groupIds[0]);
+          }
+        }
+
+        // Fetch existing task submission
+        const { data: taskSub } = await supabase
+          .from("lecture_task_submissions")
+          .select("id, image_url, status, feedback")
+          .eq("student_id", user.id)
+          .eq("lecture_id", lectureId)
+          .single();
+        if (taskSub) {
+          setTaskImageUrl(taskSub.image_url);
+          setTaskStatus(taskSub.status);
+          setTaskFeedback(taskSub.feedback);
+        }
+
+        // Check if student can progress (assignment gate)
+        if (data.assignment_required && !isAdmin && !isModerator) {
+          const { data: canProgressResult } = await supabase.rpc("can_access_next_lecture", {
+            p_current_lecture_id: lectureId,
+            p_student_id: user.id,
+          });
+          setCanProgress(!!canProgressResult);
+        } else {
+          setCanProgress(true);
+        }
 
         if (!manual && canAccessRes.data !== true && !isAdmin && !isModerator) {
           navigate({ to: "/levels" });
@@ -730,9 +932,9 @@ function LecturePage() {
         }
 
         const { data: allLecturesInLevel } = await supabase
-          .from("lectures")
+          .from("lecture_templates")
           .select("id, slot_number")
-          .eq("level_id", data.level_id)
+          .eq("level_template_id", data.level_template_id)
           .order("slot_number", { ascending: true });
 
         if (allLecturesInLevel) {
@@ -779,6 +981,18 @@ function LecturePage() {
   };
 
   const handleCompleteRequest = () => {
+    if (!taskImageUrl && lecture?.assignment_required && !isAdmin && !isModerator) {
+      toast.error(isAr ? "يجب رفع المهمة أولاً" : "You must submit the assignment first");
+      return;
+    }
+    if (lecture?.assignment_required && taskStatus === "pending" && !isAdmin && !isModerator) {
+      toast.error(isAr ? "المهمة قيد المراجعة — ينتظر الموافقة" : "Assignment is pending review — waiting for approval");
+      return;
+    }
+    if (lecture?.assignment_required && taskStatus === "rejected" && !isAdmin && !isModerator) {
+      toast.error(isAr ? "المهمة مرفوضة — يرجى إعادة الرفع" : "Assignment was rejected — please resubmit");
+      return;
+    }
     if (!hasScrolledToEnd && !isAdmin && !isModerator) {
       toast.error(isAr ? "يرجى قراءة المهمة بالكامل" : "Please read the full mission briefing");
       return;
@@ -870,7 +1084,7 @@ function LecturePage() {
 
         {activeTab === "chat" ? (
           <div className="h-[50dvh] md:h-[600px]">
-            <LectureChat lectureId={lectureId} levelId={lecture.level_id} isAr={isAr} />
+            <LectureChat lectureId={lectureId} levelId={lecture.level_id} groupId={groupId} isAr={isAr} />
           </div>
         ) : (
         <div className="space-y-12">
@@ -882,21 +1096,37 @@ function LecturePage() {
               >
                 {lecture.video_url.includes("youtube.com") || lecture.video_url.includes("youtu.be") ? (
                   <iframe
-                    src={lecture.video_url.replace("watch?v=", "embed/") + (lecture.video_url.includes("?") ? "&" : "?") + "modestbranding=1&rel=0&showinfo=0&iv_load_policy=3"}
+                    src={lecture.video_url.replace("watch?v=", "embed/") + (lecture.video_url.includes("?") ? "&" : "?") + "modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=0&disablekb=1"}
                     className="w-full h-full"
-                    allowFullScreen
                     referrerPolicy="no-referrer"
                   />
                 ) : (
                   <video
                     src={lecture.video_url}
                     controls
-                    controlsList="nodownload noduration"
+                    controlsList="nodownload noduration noplaybackrate"
                     disablePictureInPicture
                     onContextMenu={(e) => e.preventDefault()}
                     className="w-full h-full object-contain"
                   />
                 )}
+
+                {/* Watermark on video */}
+                <VideoWatermark
+                  email={user?.email || "anonymous"}
+                  userId={user?.id}
+                  username={profile?.username}
+                  phone={profile?.phone_number}
+                />
+
+                {/* Invisible overlay to block right-click/drag/copy */}
+                <div
+                  className="absolute inset-0 z-10"
+                  onContextMenu={(e) => e.preventDefault()}
+                  onDragStart={(e) => e.preventDefault()}
+                  onCopy={(e) => e.preventDefault()}
+                  style={{ pointerEvents: "none" }}
+                />
               </div>
             </motion.div>
           )}
@@ -910,7 +1140,127 @@ function LecturePage() {
                     {isAr ? "وثيقة الدراسة" : "STUDY MATERIAL"}
                   </span>
                 </div>
-                <SecurePdfViewer url={lecture.pdf_url} isAr={isAr} />
+                <SecurePdfViewer url={lecture.pdf_url} isAr={isAr} userEmail={user?.email || "anonymous"} userPhone={profile?.phone_number || "N/A"} />
+              </div>
+            </motion.div>
+          )}
+
+          {(!isAdmin && !isModerator) && (
+            <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="p-1 rounded-[2.5rem] bg-muted border border-border shadow-2xl">
+              <div className="bg-card border border-border rounded-[calc(2.5rem-0.375rem)] overflow-hidden">
+                <div className="flex items-center gap-3 px-8 py-4 border-b border-border bg-muted/50">
+                  <Camera className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                    {lecture?.assignment_required
+                      ? (isAr ? "المهمة المطلوبة" : "REQUIRED ASSIGNMENT")
+                      : (isAr ? "صورة المهمة" : "TASK SUBMISSION")}
+                  </span>
+                  {taskStatus === "approved" && (
+                    <span className="ml-auto flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-green-500/15 text-green-500 text-[9px] font-black uppercase tracking-widest">
+                      <CheckCircleSolid className="w-3 h-3" />
+                      {isAr ? "تمت الموافقة" : "APPROVED"}
+                    </span>
+                  )}
+                  {taskStatus === "pending" && (
+                    <span className="ml-auto flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-yellow-500/15 text-yellow-500 text-[9px] font-black uppercase tracking-widest">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      {isAr ? "قيد المراجعة" : "PENDING REVIEW"}
+                    </span>
+                  )}
+                  {taskStatus === "rejected" && (
+                    <span className="ml-auto flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/15 text-red-500 text-[9px] font-black uppercase tracking-widest">
+                      <X className="w-3 h-3" />
+                      {isAr ? "مرفوض" : "REJECTED"}
+                    </span>
+                  )}
+                  {!taskStatus && taskImageUrl && (
+                    <span className="ml-auto flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/15 text-primary text-[9px] font-black uppercase tracking-widest">
+                      <CheckCircleSolid className="w-3 h-3" />
+                      {isAr ? "مرسل" : "SUBMITTED"}
+                    </span>
+                  )}
+                </div>
+
+                {lecture?.assignment_required && lecture.assignment_description && (
+                  <div className="px-8 py-4 bg-primary/5 border-b border-border">
+                    <p className="text-sm text-foreground/80 leading-relaxed">{lecture.assignment_description}</p>
+                  </div>
+                )}
+
+                {taskFeedback && (
+                  <div className={`px-8 py-4 border-b border-border ${taskStatus === "rejected" ? "bg-red-500/5" : "bg-green-500/5"}`}>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                      {isAr ? "ملاحظات المشرف" : "MODERATOR FEEDBACK"}
+                    </p>
+                    <p className="text-sm text-foreground/80">{taskFeedback}</p>
+                  </div>
+                )}
+
+                <div className="p-6 md:p-8">
+                  <input
+                    type="file"
+                    ref={taskFileInputRef}
+                    onChange={handleTaskImageUpload}
+                    className="hidden"
+                    accept="image/jpeg,image/png,image/webp,.pdf,.doc,.docx"
+                  />
+
+                  {taskImageUrl ? (
+                    <div className="space-y-4">
+                      <div className="relative group">
+                        {taskImageUrl.match(/\.(pdf|doc|docx)$/i) || taskImageUrl.includes("application/pdf") ? (
+                          <div className="flex items-center gap-4 p-6 bg-muted rounded-2xl border border-border">
+                            <FileText className="w-10 h-10 text-primary" />
+                            <div>
+                              <p className="font-bold text-sm">{isAr ? "ملف مرفق" : "Attached File"}</p>
+                              <p className="text-xs text-muted-foreground truncate max-w-[200px]">{taskImageUrl.split("/").pop()}</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <img
+                            src={taskImageUrl}
+                            alt="Task submission"
+                            className="w-full max-h-[300px] object-contain rounded-2xl border border-border"
+                          />
+                        )}
+                      </div>
+                      <button
+                        onClick={() => taskFileInputRef.current?.click()}
+                        disabled={taskUploading || taskStatus === "approved"}
+                        className="w-full py-3 rounded-2xl border-2 border-dashed border-border hover:border-primary/30 text-muted-foreground hover:text-foreground text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {taskUploading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ImagePlus className="w-4 h-4" />
+                        )}
+                        {taskStatus === "approved"
+                          ? (isAr ? "تمت الموافقة" : "APPROVED")
+                          : (isAr ? "استبدال الملف" : "REPLACE FILE")}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => taskFileInputRef.current?.click()}
+                      disabled={taskUploading}
+                      className="w-full py-10 rounded-2xl border-2 border-dashed border-border hover:border-primary/30 text-muted-foreground hover:text-foreground transition-all flex flex-col items-center gap-3"
+                    >
+                      {taskUploading ? (
+                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                      ) : (
+                        <Camera className="w-8 h-8 opacity-30" />
+                      )}
+                      <div className="text-center">
+                        <p className="text-[10px] font-black uppercase tracking-widest">
+                          {isAr ? "ارفع المهمة" : "UPLOAD ASSIGNMENT"}
+                        </p>
+                        <p className="text-[9px] text-muted-foreground mt-1">
+                          {isAr ? "صورة أو PDF أو Word — حد أقصى 10MB" : "Image, PDF, or Word — max 10MB"}
+                        </p>
+                      </div>
+                    </button>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}
@@ -919,7 +1269,7 @@ function LecturePage() {
             {lecture.content_blocks?.map((block, i) => (
               <motion.div key={block.id || i} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="p-1 rounded-[2.5rem] bg-muted border border-border hover:border-primary/30 transition-all group">
                 <div className="bg-card border border-border rounded-[calc(2.5rem-0.375rem)] p-8 md:p-10">
-                  <ContentRenderer block={block} onQuizAnswer={handleQuizAnswer} quizAnswers={quizAnswers} quizStatus={quizStatus} isAr={isAr} />
+                  <ContentRenderer block={block} onQuizAnswer={handleQuizAnswer} quizAnswers={quizAnswers} quizStatus={quizStatus} isAr={isAr} userEmail={user?.email || "anonymous"} userPhone={profile?.phone_number || "N/A"} />
                 </div>
               </motion.div>
             ))}
@@ -935,21 +1285,42 @@ function LecturePage() {
                 <div className="p-4 bg-primary-foreground/10 rounded-2xl border border-primary-foreground/5"><Zap className="w-6 h-6 text-primary-foreground" /></div>
                 <div>
                   <p className="font-black uppercase tracking-[0.5em] text-[9px] opacity-60 mb-0.5">MISSION CLEARANCE</p>
-                  <p className="font-black italic text-2xl md:text-3xl tracking-tighter leading-none">DATA SYNCHRONIZED</p>
+                  <p className="font-black italic text-2xl md:text-3xl tracking-tighter leading-none">
+                    {!canProgress && !isAdmin && !isModerator
+                      ? (isAr ? "معلق — ينتظر موافقة المهمة" : "LOCKED — ASSIGNMENT PENDING")
+                      : "DATA SYNCHRONIZED"}
+                  </p>
                 </div>
               </div>
 
               <div className="w-full md:w-auto relative z-10">
-                <HeroButton
-                  onClick={isCompleted ? () => (nextLectureId ? navigate({ to: `/lecture/${nextLectureId}` }) : navigate({ to: "/levels" })) : handleCompleteRequest}
-                  disabled={isSubmitting || (!isCompleted && !hasScrolledToEnd && !isAdmin && !isModerator)}
-                  className="w-full md:w-auto bg-background text-foreground px-10 h-16 rounded-2xl font-black uppercase tracking-widest italic"
-                >
-                  <span className="flex items-center gap-3">
-                    {isCompleted ? (nextLectureId ? "NEXT MODULE" : "FINISH LEVEL") : (lecture.quiz_data?.length ? "START EXAM" : "COMPLETE MISSION")}
-                    <ArrowRight className="w-4 h-4" />
-                  </span>
-                </HeroButton>
+                {isCompleted ? (
+                  <HeroButton
+                    onClick={() => (nextLectureId ? navigate({ to: `/lecture/${nextLectureId}` }) : navigate({ to: "/levels" }))}
+                    className="w-full md:w-auto bg-background text-foreground px-10 h-16 rounded-2xl font-black uppercase tracking-widest italic"
+                  >
+                    <span className="flex items-center gap-3">
+                      {nextLectureId ? "NEXT MODULE" : "FINISH LEVEL"}
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </HeroButton>
+                ) : !canProgress && !isAdmin && !isModerator ? (
+                  <div className="w-full md:w-auto bg-background/20 text-primary-foreground px-10 h-16 rounded-2xl font-black uppercase tracking-widest italic flex items-center justify-center gap-3 cursor-not-allowed opacity-70">
+                    <Lock className="w-4 h-4" />
+                    <span>{isAr ? "معلق" : "LOCKED"}</span>
+                  </div>
+                ) : (
+                  <HeroButton
+                    onClick={handleCompleteRequest}
+                    disabled={isSubmitting || (!isCompleted && !hasScrolledToEnd && !isAdmin && !isModerator)}
+                    className="w-full md:w-auto bg-background text-foreground px-10 h-16 rounded-2xl font-black uppercase tracking-widest italic"
+                  >
+                    <span className="flex items-center gap-3">
+                      {lecture.quiz_data?.length ? "START EXAM" : "COMPLETE MISSION"}
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </HeroButton>
+                )}
               </div>
             </div>
           </motion.div>

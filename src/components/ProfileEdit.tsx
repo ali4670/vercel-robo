@@ -104,6 +104,15 @@ export const ProfileEdit: React.FC<ProfileEditProps> = ({
       const fileExt = safeName.split(".").pop() || "jpg";
       const filePath = `${user.id}/${user.id}-${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
 
+      // Delete old avatar if exists
+      const oldUrl = currentProfile?.avatar_url || myProfile?.avatar_url;
+      if (oldUrl && oldUrl.includes("/avatars/")) {
+        const oldPath = oldUrl.split("/avatars/")[1];
+        if (oldPath) {
+          await supabase.storage.from("avatars").remove([oldPath]);
+        }
+      }
+
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, file);

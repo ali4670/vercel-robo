@@ -69,9 +69,9 @@ function ExamPage() {
 
       // 2. Fetch Exam
       const { data, error } = await supabase
-        .from("exams")
+        .from("exam_templates")
         .select("*")
-        .eq("level_id", levelId)
+        .eq("level_template_id", levelId)
         .single();
 
       if (error || !data || (data.questions as Question[]).length !== 3) {

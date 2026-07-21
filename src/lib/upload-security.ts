@@ -62,6 +62,11 @@ export const UPLOAD_CONFIGS = {
     maxSize: 500 * 1024 * 1024, // 500MB
     label: "File",
   },
+  taskSubmission: {
+    accept: ["image/jpeg", "image/png", "image/webp"],
+    maxSize: 10 * 1024 * 1024, // 10MB
+    label: "Image",
+  },
 } as const;
 
 export type UploadContext = keyof typeof UPLOAD_CONFIGS;

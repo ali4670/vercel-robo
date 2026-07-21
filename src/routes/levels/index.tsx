@@ -63,12 +63,14 @@ function LevelsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [groupName, setGroupName] = useState<string | null>(null);
+  const [moderatorName, setModeratorName] = useState<string | null>(null);
 
   const fetchInitialData = useCallback(async () => {
     setLoading(true);
     try {
       let levelsQuery = supabase
-        .from("levels")
+        .from("level_templates")
         .select("*")
         .order("level_order", { ascending: true });
 
@@ -79,26 +81,27 @@ function LevelsPage() {
       const [levelsRes, lecturesRes, examsRes] = await Promise.all([
         levelsQuery,
         supabase
-          .from("lectures")
+          .from("lecture_templates")
           .select("*")
           .order("slot_number", { ascending: true }),
-        supabase.from("exams").select("level_id"),
+        supabase.from("exam_templates").select("level_template_id"),
       ]);
 
-      if (levelsRes.data) setLevels(levelsRes.data);
-      if (lecturesRes.data) setLectures(lecturesRes.data);
-      setExams(examsRes.data || []);
+      if (levelsRes.data) setLevels(levelsRes.data.map(l => ({ ...l, id: l.id })));
+      if (lecturesRes.data) setLectures(lecturesRes.data.map(l => ({ ...l, level_id: l.level_template_id })));
+      setExams((examsRes.data || []).map(e => ({ level_id: e.level_template_id })));
 
       if (user) {
-        const [progressRes, accessRes, submissionsRes] = await Promise.all([
+        const [progressRes, profileRes, submissionsRes] = await Promise.all([
           supabase
             .from("student_progress")
             .select("lecture_id")
             .eq("student_id", user.id),
           supabase
-            .from("level_access")
-            .select("level_id, granted_at")
-            .eq("user_id", user.id),
+            .from("profiles")
+            .select("group_id")
+            .eq("id", user.id)
+            .single(),
           supabase
             .from("exam_submissions")
             .select("lecture_id, total_grade, graded_at")
@@ -107,7 +110,51 @@ function LevelsPage() {
 
         if (progressRes.data)
           setProgress(progressRes.data.map((p) => p.lecture_id));
-        setAccess(accessRes.data || []);
+        
+        // Gather all group_ids from junction table + legacy group_id
+        const allGroupIds = new Set<string>();
+        if (profileRes.data?.group_id) allGroupIds.add(profileRes.data.group_id);
+        const { data: sgData } = await supabase
+          .from("student_groups")
+          .select("group_id")
+          .eq("student_id", user.id);
+        sgData?.forEach((sg) => allGroupIds.add(sg.group_id));
+
+        if (allGroupIds.size > 0) {
+          const groupIds = Array.from(allGroupIds);
+          // Get access from ALL groups
+          const [groupAccessRes, groupRes] = await Promise.all([
+            supabase
+              .from("group_level_assignments")
+              .select("level_template_id, assigned_at, group_id")
+              .in("group_id", groupIds),
+            supabase
+              .from("groups")
+              .select("name, moderator_id, id")
+              .in("id", groupIds),
+          ]);
+          if (groupAccessRes.data) {
+            const accessMap = new Map<string, { level_id: string; granted_at: string }>();
+            groupAccessRes.data.forEach(a => {
+              if (!accessMap.has(a.level_template_id)) {
+                accessMap.set(a.level_template_id, { level_id: a.level_template_id, granted_at: a.assigned_at });
+              }
+            });
+            setAccess(Array.from(accessMap.values()));
+          }
+          if (groupRes.data && groupRes.data.length > 0) {
+            const primary = groupRes.data.find(g => g.id === profileRes.data?.group_id) || groupRes.data[0];
+            setGroupName(primary.name);
+            if (primary.moderator_id) {
+              const { data: modProfile } = await supabase
+                .from("profiles")
+                .select("username")
+                .eq("id", primary.moderator_id)
+                .single();
+              if (modProfile) setModeratorName(modProfile.username);
+            }
+          }
+        }
         setSubmissions(submissionsRes.data || []);
       }
     } finally {
@@ -197,6 +244,21 @@ function LevelsPage() {
             </p>
             <div className="h-[1px] w-20 bg-muted" />
           </div>
+          {user && groupName && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-primary/5 border border-primary/15 text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+            >
+              <span>{isAr ? "المجموعة" : "GROUP"}: {groupName}</span>
+              {moderatorName && (
+                <>
+                  <span className="w-[1px] h-3 bg-border" />
+                  <span>{isAr ? "المشرف" : "MODERATOR"}: {moderatorName}</span>
+                </>
+              )}
+            </motion.div>
+          )}
         </header>
 
         {/* Sign-in prompt for guests */}
@@ -314,7 +376,7 @@ function LevelsPage() {
                         </div>
                         <div className="mb-2 text-left">
                           <h2 className="text-lg md:text-2xl lg:text-3xl font-black italic uppercase tracking-tight text-foreground">
-                            {level.title}
+                            {!isAdmin && !isModerator && groupName ? groupName : level.title}
                           </h2>
                           <div className="flex items-center gap-4 mt-2">
                             <span className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">

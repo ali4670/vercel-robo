@@ -29,6 +29,8 @@ function LevelClassroomPage() {
   const navigate = useNavigate();
 
   const [levelTitle, setLevelTitle] = useState("");
+  const [groupName, setGroupName] = useState<string | null>(null);
+  const [groupId, setGroupId] = useState<string | null>(null);
   const [levelContent, setLevelContent] = useState("");
   const [activeTab, setActiveTab] = useState<"chat" | "review">("chat");
   const [selectedChatTab, setSelectedChatTab] = useState<string>("general");
@@ -48,19 +50,62 @@ function LevelClassroomPage() {
 
     setLoading(true);
     try {
-      const [levelRes, lecturesRes] = await Promise.all([
-        supabase.from("levels").select("title").eq("id", levelId).single(),
+      const [levelRes, lecturesRes, profileRes, studentGroupsRes] = await Promise.all([
+        supabase.from("level_templates").select("title").eq("id", levelId).single(),
         supabase
-          .from("lectures")
+          .from("lecture_templates")
           .select("id, title, description, slot_number")
-          .eq("level_id", levelId)
+          .eq("level_template_id", levelId)
           .order("slot_number", { ascending: true }),
+        supabase
+          .from("profiles")
+          .select("group_id")
+          .eq("id", user.id)
+          .single(),
+        supabase
+          .from("student_groups")
+          .select("group_id")
+          .eq("student_id", user.id),
       ]);
 
       if (levelRes.error) throw levelRes.error;
 
       setLevelTitle(levelRes.data?.title || "Unknown Level");
       setLectures(lecturesRes.data || []);
+
+      // Combine groups from junction table + legacy group_id
+      const allGroupIds = new Set<string>();
+      if (profileRes.data?.group_id) allGroupIds.add(profileRes.data.group_id);
+      studentGroupsRes.data?.forEach((sg) => allGroupIds.add(sg.group_id));
+
+      // Find which of the student's groups has access to this level
+      let matchedGroupId: string | null = null;
+      let matchedGroupName: string | null = null;
+      if (allGroupIds.size > 0) {
+        const { data: assignments } = await supabase
+          .from("group_level_assignments")
+          .select("group_id")
+          .eq("level_template_id", levelId)
+          .in("group_id", Array.from(allGroupIds));
+        
+        if (assignments && assignments.length > 0) {
+          matchedGroupId = assignments[0].group_id;
+        } else if (profileRes.data?.group_id) {
+          matchedGroupId = profileRes.data.group_id;
+        } else {
+          matchedGroupId = Array.from(allGroupIds)[0];
+        }
+
+        if (matchedGroupId) {
+          setGroupId(matchedGroupId);
+          const { data: groupRes } = await supabase
+            .from("groups")
+            .select("name")
+            .eq("id", matchedGroupId)
+            .single();
+          if (groupRes) setGroupName(groupRes.name);
+        }
+      }
 
       const aggregatedContent =
         lecturesRes.data
@@ -110,7 +155,7 @@ function LevelClassroomPage() {
             </span>
           </button>
           <h1 className="text-lg md:text-3xl font-black italic uppercase tracking-tighter text-right truncate">
-            {isAr ? `فصل: ${levelTitle}` : `CLASSROOM: ${levelTitle}`}
+            {isAr ? `فصل: ${groupName || levelTitle}` : `CLASSROOM: ${groupName || levelTitle}`}
           </h1>
         </div>
 
@@ -163,6 +208,7 @@ function LevelClassroomPage() {
           {activeTab === "chat" ? (
             <LevelChat
               levelId={levelId}
+              groupId={groupId}
               lectureId={selectedChatTab !== "general" ? selectedChatTab : undefined}
               isAr={isAr}
             />
@@ -181,7 +227,7 @@ function LevelClassroomPage() {
   );
 }
 
-function LevelChat({ levelId, lectureId, isAr }: { levelId: string; lectureId?: string; isAr: boolean }) {
+function LevelChat({ levelId, groupId, lectureId, isAr }: { levelId: string; groupId?: string | null; lectureId?: string; isAr: boolean }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const { profile, isAdmin, isModerator } = useAuth();
@@ -265,12 +311,14 @@ function LevelChat({ levelId, lectureId, isAr }: { levelId: string; lectureId?: 
       level_id: levelId,
       sender_id: profile.id,
       content: newMessage,
+      group_id: groupId,
     };
     if (lectureId) insertData.lecture_id = lectureId;
     const { error } = await supabase.from("level_chats").insert([insertData]);
 
     if (error) {
-      toast.error(isAr ? "فشل إرسال الرسالة" : "Failed to send message");
+      console.error("Chat insert error:", error);
+      toast.error(isAr ? `فشل إرسال: ${error.message}` : `Failed: ${error.message}`);
     } else {
       setNewMessage("");
       if (!isAdmin && !isModerator) {
@@ -305,6 +353,7 @@ function LevelChat({ levelId, lectureId, isAr }: { levelId: string; lectureId?: 
         level_id: levelId,
         sender_id: profile.id,
         content: `📎 ${isAr ? "ملف" : "FILE"}: ${safeName}\n${publicUrl}`,
+        group_id: groupId,
       };
       if (lectureId) insertData.lecture_id = lectureId;
       const { error: insertError } = await supabase.from("level_chats").insert([insertData]);

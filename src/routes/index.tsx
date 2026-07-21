@@ -59,8 +59,8 @@ function Index() {
 
   const fetchLevels = async () => {
     const { data } = await supabase
-      .from("levels")
-      .select("*")
+      .from("level_templates")
+      .select("id, title, description, image_url, level_order, is_published, drip_interval_days")
       .eq("is_published", true)
       .order("level_order", { ascending: true });
     if (data) setLevels(data);

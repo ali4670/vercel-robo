@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "../hooks/use-auth";
 import { useLanguage } from "../lib/LanguageContext";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -47,8 +47,11 @@ import {
   ShieldAlert,
   Zap,
   GraduationCap,
+  Camera,
 } from "lucide-react";
 import { HeroButton } from "../funs/HeroButton";
+import { MediaLibrary } from "../components/MediaLibrary";
+import { GroupManager } from "../components/GroupManager";
 import { supabase } from "../lib/supabase-code";
 import { toast } from "sonner";
 import { parseDocx, parseXlsx, ParsedLecture } from "../utils/file-parser";
@@ -131,7 +134,7 @@ interface InternalTask {
 function ModeratorDashboard() {
   const { isAr } = useLanguage();
   const { isAdmin, isModerator, user, profile } = useAuth(); // Get current user and profile
-  const [activeTab, setActiveTab] = useState<"levels" | "users" | "messaging" | "progress" | "tasks" | "analytics" | "spotlight" | "failed_exams" | "directory">(
+  const [activeTab, setActiveTab] = useState<"levels" | "users" | "messaging" | "progress" | "tasks" | "analytics" | "spotlight" | "failed_exams" | "directory" | "assignments" | "grading" | "leaderboard" | "media" | "groups">(
     "levels",
   );
   const [levels, setLevels] = useState<Level[]>([]);
@@ -190,8 +193,8 @@ function ModeratorDashboard() {
 
   const fetchLevels = async () => {
     const { data } = await supabase
-      .from("levels")
-      .select("*")
+      .from("level_templates")
+      .select("id, title, level_order, is_published, created_at")
       .order("level_order", { ascending: true });
     if (data) setLevels(data);
     setLoading(false);
@@ -327,6 +330,42 @@ function ModeratorDashboard() {
             </span>
           </button>
 
+          <button
+            onClick={() => setActiveTab("assignments")}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "assignments" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
+          >
+            <div className={`p-1.5 rounded-lg ${activeTab === "assignments" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
+                <FileText className="w-3.5 h-3.5" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              {isAr ? "المهام" : "ASSIGNMENTS"}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("media")}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "media" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
+          >
+            <div className={`p-1.5 rounded-lg ${activeTab === "media" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
+                <Video className="w-3.5 h-3.5" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              {isAr ? "المكتبة" : "MEDIA LIB"}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("groups")}
+            className={`group flex items-center gap-3 px-5 py-3 rounded-[1.5rem] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] whitespace-nowrap ${activeTab === "groups" ? "bg-primary text-black shadow-lg shadow-primary/20 scale-[1.02]" : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"}`}
+          >
+            <div className={`p-1.5 rounded-lg ${activeTab === "groups" ? "bg-foreground/10" : "bg-muted/50 group-hover:bg-muted"}`}>
+                <Users className="w-3.5 h-3.5" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              {isAr ? "المجموعات" : "GROUPS"}
+            </span>
+          </button>
+
           {isAdmin && (
             <>
                 <button
@@ -444,7 +483,7 @@ function ModeratorDashboard() {
                             <button
                               onClick={async () => {
                                 if (!confirm("Are you sure?")) return;
-                                const { error } = await supabase.from("levels").delete().eq("id", level.id);
+                                const { error } = await supabase.from("level_templates").delete().eq("id", level.id);
                                 if (error) toast.error("Failed to delete level");
                                 else {
                                     toast.success("Level deleted");
@@ -469,6 +508,25 @@ function ModeratorDashboard() {
             {activeTab === "tasks" && <InternalTasks isAr={isAr} />}
             {activeTab === "failed_exams" && <FailedExams isAr={isAr} />}
             {activeTab === "grading" && <GradingHub isAr={isAr} />}
+            {activeTab === "assignments" && <AssignmentsHub isAr={isAr} />}
+            {activeTab === "media" && (
+              <motion.div key="media" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                <div className="mb-4">
+                  <h2 className="text-lg font-black uppercase">{isAr ? "مكتبة المحتوى" : "Content Library"}</h2>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase">{isAr ? "ارفع مرة واحدة، استخدم في كل مكان" : "Upload once, reference everywhere"}</p>
+                </div>
+                <MediaLibrary mode="browse" />
+              </motion.div>
+            )}
+            {activeTab === "groups" && (
+              <motion.div key="groups" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                <div className="mb-4">
+                  <h2 className="text-lg font-black uppercase">{isAr ? "المجموعات والتعيينات" : "Groups & Assignments"}</h2>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase">{isAr ? "أنشئ مجموعات وعيّن مستويات لكل مجموعة" : "Create groups and assign level templates"}</p>
+                </div>
+                <GroupManager />
+              </motion.div>
+            )}
             {activeTab === "spotlight" && <SpotlightManagement isAr={isAr} />}
             {activeTab === "analytics" && <AnalyticsTab levelId={selectedLevelId} isAr={isAr} />}
             {activeTab === "directory" && <UserDirectory isAr={isAr} />}
@@ -582,14 +640,22 @@ function FailedExams({ isAr }: { isAr: boolean }) {
   const fetchFailedAttempts = async () => {
     const { data } = await supabase
       .from("exam_attempts")
-      .select("*, profiles(username, id), levels(title)")
+      .select("*, profiles(username, id)")
       .lt("score", 70);
 
     if (data) setFailedAttempts(data);
   };
 
   const approveProgression = async (studentId: string, levelId: string) => {
-    await supabase.from("level_access").insert([{ user_id: studentId, level_id: levelId }]);
+    const { data: sgData } = await supabase.from("student_groups").select("group_id").eq("student_id", studentId);
+    const groupIds = sgData?.map((sg) => sg.group_id) || [];
+    if (groupIds.length === 0) {
+      const { data: profile } = await supabase.from("profiles").select("group_id").eq("id", studentId).single();
+      if (profile?.group_id) groupIds.push(profile.group_id);
+    }
+    for (const gid of groupIds) {
+      await supabase.from("group_level_assignments").insert({ group_id: gid, level_template_id: levelId }).select();
+    }
     toast.success("Progression approved");
     fetchFailedAttempts();
   };
@@ -608,7 +674,7 @@ function FailedExams({ isAr }: { isAr: boolean }) {
             <div>
               <p className="font-bold">{attempt.profiles?.username}</p>
               <p className="text-xs text-muted-foreground">
-                {attempt.levels?.title} - Score: {attempt.score}%
+                {attempt.level_id?.slice(0,8)} - Score: {attempt.score}%
               </p>
             </div>
             <button
@@ -647,7 +713,7 @@ function AnalyticsTab({ levelId, isAr }: { levelId: string | null; isAr: boolean
   };
 
   const fetchExamQuestions = async () => {
-    const { data } = await supabase.from("exams").select("questions").eq("level_id", levelId).single();
+    const { data } = await supabase.from("exam_templates").select("questions").eq("level_template_id", levelId).single();
     if (data) setExamQuestions(data.questions as any[]);
   };
 
@@ -916,12 +982,10 @@ function SpotlightManagement({ isAr }: { isAr: boolean }) {
 function UserManagement({ isAr }: { isAr: boolean }) {
   const { isAdmin, profile } = useAuth();
   const [users, setUsers] = useState<Profile[]>([]);
-  const [levels, setLevels] = useState<Level[]>([]);
+  const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "student" | "parent" | "moderator" | "admin">("all");
   const [loading, setLoading] = useState(true);
-  const [selectedUserId, setSelectedUserAccess] = useState<string | null>(null);
-  const [userAccess, setUserAccess] = useState<string[]>([]);
   const [parentStudentLinks, setParentStudentLinks] = useState<any[]>([]);
 
   const deleteUser = async (userId: string) => {
@@ -939,7 +1003,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
 
   useEffect(() => {
     fetchUsers();
-    fetchLevels();
+    fetchGroups();
     fetchLinks();
   }, []);
 
@@ -955,13 +1019,13 @@ function UserManagement({ isAr }: { isAr: boolean }) {
     }
   };
 
-  const fetchLevels = async () => {
+  const fetchGroups = async () => {
     try {
-      const { data, error } = await supabase.from("levels").select("*").order("level_order", { ascending: true });
+      const { data, error } = await supabase.from("groups").select("id, name").order("name");
       if (error) throw error;
-      setLevels(data);
+      setGroups(data || []);
     } catch (err) {
-      console.error("Error fetching levels:", err);
+      console.error("Error fetching groups:", err);
     }
   };
 
@@ -970,13 +1034,16 @@ function UserManagement({ isAr }: { isAr: boolean }) {
     if (data) setParentStudentLinks(data);
   };
 
-  const fetchUserAccess = async (userId: string) => {
-    try {
-      const { data, error } = await supabase.from("level_access").select("level_id").eq("user_id", userId);
-      if (error) throw error;
-      setUserAccess(data.map((a) => a.level_id));
-    } catch (err) {
-      console.error("Error fetching access:", err);
+  const assignToGroup = async (userId: string, groupId: string | null) => {
+    const { error } = await supabase.from("profiles").update({ group_id: groupId || null }).eq("id", userId);
+    if (!error) {
+      if (groupId) {
+        await supabase.from("student_groups").upsert({ student_id: userId, group_id: groupId }, { onConflict: "student_id,group_id" });
+      } else {
+        await supabase.from("student_groups").delete().eq("student_id", userId);
+      }
+      toast.success(isAr ? "تم تحديث المجموعة" : "Group updated");
+      fetchUsers();
     }
   };
 
@@ -1004,33 +1071,6 @@ function UserManagement({ isAr }: { isAr: boolean }) {
     }
   };
 
-  const toggleLevelAccess = async (userId: string, levelId: string, hasAccess: boolean) => {
-    if (hasAccess) {
-      await supabase.from("level_access").delete().eq("user_id", userId).eq("level_id", levelId);
-    } else {
-      await supabase.from("level_access").insert([{ user_id: userId, level_id: levelId }]);
-    }
-    fetchUserAccess(userId);
-    toast.success(isAr ? "تم تحديث الصلاحيات" : "Access privileges updated");
-  };
-
-  const grantAllAccess = async (userId: string) => {
-    const accessToInsert = levels
-      .filter(level => !userAccess.includes(level.id))
-      .map(level => ({ user_id: userId, level_id: level.id }));
-    if (accessToInsert.length > 0) {
-      await supabase.from("level_access").insert(accessToInsert);
-      fetchUserAccess(userId);
-      toast.success(isAr ? "تم منح الوصول لجميع المستويات" : "All levels access granted");
-    }
-  };
-
-  const revokeAllAccess = async (userId: string) => {
-    await supabase.from("level_access").delete().eq("user_id", userId);
-    fetchUserAccess(userId);
-    toast.success(isAr ? "تم إلغاء الوصول لجميع المستويات" : "All levels access revoked");
-  };
-
   // Linking functionality
   const linkStudentToParent = async (studentId: string, parentId: string) => {
     try {
@@ -1054,7 +1094,7 @@ function UserManagement({ isAr }: { isAr: boolean }) {
         if (error) throw error;
         toast.success(isAr ? "تم إلغاء الربط" : "Unlinked successfully");
         fetchLinks();
-    } catch (err: any) {
+    } catch (err) {
         toast.error("Failed to unlink");
     }
   };
@@ -1146,77 +1186,24 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                                     <option value="moderator">Moderator</option>
                                     {isAdmin && <option value="admin">Admin</option>}
                                 </select>
-                                <button
-                                    onClick={() => {
-                                        setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
-                                        if (selectedUserId !== user.id) fetchUserAccess(user.id);
-                                    }}
-                                    className={`w-8 h-8 md:w-9 md:h-9 rounded-lg bg-muted/50 border border-border hover:bg-muted text-foreground hover:text-foreground transition-all flex items-center justify-center ${selectedUserId === user.id ? "bg-primary text-primary-foreground" : ""}`}
-                                >
-                                    <Lock className="w-4 h-4" />
-                                </button>
                               </div>
 
-                              <HeroButton 
-                                onClick={() => {
-                                    setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
-                                    if (selectedUserId !== user.id) fetchUserAccess(user.id);
-                                }}
-                                className="w-full bg-primary text-primary-foreground h-9 md:h-10 rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-widest mt-2"
-                              >
-                                {isAr ? "إدارة الصلاحيات" : "MANAGE ACCESS"}
-                              </HeroButton>
+                              <div className="flex items-center gap-1.5">
+                                <Users className="w-3 h-3 text-muted-foreground shrink-0" />
+                                <select
+                                    value={(user as any).group_id || ""}
+                                    onChange={(e) => assignToGroup(user.id, e.target.value || null)}
+                                    className="flex-1 bg-foreground/20 border border-border rounded-lg p-1.5 text-[9px] text-foreground"
+                                >
+                                    <option value="">{isAr ? "بدون مجموعة" : "No Group"}</option>
+                                    {groups.map((g) => (
+                                      <option key={g.id} value={g.id}>{g.name}</option>
+                                    ))}
+                                </select>
+                              </div>
+                              </div>
                           </div>
-
-                          <AnimatePresence>
-                            {selectedUserId === user.id && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden border-t border-border mt-3 pt-3 text-left"
-                              >
-                                <div className="grid grid-cols-1 gap-2">
-                                  <div className="flex gap-2 mb-1">
-                                    <HeroButton onClick={() => grantAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-green-500/20 text-green-500 hover:bg-green-500/10 h-8 text-[9px]">
-                                      {isAr ? "منح الكل" : "GRANT ALL"}
-                                    </HeroButton>
-                                    <HeroButton onClick={() => revokeAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-red-500/20 text-red-500 hover:bg-red-500/10 h-8 text-[9px]">
-                                      {isAr ? "إلغاء الكل" : "REVOKE ALL"}
-                                    </HeroButton>
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-1.5">
-                                    {levels.map((level) => {
-                                      const hasAccess = userAccess.includes(level.id);
-                                      return (
-                                        <button
-                                          key={level.id}
-                                          onClick={() => toggleLevelAccess(user.id, level.id, hasAccess)}
-                                          className={`p-2.5 rounded-xl border text-left transition-all ${hasAccess ? "bg-green-500/10 border-green-500/50 text-green-400" : "bg-muted/50 border-border text-muted-foreground"}`}
-                                        >
-                                          <div className="flex items-center justify-between mb-1">
-                                            <span className="text-[10px] font-black uppercase">
-                                              L{level.level_order}
-                                            </span>
-                                            {hasAccess ? (
-                                              <CheckCircle2 className="w-3 h-3 text-green-400" />
-                                            ) : (
-                                              <Lock className="w-3 h-3 opacity-20" />
-                                            )}
-                                          </div>
-                                          <p className="text-[10px] font-bold truncate">
-                                            {level.title}
-                                          </p>
-                                        </button>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
                       </div>
-                  </div>
               ))}
           </div>
       </section>
@@ -1283,15 +1270,20 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                         >
                           {user.is_approved ? "OK" : "PEND"}
                         </button>
-                        <button
-                            onClick={() => {
-                                setSelectedUserAccess(selectedUserId === user.id ? null : user.id);
-                                if (selectedUserId !== user.id) fetchUserAccess(user.id);
-                            }}
-                            className={`p-1.5 md:p-2 rounded-md md:rounded-lg bg-muted/50 border border-border hover:bg-muted text-foreground transition-all ${selectedUserId === user.id ? "bg-primary text-primary-foreground" : ""}`}
-                        >
-                            <Lock className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                        </button>
+
+                        <div className="flex items-center gap-1 bg-foreground/20 border border-border rounded-md md:rounded-lg h-7 md:h-9 px-1.5">
+                          <Users className="w-3 h-3 text-muted-foreground shrink-0" />
+                          <select
+                              value={(user as any).group_id || ""}
+                              onChange={(e) => assignToGroup(user.id, e.target.value || null)}
+                              className="bg-transparent text-[8px] md:text-[9px] text-foreground focus:outline-none max-w-[60px] md:max-w-[100px]"
+                          >
+                              <option value="">{isAr ? "بدون" : "None"}</option>
+                              {groups.map((g) => (
+                                <option key={g.id} value={g.id}>{g.name}</option>
+                              ))}
+                          </select>
+                        </div>
 
                         <select
                             value={user.role}
@@ -1371,52 +1363,6 @@ function UserManagement({ isAr }: { isAr: boolean }) {
                         </select>
                     </div>
                 )}
-
-                <AnimatePresence>
-                  {selectedUserId === user.id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden border-t border-border pt-3"
-                    >
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <div className="col-span-2 md:col-span-4 flex gap-2 mb-1">
-                          <HeroButton onClick={() => grantAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-green-500/20 text-green-500 hover:bg-green-500/10 h-8 text-[9px]">
-                            {isAr ? "منح الكل" : "GRANT ALL"}
-                          </HeroButton>
-                          <HeroButton onClick={() => revokeAllAccess(user.id)} variant="outline" size="sm" className="flex-1 border-red-500/20 text-red-500 hover:bg-red-500/10 h-8 text-[9px]">
-                            {isAr ? "إلغاء الكل" : "REVOKE ALL"}
-                          </HeroButton>
-                        </div>
-                        {levels.map((level) => {
-                          const hasAccess = userAccess.includes(level.id);
-                          return (
-                            <button
-                              key={level.id}
-                              onClick={() => toggleLevelAccess(user.id, level.id, hasAccess)}
-                              className={`p-2.5 rounded-xl border text-left transition-all ${hasAccess ? "bg-green-500/10 border-green-500/50 text-green-400" : "bg-muted/50 border-border text-muted-foreground"}`}
-                            >
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="text-[10px] font-black uppercase">
-                                  Level {level.level_order}
-                                </span>
-                                {hasAccess ? (
-                                  <CheckCircle2 className="w-3 h-3 text-green-400" />
-                                ) : (
-                                  <Lock className="w-3 h-3 opacity-30" />
-                                )}
-                              </div>
-                              <p className="text-[10px] font-bold truncate">
-                                {level.title}
-                              </p>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
             );
           })}
@@ -1431,17 +1377,21 @@ function UserManagement({ isAr }: { isAr: boolean }) {
 function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerator: boolean; isAdmin: boolean }) {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
-  const [selectedChatType, setSelectedChatType] = useState<"dm" | "level" | null>(null);
+  const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
+  const [selectedChatType, setSelectedChatType] = useState<"dm" | "level" | "group" | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
   const [selectedLectureId, setSelectedLectureId] = useState<string | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [levelChatGroupId, setLevelChatGroupId] = useState<string | null>(null);
+  const [levelGroups, setLevelGroups] = useState<{ id: string; name: string }[]>([]);
   const [levelLectures, setLevelLectures] = useState<Record<string, { id: string; title: string; slot_number: number }[]>>({});
   const [expandedLevels, setExpandedLevels] = useState<Set<string>>(new Set());
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [chatSearch, setChatSearch] = useState("");
   const { profile: myProfile } = useAuth();
-  const chatContainerRef = useRef<HTMLDivElement>(null); // Ref for scrolling
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchProfilesAndLevels();
@@ -1469,7 +1419,7 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
           },
         )
         .subscribe();
-    } else if (selectedChatType === "level" && selectedLevelId) {
+    } else if (selectedChatType === "level" && selectedLevelId && levelChatGroupId) {
       fetchMessages();
       const channelName = selectedLectureId
         ? `lecture_chat:${selectedLectureId}`
@@ -1492,11 +1442,28 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
           },
         )
         .subscribe();
+    } else if (selectedChatType === "group" && selectedGroupId) {
+      fetchMessages();
+      subscription = supabase
+        .channel(`group_messages:${selectedGroupId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "group_messages",
+            filter: `group_id=eq.${selectedGroupId}`,
+          },
+          () => {
+            fetchMessages();
+          },
+        )
+        .subscribe();
     }
     return () => {
       if (subscription) supabase.removeChannel(subscription);
     };
-  }, [selectedChatType, selectedUserId, selectedLevelId, selectedLectureId, myProfile?.id]);
+  }, [selectedChatType, selectedUserId, selectedLevelId, selectedLectureId, selectedGroupId, levelChatGroupId, myProfile?.id]);
 
   useEffect(() => {
     // Scroll to bottom on new message
@@ -1512,23 +1479,31 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
       .neq("id", myProfile?.id);
     if (profilesData) setProfiles(profilesData);
 
-    const { data: levelsData } = await supabase
-      .from("levels")
-      .select("*")
-      .order("level_order", { ascending: true });
-    if (levelsData) {
-      setLevels(levelsData);
+    const [levelsRes, groupsRes] = await Promise.all([
+      supabase
+        .from("level_templates")
+        .select("id, title, level_order, is_published")
+        .order("level_order", { ascending: true }),
+      supabase
+        .from("groups")
+        .select("id, name")
+        .order("name"),
+    ]);
+
+    if (levelsRes.data) {
+      setLevels(levelsRes.data);
       const lecMap: Record<string, { id: string; title: string; slot_number: number }[]> = {};
-      for (const lv of levelsData) {
+      for (const lv of levelsRes.data) {
         const { data: lecs } = await supabase
-          .from("lectures")
+          .from("lecture_templates")
           .select("id, title, slot_number")
-          .eq("level_id", lv.id)
+          .eq("level_template_id", lv.id)
           .order("slot_number", { ascending: true });
         if (lecs) lecMap[lv.id] = lecs;
       }
       setLevelLectures(lecMap);
     }
+    if (groupsRes.data) setGroups(groupsRes.data);
   };
 
   const fetchMessages = async () => {
@@ -1549,11 +1524,13 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
         setMessages(data || []);
       }
     } else if (selectedChatType === "level" && selectedLevelId) {
+      if (!levelChatGroupId) { setMessages([]); return; }
       console.log("Fetching Level messages...");
       let query = supabase
         .from("level_chats")
         .select("*, profiles(username, avatar_url, role)")
         .eq("level_id", selectedLevelId)
+        .eq("group_id", levelChatGroupId)
         .order("created_at", { ascending: true });
 
       if (selectedLectureId) {
@@ -1568,6 +1545,17 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
         console.error("Level Chat Fetch error:", error);
       } else {
         console.log("Fetched Level messages:", data);
+        setMessages(data || []);
+      }
+    } else if (selectedChatType === "group" && selectedGroupId) {
+      const { data, error } = await supabase
+        .from("group_messages")
+        .select("*, profiles!sender_id(username, avatar_url, role)")
+        .eq("group_id", selectedGroupId)
+        .order("created_at", { ascending: true });
+      if (error) {
+        console.error("Group Chat Fetch error:", error);
+      } else {
         setMessages(data || []);
       }
     } else {
@@ -1595,10 +1583,12 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
         fetchMessages(); // Force immediate refresh
       }
     } else if (selectedChatType === "level" && selectedLevelId) {
+      if (!levelChatGroupId) { toast.error(isAr ? "اختر مجموعة أولاً" : "Select a group first"); return; }
       const insertData: any = {
         level_id: selectedLevelId,
         sender_id: myProfile.id,
         content: newMessage,
+        group_id: levelChatGroupId,
       };
       if (selectedLectureId) insertData.lecture_id = selectedLectureId;
       const { error } = await supabase.from("level_chats").insert([insertData]);
@@ -1607,31 +1597,70 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
         toast.error(isAr ? "فشل إرسال رسالة الفصل" : "Failed to send classroom message.");
       } else {
         console.log("Chat message sent");
-        fetchMessages(); // Force immediate refresh
+        fetchMessages();
+      }
+    } else if (selectedChatType === "group" && selectedGroupId) {
+      const { error } = await supabase.from("group_messages").insert([{
+        group_id: selectedGroupId,
+        sender_id: myProfile.id,
+        content: newMessage,
+      }]);
+      if (error) {
+        toast.error(isAr ? "فشل إرسال الرسالة" : "Failed to send message.");
+      } else {
+        fetchMessages();
       }
     }
     setNewMessage("");
   };
 
-  const selectChat = (type: "dm" | "level", id: string) => {
+  const selectChat = async (type: "dm" | "level" | "group", id: string) => {
     setSelectedChatType(type);
     setSelectedLectureId(null);
+    setLevelChatGroupId(null);
+    setLevelGroups([]);
     if (type === "dm") {
       setSelectedUserId(id);
+      setSelectedLevelId(null);
+      setSelectedGroupId(null);
+    } else if (type === "group") {
+      setSelectedGroupId(id);
+      setSelectedUserId(null);
       setSelectedLevelId(null);
     } else {
       setSelectedLevelId(id);
       setSelectedUserId(null);
+      setSelectedGroupId(null);
+      const { data: gla } = await supabase
+        .from("group_level_assignments")
+        .select("group_id, groups:group_id(id, name)")
+        .eq("level_template_id", id);
+      if (gla && gla.length > 0) {
+        const lvlGroups = gla.map((g: any) => ({ id: g.group_id, name: g.groups?.name || g.group_id }));
+        setLevelGroups(lvlGroups);
+        if (lvlGroups.length === 1) setLevelChatGroupId(lvlGroups[0].id);
+      }
     }
-    setMessages([]); // Clear messages when switching chat
+    setMessages([]);
     setNewMessage("");
   };
 
-  const selectLecture = (levelId: string, lectureId: string) => {
+  const selectLecture = async (levelId: string, lectureId: string) => {
     setSelectedChatType("level");
     setSelectedLevelId(levelId);
     setSelectedLectureId(lectureId);
     setSelectedUserId(null);
+    setLevelChatGroupId(null);
+    setLevelGroups([]);
+    const { data: gla } = await supabase
+      .from("group_level_assignments")
+      .select("group_id, groups:group_id(id, name)")
+      .eq("level_template_id", levelId);
+    if (gla && gla.length > 0) {
+      const lvlGroups = gla.map((g: any) => ({ id: g.group_id, name: g.groups?.name || g.group_id }));
+      setLevelGroups(lvlGroups);
+      if (lvlGroups.length === 1) setLevelChatGroupId(lvlGroups[0].id);
+    }
     setMessages([]);
     setNewMessage("");
   };
@@ -1646,7 +1675,7 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
   };
 
   const deleteMessage = async (messageId: string) => {
-    const table = selectedChatType === "dm" ? "direct_messages" : "level_chats";
+    const table = selectedChatType === "dm" ? "direct_messages" : selectedChatType === "group" ? "group_messages" : "level_chats";
     console.log(`Attempting to delete message ${messageId} from ${table}`);
     const { error } = await supabase.from(table).delete().eq("id", messageId);
     
@@ -1666,7 +1695,7 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
     p.phone_number?.includes(chatSearch)
   );
 
-  const hasChatOpen = selectedChatType && (selectedUserId || selectedLevelId);
+  const hasChatOpen = selectedChatType && (selectedUserId || selectedLevelId || selectedGroupId);
 
   return (
     <div className="h-[calc(100dvh-200px)] md:h-[600px] lg:h-[700px] flex flex-col md:flex-row gap-0 md:gap-4 relative">
@@ -1759,6 +1788,25 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
             })}
 
             <h4 className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-3 mb-1">
+              {isAr ? "مجموعات" : "GROUPS"}
+            </h4>
+            {groups.filter(g => g.name?.toLowerCase().includes(chatSearch.toLowerCase())).map((group) => (
+              <button
+                key={group.id}
+                onClick={() => selectChat("group", group.id)}
+                className={`w-full flex items-center gap-2.5 p-2 rounded-xl transition-all ${selectedChatType === "group" && selectedGroupId === group.id ? "bg-primary text-black shadow-lg shadow-primary/10" : "hover:bg-muted"}`}
+              >
+                <div className="w-10 h-10 rounded-full bg-primary/10 overflow-hidden flex-shrink-0 border border-border flex items-center justify-center">
+                  <Users className="w-4 h-4 text-primary/60" />
+                </div>
+                <div className="text-left overflow-hidden flex-1 min-w-0">
+                  <p className="font-bold text-sm truncate">{group.name}</p>
+                  <p className="text-[9px] text-muted-foreground">{isAr ? "محادثة جماعية" : "Group chat"}</p>
+                </div>
+              </button>
+            ))}
+
+            <h4 className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-muted-foreground mt-3 mb-1">
               {isAr ? "رسائل مباشرة" : "DIRECT MESSAGES"}
             </h4>
             {filteredProfiles.map((p) => (
@@ -1807,6 +1855,9 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
                     const profile = profiles.find((p) => p.id === selectedUserId);
                     return profile?.avatar_url ? <img src={profile.avatar_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-sm font-black text-muted-foreground/40">{profile?.username?.charAt(0)}</div>;
                   }
+                  if (selectedChatType === "group") {
+                    return <div className="w-full h-full flex items-center justify-center"><Users className="w-4 h-4 text-primary/60" /></div>;
+                  }
                   const selectedLevel = levels.find((l) => l.id === selectedLevelId);
                   return selectedLevel?.image_url ? <img src={selectedLevel.image_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><MessageSquare className="w-4 h-4 text-muted-foreground/30" /></div>;
                 })()}
@@ -1815,19 +1866,47 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
                 <h3 className="font-bold text-sm truncate">
                   {selectedChatType === "dm"
                     ? profiles.find((p) => p.id === selectedUserId)?.username
-                    : selectedLectureId
-                      ? (() => {
-                          const lecs = levelLectures[selectedLevelId || ""] || [];
-                          const lec = lecs.find((l) => l.id === selectedLectureId);
-                          return lec ? `Unit ${lec.slot_number}: ${lec.title}` : levels.find((l) => l.id === selectedLevelId)?.title;
-                        })()
-                      : levels.find((l) => l.id === selectedLevelId)?.title}
+                    : selectedChatType === "group"
+                      ? groups.find((g) => g.id === selectedGroupId)?.name
+                      : selectedLectureId
+                        ? (() => {
+                            const lecs = levelLectures[selectedLevelId || ""] || [];
+                            const lec = lecs.find((l) => l.id === selectedLectureId);
+                            return lec ? `Unit ${lec.slot_number}: ${lec.title}` : levels.find((l) => l.id === selectedLevelId)?.title;
+                          })()
+                        : levels.find((l) => l.id === selectedLevelId)?.title}
                 </h3>
                 <p className="text-[10px] text-muted-foreground truncate">
-                  {selectedChatType === "dm" ? "online" : selectedLectureId ? "lecture chat" : "classroom"}
+                  {selectedChatType === "dm" ? "online" : selectedChatType === "group" ? "group chat" : selectedLectureId ? "lecture chat" : "classroom"}
                 </p>
               </div>
             </header>
+
+            {/* Group selector for level chats */}
+            {selectedChatType === "level" && levelGroups.length > 1 && (
+              <div className="flex gap-1.5 px-3 py-2 border-b border-border bg-muted/40 overflow-x-auto">
+                {levelGroups.map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => { setLevelChatGroupId(g.id); setMessages([]); }}
+                    className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all ${
+                      levelChatGroupId === g.id
+                        ? "bg-primary text-black"
+                        : "bg-foreground/10 text-muted-foreground hover:bg-foreground/20"
+                    }`}
+                  >
+                    {g.name}
+                  </button>
+                ))}
+              </div>
+            )}
+            {selectedChatType === "level" && levelGroups.length === 0 && (
+              <div className="px-3 py-2 border-b border-border bg-muted/40">
+                <p className="text-[11px] text-muted-foreground text-center">
+                  {isAr ? "لا توجد مجموعات مخصصة لهذا المستوى" : "No groups assigned to this level"}
+                </p>
+              </div>
+            )}
 
             {/* Messages area */}
             <div
@@ -1889,7 +1968,7 @@ function MessagingHub({ isAr, isModerator, isAdmin }: { isAr: boolean; isModerat
               />
               <button
                 onClick={sendMessage}
-                disabled={!newMessage.trim()}
+                disabled={!newMessage.trim() || (selectedChatType === "level" && !levelChatGroupId)}
                 className="w-10 h-10 rounded-full bg-primary text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:hover:scale-100 shadow-lg shadow-primary/20"
               >
                 <Send className="w-4 h-4" />
@@ -1917,6 +1996,190 @@ const uuidv4 = () => {
     return v.toString(16);
   });
 };
+
+function TaskSubmissionsGrid({ lectureId, levelId, isAr }: { lectureId: string; levelId: string; isAr: boolean }) {
+  const { user } = useAuth();
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [gradingModal, setGradingModal] = useState<any>(null);
+  const [gradeValue, setGradeValue] = useState<number>(50);
+  const [feedbackValue, setFeedbackValue] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!lectureId) return;
+    loadData();
+  }, [lectureId]);
+
+  const loadData = async () => {
+    setLoading(true);
+    const [subsRes, studentsRes] = await Promise.all([
+      supabase.from("lecture_task_submissions").select("*, profiles:student_id(username, avatar_url)").eq("lecture_id", lectureId),
+      supabase.from("profiles").select("id, username, avatar_url").eq("role", "student"),
+    ]);
+    setSubmissions(subsRes.data || []);
+    setStudents(studentsRes.data || []);
+    setLoading(false);
+  };
+
+  const handleGrade = async () => {
+    if (!gradingModal) return;
+    setSaving(true);
+    const { error } = await supabase.from("lecture_task_submissions").update({
+      grade: gradeValue,
+      graded_by: user?.id,
+      graded_at: new Date().toISOString(),
+    }).eq("id", gradingModal.id);
+    setSaving(false);
+    if (!error) {
+      loadData();
+      toast.success(isAr ? "تم التقييم" : "Grade saved");
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!gradingModal) return;
+    setSaving(true);
+    const { error } = await supabase.rpc("approve_assignment", {
+      p_submission_id: gradingModal.id,
+      p_moderator_id: user?.id,
+      p_feedback: feedbackValue || null,
+      p_grade: gradeValue,
+    });
+    setSaving(false);
+    if (!error) {
+      setGradingModal(null);
+      setFeedbackValue("");
+      loadData();
+      toast.success(isAr ? "تمت الموافقة على المهمة" : "Assignment approved");
+    }
+  };
+
+  const handleReject = async () => {
+    if (!gradingModal) return;
+    setSaving(true);
+    const { error } = await supabase.rpc("reject_assignment", {
+      p_submission_id: gradingModal.id,
+      p_moderator_id: user?.id,
+      p_feedback: feedbackValue || null,
+      p_grade: gradeValue,
+    });
+    setSaving(false);
+    if (!error) {
+      setGradingModal(null);
+      setFeedbackValue("");
+      loadData();
+      toast.success(isAr ? "تم رفض المهمة" : "Assignment rejected");
+    }
+  };
+
+  const getStudentStatus = (studentId: string) => submissions.find(s => s.student_id === studentId);
+
+  if (loading) return <div className="flex items-center justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-primary" /></div>;
+
+  return (
+    <div className="space-y-3">
+      <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+        <Camera className="w-3 h-3" /> Task Submissions ({submissions.length}/{students.length})
+      </label>
+
+      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+        {students.map((student) => {
+          const sub = getStudentStatus(student.id);
+          return (
+            <button
+              key={student.id}
+              onClick={() => sub && setGradingModal(sub)}
+              className={`relative p-2 rounded-xl border transition-all text-center ${sub ? "bg-muted/50 border-primary/20 hover:border-primary/40 cursor-pointer" : "bg-muted/30 border-border opacity-50"}`}
+            >
+              {sub ? (
+                <>
+                  <img src={sub.image_url} className="w-full h-12 rounded-lg object-cover mb-1" alt="" />
+                  {sub.grade !== null && (
+                    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full ${sub.grade >= 80 ? "bg-primary/20 text-primary" : sub.grade >= 50 ? "bg-yellow-500/20 text-yellow-500" : "bg-destructive/20 text-destructive"}`}>
+                      {sub.grade}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="w-full h-12 rounded-lg bg-muted flex items-center justify-center mb-1">
+                    <X className="w-4 h-4 text-muted-foreground/30" />
+                  </div>
+                  <span className="text-[7px] font-bold text-muted-foreground uppercase">{isAr ? "لم يرسل" : "MISSING"}</span>
+                </>
+              )}
+              <p className="text-[7px] font-bold text-muted-foreground truncate mt-0.5">{student.username}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      {gradingModal && (
+        <div className="fixed inset-0 z-[250] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setGradingModal(null)}>
+          <div className="bg-card border border-border rounded-3xl p-6 max-w-lg w-full space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-black uppercase tracking-widest">{isAr ? "تقييم المهمة" : "GRADE TASK"}</h3>
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] font-black px-2 py-1 rounded-full ${gradingModal.status === 'approved' ? 'bg-green-500/20 text-green-500' : gradingModal.status === 'rejected' ? 'bg-red-500/20 text-red-500' : gradingModal.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-muted text-muted-foreground'}`}>
+                  {gradingModal.status?.toUpperCase()}
+                </span>
+                <button onClick={() => setGradingModal(null)} className="p-2 rounded-xl bg-muted hover:bg-muted/80"><X className="w-4 h-4" /></button>
+              </div>
+            </div>
+            <img src={gradingModal.image_url} className="w-full max-h-[50vh] object-contain rounded-2xl border border-border" alt="" />
+            <div className="flex items-center gap-4">
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{isAr ? "الدرجة" : "GRADE"}</label>
+              <input
+                type="range" min={0} max={100} value={gradeValue}
+                onChange={(e) => setGradeValue(Number(e.target.value))}
+                className="flex-1 accent-primary"
+              />
+              <span className="text-lg font-black text-primary w-12 text-right">{gradeValue}</span>
+            </div>
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-1">{isAr ? "ملاحظات" : "FEEDBACK"}</label>
+              <textarea
+                value={feedbackValue}
+                onChange={(e) => setFeedbackValue(e.target.value)}
+                placeholder={isAr ? "اكتب ملاحظات..." : "Write feedback..."}
+                className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-muted/30 resize-none"
+                rows={2}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={handleGrade}
+                disabled={saving}
+                className="py-3 bg-muted text-foreground rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                {isAr ? "حفظ الدرجة" : "SAVE GRADE"}
+              </button>
+              <button
+                onClick={handleApprove}
+                disabled={saving}
+                className="py-3 bg-green-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                {isAr ? "موافقة" : "APPROVE"}
+              </button>
+              <button
+                onClick={handleReject}
+                disabled={saving}
+                className="py-3 bg-red-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                {isAr ? "رفض" : "REJECT"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: () => void }) {
   const { isAr } = useLanguage();
@@ -1959,7 +2222,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
 
   const fetchNextOrder = async () => {
     const { data } = await supabase
-      .from("levels")
+      .from("level_templates")
       .select("level_order")
       .order("level_order", { ascending: false })
       .limit(1);
@@ -1969,7 +2232,7 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
   const loadLevelData = async () => {
     setLoading(true);
     const { data: level, error: levelError } = await supabase
-      .from("levels")
+      .from("level_templates")
       .select("*")
       .eq("id", levelId)
       .single();
@@ -1987,9 +2250,9 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
       setDripInterval(level.drip_interval_days || 7);
 
       const { data: lects } = await supabase
-        .from("lectures")
+        .from("lecture_templates")
         .select("*")
-        .eq("level_id", levelId)
+        .eq("level_template_id", levelId)
         .order("slot_number", { ascending: true });
       if (lects) {
         setLectures(lects.map((l) => ({ ...l, content_blocks: l.content_blocks || [] })));
@@ -1997,9 +2260,9 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
       }
 
       const { data: exam } = await supabase
-        .from("exams")
+        .from("exam_templates")
         .select("questions")
-        .eq("level_id", levelId)
+        .eq("level_template_id", levelId)
         .single();
       if (exam && exam.questions) setExamQuestions(exam.questions as Question[]);
     }
@@ -2199,24 +2462,24 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
 
       if (!currentLevelId) {
         const { data, error } = await supabase
-          .from("levels")
-          .insert([levelPayload])
+          .from("level_templates")
+          .insert([{ ...levelPayload, created_by: user?.id }])
           .select()
           .single();
         if (error) throw error;
         currentLevelId = data.id;
       } else {
         const { error } = await supabase
-          .from("levels")
+          .from("level_templates")
           .update(levelPayload)
           .eq("id", levelId);
         if (error) throw error;
       }
 
       const { data: existingLectures } = await supabase
-        .from("lectures")
+        .from("lecture_templates")
         .select("id")
-        .eq("level_id", currentLevelId);
+        .eq("level_template_id", currentLevelId);
 
       const existingIds = existingLectures?.map((l) => l.id) || [];
       const lecturesToSave = lectures
@@ -2224,11 +2487,11 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
         .map((l, index) => ({
           id: l.id || uuidv4(),
           title: l.title,
-          description: l.description,
-          video_url: l.video_url,
-          pdf_url: l.pdf_url,
+          description: l.description || null,
+          video_url: l.video_url || null,
+          pdf_url: l.pdf_url || null,
           slot_number: index + 1,
-          level_id: currentLevelId,
+          level_template_id: currentLevelId,
           is_live: l.is_live !== false,
           content_blocks: l.content_blocks || [],
           is_big_exam: !!l.is_big_exam,
@@ -2241,28 +2504,28 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
 
       // Delete lectures that were removed
       if (idsToDelete.length > 0) {
-        await supabase.from("lectures").delete().in("id", idsToDelete);
+        await supabase.from("lecture_templates").delete().in("id", idsToDelete);
       }
 
       // Upsert lectures
       if (lecturesToSave.length > 0) {
-        const { error: upsertError } = await supabase.from("lectures").upsert(lecturesToSave);
+        const { error: upsertError } = await supabase.from("lecture_templates").upsert(lecturesToSave);
         if (upsertError) throw upsertError;
       }
 
       // Save exam
       if (examQuestions.length > 0) {
         const { data: existingExam, error: fetchError } = await supabase
-          .from("exams")
+          .from("exam_templates")
           .select("id")
-          .eq("level_id", currentLevelId)
+          .eq("level_template_id", currentLevelId)
           .maybeSingle();
 
         if (fetchError) throw fetchError;
 
         if (existingExam) {
           const { error: updateError } = await supabase
-            .from("exams")
+            .from("exam_templates")
             .update({ 
               title: `Exam for ${levelTitle}`, 
               questions: examQuestions 
@@ -2271,10 +2534,10 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
           if (updateError) throw updateError;
         } else {
           const { error: insertError } = await supabase
-            .from("exams")
+            .from("exam_templates")
             .insert([
               {
-                level_id: currentLevelId,
+                level_template_id: currentLevelId,
                 title: `Exam for ${levelTitle}`,
                 questions: examQuestions,
               },
@@ -2817,6 +3080,14 @@ function CourseBuilder({ levelId, onBack }: { levelId: string | null; onBack: ()
                           />
                         </div>
                       </div>
+
+                      {/* Task Submissions Grid */}
+                      <TaskSubmissionsGrid
+                        lectureId={lectures[selectedLectureIdx]?.id || ""}
+                        levelId={levelId || ""}
+                        isAr={isAr}
+                      />
+
                     </div>
 
                     <div className="space-y-6">
@@ -3567,21 +3838,30 @@ function CourseProgress({ isAr }: { isAr: boolean }) {
   const fetchCourseData = async () => {
     setLoading(true);
     try {
-      const [profilesRes, levelsRes, lecturesRes, studentProgressRes, levelAccessRes] =
+      const [profilesRes, levelsRes, lecturesRes, studentProgressRes, groupLevelRes, sgRes] =
         await Promise.all([
           supabase.from("profiles").select("*"),
-          supabase.from("levels").select("*"),
-          supabase.from("lectures").select("id, level_id, slot_number, is_live"),
+          supabase.from("level_templates").select("id, title, level_order, is_published"),
+          supabase.from("lecture_templates").select("id, level_template_id, slot_number, is_live"),
           supabase.from("student_progress").select("student_id, lecture_id"),
-          supabase.from("level_access").select("user_id, level_id"),
+          supabase.from("group_level_assignments").select("group_id, level_template_id"),
+          supabase.from("student_groups").select("student_id, group_id"),
         ]);
 
       const allProfiles: Profile[] = (profilesRes.data || []).filter(p => p.role === 'student');
       const allLevels: Level[] = levelsRes.data || [];
-      const allLectures: FullLecture[] = lecturesRes.data || [];
+      const allLectures: FullLecture[] = (lecturesRes.data || []).map(l => ({ ...l, level_id: l.level_template_id }));
       const allStudentProgress: { student_id: string; lecture_id: string }[] =
         studentProgressRes.data || [];
-      const allLevelAccess: { user_id: string; level_id: string }[] = levelAccessRes.data || [];
+      const allGroupLevelAccess: { group_id: string; level_template_id: string }[] = groupLevelRes.data || [];
+      const sgData: { student_id: string; group_id: string }[] = sgRes.data || [];
+
+      const studentGroupsMap = new Map<string, Set<string>>();
+      for (const sg of sgData) {
+        const existing = studentGroupsMap.get(sg.student_id) || new Set<string>();
+        existing.add(sg.group_id);
+        studentGroupsMap.set(sg.student_id, existing);
+      }
 
       // Map lectures to their levels
       const levelsWithLectures = allLevels.map((level) => ({
@@ -3596,10 +3876,12 @@ function CourseProgress({ isAr }: { isAr: boolean }) {
           let totalLecturesForUser = 0;
           let completedLecturesForUser = 0;
 
-          // Determine which levels this user has access to
-          const accessibleLevelIds = allLevelAccess
-            .filter((la) => la.user_id === profile.id)
-            .map((la) => la.level_id);
+          // Determine which levels this user's group has access to
+          const studentGroupIds = studentGroupsMap.get(profile.id) || new Set<string>();
+          if ((profile as any).group_id) studentGroupIds.add((profile as any).group_id);
+          const accessibleLevelIds = allGroupLevelAccess
+            .filter((la) => studentGroupIds.has(la.group_id))
+            .map((la) => la.level_template_id);
 
           // For admins/moderators, they have access to all levels
           const userAccessibleLevels =
@@ -3801,7 +4083,7 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                 <div>
                     <h3 className="font-bold text-foreground">{sub.profiles?.username}</h3>
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                        {sub.lectures?.title} // {new Date(sub.created_at).toLocaleDateString()}
+                        {sub.lecture_templates?.title} // {new Date(sub.created_at).toLocaleDateString()}
                     </p>
                 </div>
             </div>
@@ -3845,7 +4127,7 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                                 {isAr ? "تصحيح الإجابات" : "EXAMINATION FILE"}
                             </h3>
                             <p className="text-emerald-400/60 text-[10px] font-black uppercase tracking-widest">
-                                AGENT: {selectedSub.profiles?.username} // MODULE: {selectedSub.lectures?.title}
+                                AGENT: {selectedSub.profiles?.username} // MODULE: {selectedSub.lecture_templates?.title}
                             </p>
                         </div>
                         <button onClick={() => setSelectedSub(null)} className="p-3 rounded-full bg-muted/50 hover:bg-red-500 transition-all">
@@ -3892,6 +4174,335 @@ function GradingHub({ isAr }: { isAr: boolean }) {
                     </div>
                 </motion.div>
             </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// ASSIGNMENTS HUB — Pending Reviews Dashboard
+// ═══════════════════════════════════════════════════════
+
+function AssignmentsHub({ isAr }: { isAr: boolean }) {
+  const { user } = useAuth();
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [search, setSearch] = useState("");
+  const [selectedSub, setSelectedSub] = useState<any>(null);
+  const [feedback, setFeedback] = useState("");
+  const [grade, setGrade] = useState<number | "">("");
+  const [processing, setProcessing] = useState(false);
+
+  const fetchSubmissions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("lecture_task_submissions")
+        .select(`
+          id, student_id, lecture_id, image_url, file_url, status, feedback, grade, created_at, updated_at,
+          profiles:student_id (id, username, phone_number, email),
+          lecture_templates:lecture_id (id, title, level_template_id, slot_number, assignment_required, assignment_description,
+            level_templates:level_template_id (id, title, level_order)
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setSubmissions(data || []);
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchSubmissions(); }, [fetchSubmissions]);
+
+  const filtered = submissions.filter((s) => {
+    if (filter !== "all" && s.status !== filter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const name = s.profiles?.username?.toLowerCase() || "";
+      const phone = s.profiles?.phone_number?.toLowerCase() || "";
+      const lesson = s.lecture_templates?.title?.toLowerCase() || "";
+      if (!name.includes(q) && !phone.includes(q) && !lesson.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const handleApprove = async (sub: any) => {
+    setProcessing(true);
+    try {
+      const { error } = await supabase.rpc("approve_assignment", {
+        p_submission_id: sub.id,
+        p_moderator_id: user?.id,
+        p_feedback: feedback || null,
+        p_grade: grade !== "" ? grade : null,
+      });
+      if (error) throw error;
+      toast.success(isAr ? "تمت الموافقة على المهمة" : "Assignment approved");
+      setSelectedSub(null);
+      setFeedback("");
+      setGrade("");
+      fetchSubmissions();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReject = async (sub: any) => {
+    setProcessing(true);
+    try {
+      const { error } = await supabase.rpc("reject_assignment", {
+        p_submission_id: sub.id,
+        p_moderator_id: user?.id,
+        p_feedback: feedback || null,
+        p_grade: grade !== "" ? grade : null,
+      });
+      if (error) throw error;
+      toast.success(isAr ? "تم رفض المهمة" : "Assignment rejected");
+      setSelectedSub(null);
+      setFeedback("");
+      setGrade("");
+      fetchSubmissions();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleGrantAccess = async (sub: any) => {
+    const reason = prompt(isAr ? "سبب المنح:" : "Reason for override:");
+    if (reason === null) return;
+    setProcessing(true);
+    try {
+      const { error } = await supabase.rpc("grant_lecture_access", {
+        p_student_id: sub.student_id,
+        p_lecture_id: sub.lecture_id,
+        p_moderator_id: user?.id,
+        p_reason: reason || "Manual override by moderator",
+      });
+      if (error) throw error;
+      toast.success(isAr ? "تم منح الصلاحية" : "Access granted");
+      fetchSubmissions();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const pendingCount = submissions.filter((s) => s.status === "pending").length;
+
+  const statusColors: Record<string, string> = {
+    pending: "bg-yellow-500/15 text-yellow-500",
+    approved: "bg-green-500/15 text-green-500",
+    rejected: "bg-red-500/15 text-red-500",
+  };
+
+  const statusLabels: Record<string, Record<string, string>> = {
+    pending: { en: "PENDING", ar: "قيد المراجعة" },
+    approved: { en: "APPROVED", ar: "تمت الموافقة" },
+    rejected: { en: "REJECTED", ar: "مرفوض" },
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black italic tracking-tighter">
+            {isAr ? "مراجعة المهام" : "ASSIGNMENT REVIEWS"}
+          </h2>
+          <p className="text-xs text-muted-foreground mt-1">
+            {pendingCount} {isAr ? "بانتظار المراجعة" : "pending review"}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 flex-wrap">
+        {(["all", "pending", "approved", "rejected"] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              filter === f ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            {f === "all" ? (isAr ? "الكل" : "ALL") : statusLabels[f]?.[isAr ? "ar" : "en"]}
+          </button>
+        ))}
+        <input
+          type="text"
+          placeholder={isAr ? "بحث..." : "Search..."}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-4 py-2 rounded-xl bg-muted border border-border text-sm outline-none focus:border-primary ml-auto"
+        />
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-20 text-muted-foreground">
+          <p className="text-sm font-bold">{isAr ? "لا توجد مهام" : "No submissions found"}</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((sub) => (
+            <motion.div
+              key={sub.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card border border-border rounded-2xl p-4 md:p-6 hover:border-primary/30 transition-all cursor-pointer"
+              onClick={() => { setSelectedSub(sub); setFeedback(sub.feedback || ""); setGrade(sub.grade ?? ""); }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-sm">
+                    {sub.profiles?.username?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm">{sub.profiles?.username || "Unknown"}</p>
+                    <p className="text-xs text-muted-foreground">{sub.profiles?.phone_number || sub.profiles?.email}</p>
+                  </div>
+                </div>
+                <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${statusColors[sub.status] || ""}`}>
+                  {statusLabels[sub.status]?.[isAr ? "ar" : "en"]}
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                <span>{isAr ? "المستوى" : "Level"}: {sub.lecture_templates?.level_templates?.title || "—"}</span>
+                <span>{isAr ? "الدرس" : "Lesson"}: {sub.lecture_templates?.title || "—"}</span>
+                <span>{isAr ? "الدورة" : "Slot"}: #{sub.lecture_templates?.slot_number}</span>
+                <span>{isAr ? "التاريخ" : "Date"}: {new Date(sub.created_at).toLocaleDateString()}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Review Modal */}
+      <AnimatePresence>
+        {selectedSub && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setSelectedSub(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-card border border-border rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 md:p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-black text-lg">{isAr ? "مراجعة المهمة" : "REVIEW ASSIGNMENT"}</h3>
+                <button onClick={() => setSelectedSub(null)} className="p-2 rounded-xl bg-muted hover:bg-muted/80">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-sm">
+                    {selectedSub.profiles?.username?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm">{selectedSub.profiles?.username}</p>
+                    <p className="text-xs text-muted-foreground">{selectedSub.profiles?.phone_number} | {selectedSub.profiles?.email}</p>
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>{isAr ? "الدرس" : "Lesson"}: {selectedSub.lecture_templates?.title}</p>
+                  <p>{isAr ? "المستوى" : "Level"}: {selectedSub.lecture_templates?.level_templates?.title}</p>
+                  {selectedSub.lecture_templates?.assignment_description && (
+                    <p className="mt-2 p-3 bg-muted rounded-xl">{selectedSub.lectures.assignment_description}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Submission preview */}
+              {selectedSub.image_url && (
+                <div className="mb-6">
+                  {selectedSub.image_url.match(/\.(pdf|doc|docx)$/i) || selectedSub.image_url.includes("application/pdf") ? (
+                    <a href={selectedSub.image_url} target="_blank" rel="noopener" className="flex items-center gap-3 p-4 bg-muted rounded-2xl border border-border hover:bg-muted/80 transition-all">
+                      <FileText className="w-8 h-8 text-primary" />
+                      <div>
+                        <p className="font-bold text-sm">{isAr ? "عرض الملف" : "View File"}</p>
+                        <p className="text-xs text-muted-foreground">{isAr ? "افتح في نافذة جديدة" : "Opens in new tab"}</p>
+                      </div>
+                    </a>
+                  ) : (
+                    <img src={selectedSub.image_url} alt="Submission" className="w-full max-h-[300px] object-contain rounded-2xl border border-border" />
+                  )}
+                </div>
+              )}
+
+              {/* Feedback */}
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 block">
+                    {isAr ? "ملاحظات" : "FEEDBACK"}
+                  </label>
+                  <textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    className="w-full bg-muted border border-border rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary h-24 resize-none"
+                    placeholder={isAr ? "اكتب ملاحظاتك..." : "Write your feedback..."}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 block">
+                    {isAr ? "الدرجة" : "GRADE"}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={grade}
+                    onChange={(e) => setGrade(e.target.value ? parseInt(e.target.value) : "")}
+                    className="w-full bg-muted border border-border rounded-2xl px-4 py-3 text-sm outline-none focus:border-primary"
+                    placeholder="0-100"
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  onClick={() => handleApprove(selectedSub)}
+                  disabled={processing}
+                  className="py-3 rounded-2xl bg-green-500/10 border border-green-500/30 text-green-500 font-black text-xs uppercase tracking-widest hover:bg-green-500/20 transition-all disabled:opacity-50"
+                >
+                  {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (isAr ? "موافقة" : "APPROVE")}
+                </button>
+                <button
+                  onClick={() => handleReject(selectedSub)}
+                  disabled={processing}
+                  className="py-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-500/20 transition-all disabled:opacity-50"
+                >
+                  {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (isAr ? "رفض" : "REJECT")}
+                </button>
+                <button
+                  onClick={() => handleGrantAccess(selectedSub)}
+                  disabled={processing}
+                  className="py-3 rounded-2xl bg-primary/10 border border-primary/30 text-primary font-black text-xs uppercase tracking-widest hover:bg-primary/20 transition-all disabled:opacity-50"
+                >
+                  {processing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (isAr ? "منح صلاحية" : "GRANT ACCESS")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
